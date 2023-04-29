@@ -1,0 +1,219 @@
+#include "CommandProcessor.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+void CommandProcessor::parseCmdScript(const std::string &filename) {
+    std::ifstream input(filename);
+    std::string line;
+    while (std::getline(input, line)) {
+        std::istringstream iss(line);
+        std::vector<std::string> arguments;
+        std::string argument;
+        while (std::getline(iss, argument, '\t')) {
+            arguments.push_back(argument);
+        }
+        if (arguments.empty() || arguments[0].empty() || arguments[0][0] == ';') {
+            // empty or comment line, skip
+            continue;
+        }
+        if (arguments[0] == "world") {
+            worldCmd(arguments);
+        } else if (arguments[0] == "import") {
+            importCmd(arguments);
+        } else if (arguments[0] == "debug") {
+            debugCmd(arguments);
+        } else if (arguments[0] == "what_is_at") {
+            whatIsAtCmd(arguments);
+        } else if (arguments[0] == "what_is") {
+            whatIsCmd(arguments);
+        } else if (arguments[0] == "what_is_in") {
+            whatIsInCmd(arguments);
+        } else if (arguments[0] == "quit") {
+            quitCmd();
+            break;
+        } else {
+            std::cerr << "Unknown command: " << arguments[0] << std::endl;
+        }
+    }
+}
+
+/**
+ * world<tab><westLong><tab><eastLong><tab><southLat><tab><northLat>
+ * @param arguments
+ */
+void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
+    if (arguments.size() != 5) {
+        std::cerr << "Invalid world command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: world <westLong> <eastLong> <southLat> <northLat>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+    std::cout << "world command" << std::endl;
+    std::cout << "westLong: " << arguments[1] << std::endl;
+    std::cout << "eastLong: " << arguments[2] << std::endl;
+    std::cout << "southLat: " << arguments[3] << std::endl;
+    std::cout << "northLat: " << arguments[4] << std::endl;
+
+}
+
+/**
+ * import<tab><relative path>
+ * import<tab><GIS record file>
+ *
+ * @param arguments
+ */
+void CommandProcessor::importCmd(std::vector<std::string> arguments) {
+    if (arguments.size() != 2) {
+        std::cerr << "Invalid import command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: import <filename>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+    std::cout << "import command" << std::endl;
+    std::cout << "filepath: " << arguments[1] << std::endl;
+}
+
+/**
+ * debug<tab><quad|hash|pool|world>
+ * @param arguments
+ */
+void CommandProcessor::debugCmd(std::vector<std::string> arguments) {
+    if (arguments.size() != 2) {
+        std::cerr << "Invalid debug command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: debug <quad|hash|pool|world>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+    std::cout << "debug command" << std::endl;
+    std::cout << "debug type: " << arguments[1] << std::endl;
+    if (arguments[1] == "quad") {
+        // print out the quadtree
+    } else if (arguments[1] == "hash") {
+        // print out the hash table
+    } else if (arguments[1] == "pool") {
+        // print out the memory pool
+    } else if (arguments[1] == "world") {
+        // print out the world
+    } else {
+        std::cerr << "Invalid debug type" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: debug <quad|hash|pool|world>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+}
+
+/**
+ * what_is_at<tab><latitude><space><longitude>.
+ * @param arguments
+ */
+void CommandProcessor::whatIsAtCmd(std::vector<std::string> arguments) {
+    // print arguments
+
+    if (arguments.size() != 3) {
+        std::cerr << "Invalid what_is_at command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: what_is_at <latitude> <longitude>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+    std::cout << "what_is_at command" << std::endl;
+    std::cout << "latitude: " << arguments[1] << std::endl;
+    std::cout << "longitude: " << arguments[2] << std::endl;
+}
+
+/**
+ * what_is<tab><feature name><tab><state abbreviation>
+ * @param arguments
+ */
+void CommandProcessor::whatIsCmd(std::vector<std::string> arguments) {
+    if (arguments.size() != 3) {
+        std::cerr << "Invalid what_is command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: what_is <feature name> <state abbreviation>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+    std::cout << "what_is command" << std::endl;
+    std::cout << "feature name: " << arguments[0] << std::endl;
+    std::cout << "state abbreviation: " << arguments[1] << std::endl;
+}
+
+/**
+ * required:
+ * what_is_in<tab><latitude><space><longitude<tab><half-height><tab><half-width>
+ * optional:
+ * what_is_in<tab>-filter<tab><pop|water|structure><tab><latitude><space><longitude<tab><half-height><tab><half-width>
+ * what_is_in<tab>-long<tab><latitude><space><longitude<tab><half-height><tab><half-width>
+ * @param arguments
+ */
+void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
+    // check if the number of arguments isn't greater than 5 and less than 7
+    if (arguments.size() < 5 || arguments.size() > 7) {
+        std::cerr << "Invalid what_is_in command" << std::endl;
+        // explain how to use the command
+        std::cerr << "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>" << std::endl;
+        // exit with error
+        exit(1);
+    }
+
+    std::string filterOption = "None";
+    bool longLog = false;
+    std::string latitude;
+    std::string longitude;
+    int halfHeight;
+    int halfWidth;
+
+    if (arguments[1] == "-filter") {
+        ///  -filter [ pop | water | structure ]
+        if (arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure") {
+            filterOption = arguments[2];
+        } else {
+            std::cerr << "Invalid filter option" << std::endl;
+            // explain how to use the command
+            std::cerr
+                    << "Usage: what_is_in<tab>-filter<tab><pop|water|structure> <latitude> <longitude> <half-height> <half-width>"
+                    << std::endl;
+            // exit with error
+            exit(1);
+        }
+
+        latitude = arguments[3];
+        longitude = arguments[4];
+        halfHeight = std::stoi(arguments[5]);
+        halfWidth = std::stoi(arguments[6]);
+
+    } else if (arguments[1] == "-long") {
+        longLog = true;
+        latitude = arguments[2];
+        longitude = arguments[3];
+        halfHeight = std::stoi(arguments[4]);
+        halfWidth = std::stoi(arguments[5]);
+    } else {
+        latitude = arguments[1];
+        longitude = arguments[2];
+        halfHeight = std::stoi(arguments[3]);
+        halfWidth = std::stoi(arguments[4]);
+    }
+
+    std::cout << "what_is_in command" << std::endl;
+    std::cout << "filter option: " << filterOption << std::endl;
+    std::cout << "long log: " << longLog << std::endl;
+    std::cout << "latitude: " << latitude << std::endl;
+    std::cout << "longitude: " << longitude << std::endl;
+    std::cout << "half-height: " << halfHeight << std::endl;
+    std::cout << "half-width: " << halfWidth << std::endl;
+}
+
+/**
+ * quit<tab>
+ */
+void CommandProcessor::quitCmd() {
+    std::cout << "quit command" << std::endl;
+    std::cout << "Exiting..." << std::endl;
+    exit(0);
+}

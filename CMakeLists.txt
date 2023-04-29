@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.23)
-project (finalprojalgo)
+cmake_minimum_required(VERSION 3.25)
+project(8042_project)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(finalprojalgo main.cpp GIS.cpp GISRecord.cpp GISRecord.h NameIndex.cpp NameIndex.h CoordinateIndex.cpp CoordinateIndex.h BufferPool.cpp BufferPool.h Logger.cpp Logger.h SystemManager.cpp SystemManager.h CommandProcessor.cpp CommandProcessor.h)
+add_executable(GIS)
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
+target_sources(GIS PRIVATE ${SOURCES})
