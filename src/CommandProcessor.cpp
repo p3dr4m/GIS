@@ -74,6 +74,14 @@ void CommandProcessor::importCmd(std::vector<std::string> arguments) {
     }
     std::cout << "import command" << std::endl;
     std::cout << "filepath: " << arguments[1] << std::endl;
+
+    // open the file
+    std::ifstream input(arguments[1]);
+    std::string line;
+    // print out each line
+    while (std::getline(input, line)) {
+        std::cout << line << std::endl;
+    }
 }
 
 /**
