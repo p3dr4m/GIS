@@ -1,3 +1,0 @@
-C:/Users/Raziq/Documents/work/finalprojalgo/cmake-build-debug/CMakeFiles/finalprojalgo.dir
-C:/Users/Raziq/Documents/work/finalprojalgo/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/Raziq/Documents/work/finalprojalgo/cmake-build-debug/CMakeFiles/rebuild_cache.dir
