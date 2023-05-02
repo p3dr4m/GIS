@@ -6,6 +6,7 @@
 #define INC_8042_PROJECT_COMMANDPROCESSOR_H
 
 #include <string>
+#include <vector>
 
 enum Command {
     world, import, debug, what_is_at, what_is, what_is_in, quit
