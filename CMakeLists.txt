@@ -8,5 +8,5 @@ add_executable(GIS)
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 target_sources(GIS PRIVATE ${SOURCES})
 
-# copy data directory to build directory
+# force copy data directory to build directory
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
