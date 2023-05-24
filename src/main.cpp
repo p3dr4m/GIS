@@ -1,5 +1,6 @@
 #include <iostream>
 #include "CommandProcessor.h"
+#include "BufferPool.h"
 
 /**
  * •/GIS <database file name> <command script file name> ‹log file name>
@@ -25,7 +26,6 @@ int main(int argc, char *argv[]) {
 
     CommandProcessor commandProcessor;
     commandProcessor.parseCmdScript(cmdScriptFilePath);
-
 
     return 0;
 }
