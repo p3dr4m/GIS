@@ -1,6 +1,5 @@
 #include <iostream>
 #include "CommandProcessor.h"
-#include "BufferPool.h"
 
 /**
  * •/GIS <database file name> <command script file name> ‹log file name>

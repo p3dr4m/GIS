@@ -1,30 +1,28 @@
-//
-// Created by Raziq on 2023-04-26.
-//
+#ifndef INC_8042_PROJECT_COORDINATEINDEX_H
+#define INC_8042_PROJECT_COORDINATEINDEX_H
 
-#ifndef FINALPROJALGO_COORDINATEINDEX_H
-#define FINALPROJALGO_COORDINATEINDEX_H
-#include "QuadTree.h"
+#include "PRQuadTree.h"
 
 
 class CoordinateIndex {
 public:
     void insertRecord(float latitude, float longitude, int fileOffset,
                       int dbLine);
-    std::vector<int> searchRecords(float latitude, float longitude);
-    std::vector<int> searchRecords(Coordinate centralLocation, float height,
-                                   float width);
 
-    void updateBoundsOfTree(float minLat, float minLong, float maxLat,
-                            float maxLong) {
-        m_tree.setBoundry(minLat, minLong, maxLat, maxLong);
+    std::vector<int> searchRecords(float latitude, float longitude);
+
+    std::vector<int> searchRecords(Coordinate centralLocation, float height,
+                              float width);
+
+    void updateBoundsOfTree(Bounds bounds) {
+        quadTree.setBoundary(bounds);
     }
 
-    std::string printTree() { return m_tree.toString(1); }
+    std::string printTree() { return quadTree.toString(1); }
 
 private:
-    QuadTree m_tree;
+    PRQuadTree quadTree;
 };
 
 
-#endif //FINALPROJALGO_COORDINATEINDEX_H
+#endif //INC_8042_PROJECT_COORDINATEINDEX_H

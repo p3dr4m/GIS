@@ -1,16 +1,13 @@
-//
-// Created by Pedram Nazari on 2023-04-28.
-//
-
 #include "GISRecord.h"
-#include "Logger.h"
+
+
+
 
 /**
  * Converts a DMS coordinate to a decimal coordinate
  * @param dms
  * @return
  */
-
 float GISRecord::convertDMS(DMS dms) {
     auto decimalVersion = static_cast<float>(dms.degrees);
     decimalVersion += static_cast<float>(dms.minutes) / 60.f;
@@ -45,6 +42,8 @@ void GISRecord::setBounds(DMS minLat, DMS maxLat, DMS minLong, DMS maxLong) {
     // log bounds from logger class
     logger.log(logLine, Logger::WORLD, true, true);
 
-    m_coordinateIndexedDatabase->updateBoundsOfTree(m_minLat, m_minLong, m_maxLat,
-                                                    m_maxLong);
+//    coordinateIndex->updateBoundsOfTree(bounds);
+    // update bounds of coordinate index
+    coordinateIndex->updateBoundsOfTree(bounds);
 }
+

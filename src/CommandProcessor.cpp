@@ -1,42 +1,58 @@
 #include "CommandProcessor.h"
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <stdexcept>
 
 void CommandProcessor::parseCmdScript(const std::string &filename) {
-    std::ifstream input(filename);
-    std::string line;
-    while (std::getline(input, line)) {
-        std::istringstream iss(line);
-        std::vector<std::string> arguments;
-        std::string argument;
-        while (std::getline(iss, argument, '\t')) {
-            arguments.push_back(argument);
-        }
-        if (arguments.empty() || arguments[0].empty() || arguments[0][0] == ';') {
-            // empty or comment line, skip
-            continue;
-        }
+    vector<vector<string>> commands = systemManager.readScript(filename);
+    Command command;
+    for (auto &&arguments: commands) {
+        // convert command to enum
         if (arguments[0] == "world") {
-            worldCmd(arguments);
+            command = world;
         } else if (arguments[0] == "import") {
-            importCmd(arguments);
+            command = import;
         } else if (arguments[0] == "debug") {
-            debugCmd(arguments);
+            command = debug;
         } else if (arguments[0] == "what_is_at") {
-            whatIsAtCmd(arguments);
+            command = what_is_at;
         } else if (arguments[0] == "what_is") {
-            whatIsCmd(arguments);
+            command = what_is;
         } else if (arguments[0] == "what_is_in") {
-            whatIsInCmd(arguments);
+            command = what_is_in;
         } else if (arguments[0] == "quit") {
-            quitCmd();
-            break;
+            command = quit;
         } else {
-            std::cerr << "Unknown command: " << arguments[0] << std::endl;
+            throw std::invalid_argument("Invalid command: " + arguments[0]);
+        }
+
+        // process command
+        switch (command) {
+            case world:
+                worldCmd(arguments);
+                break;
+            case import:
+                importCmd(arguments);
+                break;
+            case debug:
+                debugCmd(arguments);
+                break;
+            case what_is_at:
+                whatIsAtCmd(arguments);
+                break;
+            case what_is:
+                whatIsCmd(arguments);
+                break;
+            case what_is_in:
+                whatIsInCmd(arguments);
+                break;
+            case quit:
+                quitCmd();
+                break;
         }
     }
 }
+
 
 /**
  * world<tab><westLong><tab><eastLong><tab><southLat><tab><northLat>
@@ -44,14 +60,10 @@ void CommandProcessor::parseCmdScript(const std::string &filename) {
  */
 void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
     if (arguments.size() != 5) {
-        std::cerr << "Invalid world command" << std::endl;
-        // explain how to use the command
-        std::cerr << "Usage: world <westLong> <eastLong> <southLat> <northLat>" << std::endl;
-        // exit with error
-        exit(1);
+        throw std::invalid_argument("Invalid world command\nUsage: world <westLong> <eastLong> <southLat> <northLat>");
     }
     std::cout << "world command" << std::endl;
-    GISRecord::DMS westLong, eastLong, northLat, southLat;
+    DMS westLong{}, eastLong{}, northLat{}, southLat{};
 
     westLong = systemManager.fillDMS(arguments[1]);
     eastLong = systemManager.fillDMS(arguments[2]);
@@ -88,7 +100,7 @@ void CommandProcessor::importCmd(std::vector<std::string> arguments) {
     std::string line;
     // print out each line
     while (std::getline(input, line)) {
-        std::cout << line << std::endl;
+        break;
     }
 }
 
@@ -224,7 +236,6 @@ void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
     std::cout << "half-height: " << halfHeight << std::endl;
     std::cout << "half-width: " << halfWidth << std::endl;
 }
-
 
 
 /**

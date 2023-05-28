@@ -5,25 +5,26 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "GISRecord.h"
+using namespace std;
+
+struct Bounds {
+    float minLat;
+    float maxLat;
+    float minLong;
+    float maxLong;
+};
+
+struct Coordinate {
+    float latitude;
+    float longitude;
+};
+
 
 class PRQuadTree {
 public:
-    void setBoundary(GISRecord::Bounds bounds);
-    struct Coord {
-        float latitude;
-        float longitude;
-    };
+    void setBoundary(Bounds bounds);
 
-    struct Node {
-        Coord bound;
-
-    };
-
-    struct BoundingBox {
-
-    };
-private:
+    string toString(int level);
 
 };
 
