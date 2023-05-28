@@ -1,0 +1,11 @@
+
+#ifndef INC_8042_PROJECT_HASHTABLE_H
+#define INC_8042_PROJECT_HASHTABLE_H
+
+
+class HashTable {
+
+};
+
+
+#endif //INC_8042_PROJECT_HASHTABLE_H

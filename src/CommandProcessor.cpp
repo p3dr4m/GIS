@@ -225,6 +225,8 @@ void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
     std::cout << "half-width: " << halfWidth << std::endl;
 }
 
+
+
 /**
  * quit<tab>
  */
@@ -233,3 +235,4 @@ void CommandProcessor::quitCmd() {
     std::cout << "Exiting..." << std::endl;
     exit(0);
 }
+

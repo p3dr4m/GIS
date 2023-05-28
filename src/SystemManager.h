@@ -11,7 +11,8 @@
 using namespace std;
 
 class SystemManager {
-
+    public:
+    GISRecord::DMS fillDMS(string value);
 };
 
 

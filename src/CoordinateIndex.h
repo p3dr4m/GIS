@@ -4,13 +4,26 @@
 
 #ifndef FINALPROJALGO_COORDINATEINDEX_H
 #define FINALPROJALGO_COORDINATEINDEX_H
+#include "QuadTree.h"
 
-struct DMS {
-    int num;
-};
 
 class CoordinateIndex {
+public:
+    void insertRecord(float latitude, float longitude, int fileOffset,
+                      int dbLine);
+    std::vector<int> searchRecords(float latitude, float longitude);
+    std::vector<int> searchRecords(Coordinate centralLocation, float height,
+                                   float width);
 
+    void updateBoundsOfTree(float minLat, float minLong, float maxLat,
+                            float maxLong) {
+        m_tree.setBoundry(minLat, minLong, maxLat, maxLong);
+    }
+
+    std::string printTree() { return m_tree.toString(1); }
+
+private:
+    QuadTree m_tree;
 };
 
 

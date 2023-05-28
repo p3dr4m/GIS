@@ -10,9 +10,7 @@
 #include "GISRecord.h"
 #include "SystemManager.h"
 
-enum Command {
-    world, import, debug, what_is_at, what_is, what_is_in, quit
-};
+
 
 class CommandProcessor {
 private:
@@ -23,10 +21,14 @@ private:
     void whatIsCmd(std::vector<std::string> arguments);
     void whatIsInCmd(std::vector<std::string> arguments);
     static void quitCmd();
+    GISRecord gisRecord;
+    SystemManager systemManager;
 
 public:
     void parseCmdScript(const std::string& filename);
-
+    enum Command {
+        world, import, debug, what_is_at, what_is, what_is_in, quit
+    };
 };
 
 
