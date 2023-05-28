@@ -4,6 +4,7 @@
 #include <ctime>
 #include <fstream>
 #include "Logger.h"
+using namespace std;
 
 void Logger::log(std::string message) {
     writeToLog(message, logFileName);

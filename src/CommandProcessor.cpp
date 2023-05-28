@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+using namespace std;
 
 void CommandProcessor::parseCmdScript(const std::string &filename) {
     vector<vector<string>> commands = systemManager.readScript(filename);

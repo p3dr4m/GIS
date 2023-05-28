@@ -1,11 +1,8 @@
-
 #ifndef INC_8042_PROJECT_PRQUADTREE_H
 #define INC_8042_PROJECT_PRQUADTREE_H
 
+
 #include <string>
-#include <vector>
-#include <iostream>
-using namespace std;
 
 struct Bounds {
     float minLat;
@@ -24,7 +21,7 @@ class PRQuadTree {
 public:
     void setBoundary(Bounds bounds);
 
-    string toString(int level);
+    std::string toString(int level);
 
 };
 

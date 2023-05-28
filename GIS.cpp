@@ -1,5 +1,6 @@
 #include <iostream>
-#include "CommandProcessor.h"
+#include "src/CommandProcessor.h"
+using namespace std;
 
 /**
  * •/GIS <database file name> <command script file name> ‹log file name>

@@ -10,17 +10,17 @@ enum Command {
 
 class CommandProcessor {
 private:
-    void worldCmd(vector<string> arguments);
+    void worldCmd(std::vector<std::string> arguments);
 
-    void importCmd(vector<string> arguments);
+    void importCmd(std::vector<std::string> arguments);
 
-    void debugCmd(vector<string> arguments);
+    void debugCmd(std::vector<std::string> arguments);
 
-    void whatIsAtCmd(vector<string> arguments);
+    void whatIsAtCmd(std::vector<std::string> arguments);
 
-    void whatIsCmd(vector<string> arguments);
+    void whatIsCmd(std::vector<std::string> arguments);
 
-    void whatIsInCmd(vector<string> arguments);
+    void whatIsInCmd(std::vector<std::string> arguments);
 
     static void quitCmd();
 
@@ -28,7 +28,7 @@ private:
     SystemManager systemManager;
 
 public:
-    void parseCmdScript(const string &filename);
+    void parseCmdScript(const std::string &filename);
 
 
 };

@@ -1,4 +1,5 @@
 #include "CoordinateIndex.h"
+using namespace std;
 
 std::vector<int> CoordinateIndex::searchRecords(Coordinate centralLocation, float height, float width) {
     return {};

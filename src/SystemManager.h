@@ -6,15 +6,13 @@
 #define INC_8042_PROJECT_SYSTEMMANAGER_H
 
 #include <string>
+#include <vector>
 #include "GISRecord.h"
-
-using namespace std;
-
 
 class SystemManager {
 public:
-    DMS fillDMS(string value);
-    vector<vector<string>> readScript(string filename);
+    DMS fillDMS(std::string value);
+    std::vector<std::vector<std::string>> readScript(std::string filename);
 };
 
 

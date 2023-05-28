@@ -5,6 +5,7 @@
 #include "BufferPool.h"
 #include <algorithm>
 #include <cstring>
+using namespace std;
 
 BufferPool::BufferPool(size_t buffer_size)
         : buffer_size_(buffer_size), buffer_(new char[buffer_size]), read_pos_(0), write_pos_(0) {}
