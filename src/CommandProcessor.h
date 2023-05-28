@@ -7,6 +7,8 @@
 
 #include <string>
 #include <vector>
+#include "GISRecord.h"
+#include "SystemManager.h"
 
 enum Command {
     world, import, debug, what_is_at, what_is, what_is_in, quit

@@ -51,10 +51,18 @@ void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
         exit(1);
     }
     std::cout << "world command" << std::endl;
-    std::cout << "westLong: " << arguments[1] << std::endl;
-    std::cout << "eastLong: " << arguments[2] << std::endl;
-    std::cout << "southLat: " << arguments[3] << std::endl;
-    std::cout << "northLat: " << arguments[4] << std::endl;
+    GISRecord::DMS westLong, eastLong, northLat, southLat;
+
+    westLong = systemManager.fillDMS(arguments[1]);
+    eastLong = systemManager.fillDMS(arguments[2]);
+    southLat = systemManager.fillDMS(arguments[3]);
+    northLat = systemManager.fillDMS(arguments[4]);
+
+    float w = gisRecord.convertDMS(westLong);
+    float e = gisRecord.convertDMS(eastLong);
+    float s = gisRecord.convertDMS(southLat);
+    float n = gisRecord.convertDMS(northLat);
+
 
 }
 
