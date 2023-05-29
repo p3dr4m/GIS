@@ -2,6 +2,7 @@
 #define INC_8042_PROJECT_COORDINATEINDEX_H
 
 #include "PRQuadTree.h"
+#include <vector>
 
 
 class CoordinateIndex {
@@ -12,7 +13,7 @@ public:
     std::vector<int> searchRecords(float latitude, float longitude);
 
     std::vector<int> searchRecords(Coordinate centralLocation, float height,
-                              float width);
+                                   float width);
 
     void updateBoundsOfTree(Bounds bounds) {
         quadTree.setBoundary(bounds);

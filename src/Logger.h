@@ -1,11 +1,5 @@
-//
-// Created by Raziq on 2023-04-26.
-//
-
 #ifndef INC_8042_PROJECT_LOGGER_H
 #define INC_8042_PROJECT_LOGGER_H
-
-#pragma once
 
 #include <string>
 

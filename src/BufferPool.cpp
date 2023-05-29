@@ -1,10 +1,8 @@
-//
-// Created by Raziq on 2023-04-26.
-//
 
 #include "BufferPool.h"
 #include <algorithm>
 #include <cstring>
+
 using namespace std;
 
 BufferPool::BufferPool(size_t buffer_size)

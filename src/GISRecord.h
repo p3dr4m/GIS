@@ -21,11 +21,12 @@ struct DMS {
 };
 
 
-
 class GISRecord {
 public:
     GISRecord() = default;
+
     Bounds bounds{};
+
     float convertDMS(DMS dms);
 
     void setBounds(DMS minLat, DMS maxLat, DMS minLong, DMS maxLong);
@@ -33,7 +34,7 @@ public:
 
 private:
     Logger logger;
-    CoordinateIndex* coordinateIndex{};
+    CoordinateIndex *coordinateIndex{};
 };
 
 

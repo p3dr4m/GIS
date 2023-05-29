@@ -1,9 +1,7 @@
 #include <iostream>
-#include <sstream>
-#include <limits>
-#include <ctime>
 #include <fstream>
 #include "Logger.h"
+
 using namespace std;
 
 void Logger::log(std::string message) {
