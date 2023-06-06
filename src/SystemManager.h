@@ -17,10 +17,13 @@ public:
         return instance;
     }
 
+    SystemManager() = default;
+
     // Delete the copy constructor and assignment operator to prevent copies
     SystemManager(const SystemManager &) = delete;
 
     SystemManager &operator=(const SystemManager &) = delete;
+
     Logger logger;
     CommandProcessor commandProcessor;
 
@@ -28,9 +31,6 @@ public:
 
     void readScript(std::string &filename);
 
-private:
-    // Private constructor to prevent direct instantiation
-    SystemManager() {}
 };
 
 
