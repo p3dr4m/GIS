@@ -2,56 +2,54 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include "SystemManager.h"
 
 using namespace std;
 
-void CommandProcessor::parseCmdScript(const std::string &filename) {
-    vector<vector<string>> commands = systemManager.readScript(filename);
+void CommandProcessor::parseCmdScript(std::vector<std::string> arguments) {
     Command command;
-    for (auto &&arguments: commands) {
-        // convert command to enum
-        if (arguments[0] == "world") {
-            command = world;
-        } else if (arguments[0] == "import") {
-            command = import;
-        } else if (arguments[0] == "debug") {
-            command = debug;
-        } else if (arguments[0] == "what_is_at") {
-            command = what_is_at;
-        } else if (arguments[0] == "what_is") {
-            command = what_is;
-        } else if (arguments[0] == "what_is_in") {
-            command = what_is_in;
-        } else if (arguments[0] == "quit") {
-            command = quit;
-        } else {
-            throw std::invalid_argument("Invalid command: " + arguments[0]);
-        }
+    // convert command to enum
+    if (arguments[0] == "world") {
+        command = world;
+    } else if (arguments[0] == "import") {
+        command = import;
+    } else if (arguments[0] == "debug") {
+        command = debug;
+    } else if (arguments[0] == "what_is_at") {
+        command = what_is_at;
+    } else if (arguments[0] == "what_is") {
+        command = what_is;
+    } else if (arguments[0] == "what_is_in") {
+        command = what_is_in;
+    } else if (arguments[0] == "quit") {
+        command = quit;
+    } else {
+        throw std::invalid_argument("Invalid command: " + arguments[0]);
+    }
 
-        // process command
-        switch (command) {
-            case world:
-                worldCmd(arguments);
-                break;
-            case import:
-                importCmd(arguments);
-                break;
-            case debug:
-                debugCmd(arguments);
-                break;
-            case what_is_at:
-                whatIsAtCmd(arguments);
-                break;
-            case what_is:
-                whatIsCmd(arguments);
-                break;
-            case what_is_in:
-                whatIsInCmd(arguments);
-                break;
-            case quit:
-                quitCmd();
-                break;
-        }
+    // process command
+    switch (command) {
+        case world:
+            worldCmd(arguments);
+            break;
+        case import:
+            importCmd(arguments);
+            break;
+        case debug:
+            debugCmd(arguments);
+            break;
+        case what_is_at:
+            whatIsAtCmd(arguments);
+            break;
+        case what_is:
+            whatIsCmd(arguments);
+            break;
+        case what_is_in:
+            whatIsInCmd(arguments);
+            break;
+        case quit:
+            quitCmd();
+            break;
     }
 }
 
@@ -66,7 +64,7 @@ void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
     }
     std::cout << "world command" << std::endl;
     DMS westLong{}, eastLong{}, northLat{}, southLat{};
-
+    SystemManager& systemManager = SystemManager::getInstance();
     westLong = systemManager.fillDMS(arguments[1]);
     eastLong = systemManager.fillDMS(arguments[2]);
     southLat = systemManager.fillDMS(arguments[3]);

@@ -1,6 +1,5 @@
 #include "SystemManager.h"
 #include <stdexcept>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -35,10 +34,10 @@ DMS SystemManager::fillDMS(string value) {
     return dms;
 }
 
-vector<vector<string>> SystemManager::readScript(string filename) {
+void SystemManager::readScript(string &filename) {
     ifstream input(filename);
     string line;
-    vector<vector<string>> commands;
+//    vector<vector<string>> commands;
     while (getline(input, line)) {
         istringstream iss(line);
         vector<string> arguments;
@@ -54,7 +53,8 @@ vector<vector<string>> SystemManager::readScript(string filename) {
             continue;
         }
 
-        commands.push_back(arguments);
+        // run parseCmdScript here
+//        commandProcessor.parseCmdScript(arguments);
     }
-    return commands;
+//    return commands;
 }

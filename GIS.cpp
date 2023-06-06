@@ -1,5 +1,6 @@
 #include <iostream>
-#include "src/CommandProcessor.h"
+#include "src/SystemManager.h"
+
 using namespace std;
 
 /**
@@ -24,8 +25,8 @@ int main(int argc, char *argv[]) {
     std::cout << "command script file name: " << cmdScriptFilePath << std::endl;
     std::cout << "log file name: " << logFilePath << std::endl;
 
-    CommandProcessor commandProcessor;
-    commandProcessor.parseCmdScript(cmdScriptFilePath);
+    SystemManager systemManager;
+    systemManager.readScript(reinterpret_cast<string &>(cmdScriptFilePath));
 
     return 0;
 }

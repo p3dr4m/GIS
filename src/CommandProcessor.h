@@ -2,7 +2,6 @@
 #define INC_8042_PROJECT_COMMANDPROCESSOR_H
 
 #include "GISRecord.h"
-#include "SystemManager.h"
 
 enum Command {
     world, import, debug, what_is_at, what_is, what_is_in, quit
@@ -25,10 +24,9 @@ private:
     static void quitCmd();
 
     GISRecord gisRecord;
-    SystemManager systemManager;
 
 public:
-    void parseCmdScript(const std::string &filename);
+    void parseCmdScript(std::vector<std::string> arguments);
 
 
 };
