@@ -19,7 +19,6 @@ public:
         quadTree.setBoundary(bounds);
     }
 
-    std::string printTree() { return quadTree.toString(1); }
 
 private:
     PRQuadTree quadTree;

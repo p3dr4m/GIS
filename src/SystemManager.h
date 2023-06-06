@@ -5,7 +5,8 @@
 
 #include <string>
 #include <vector>
-#include "CommandProcessor.h"
+#include "Logger.h"
+#include "GISRecord.h"
 
 class SystemManager {
 public:
@@ -25,11 +26,10 @@ public:
     SystemManager &operator=(const SystemManager &) = delete;
 
     Logger logger;
-    CommandProcessor commandProcessor;
 
     DMS fillDMS(std::string value);
 
-    void readScript(std::string &filename);
+    std::vector<std::vector<std::string>> readScript(const std::string& filename);
 
 };
 

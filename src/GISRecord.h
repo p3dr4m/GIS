@@ -23,7 +23,14 @@ struct DMS {
 
 class GISRecord {
 public:
-    GISRecord() = default;
+    GISRecord() {
+        coordinateIndex = new CoordinateIndex();
+    };
+
+    ~GISRecord() {
+        delete coordinateIndex;
+        coordinateIndex = new CoordinateIndex();
+    }
 
     Bounds bounds{};
 
@@ -34,7 +41,7 @@ public:
 
 private:
     Logger logger;
-    CoordinateIndex *coordinateIndex{};
+    CoordinateIndex *coordinateIndex;
 };
 
 

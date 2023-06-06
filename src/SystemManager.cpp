@@ -34,10 +34,10 @@ DMS SystemManager::fillDMS(string value) {
     return dms;
 }
 
-void SystemManager::readScript(string &filename) {
+vector<vector<string>> SystemManager::readScript(const string &filename) {
     ifstream input(filename);
     string line;
-//    vector<vector<string>> commands;
+    vector<vector<string>> commands;
     while (getline(input, line)) {
         istringstream iss(line);
         vector<string> arguments;
@@ -53,8 +53,7 @@ void SystemManager::readScript(string &filename) {
             continue;
         }
 
-        // run parseCmdScript here
-//        commandProcessor.parseCmdScript(arguments);
+        commands.push_back(arguments);
     }
-//    return commands;
+    return commands;
 }
