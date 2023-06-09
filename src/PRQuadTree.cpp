@@ -7,13 +7,15 @@
 using namespace std;
 
 void PRQuadTree::setBoundary(Bounds bounds) {
-    float halfWidth = (bounds.maxLat - bounds.minLat) / 2;
-    float halfHeight = (bounds.maxLong - bounds.minLong) / 2;
+    float boxHalfWidthLat = (bounds.maxLat - bounds.minLat) / 2;
+    float boxHalfWidthLong = (bounds.maxLong - bounds.minLong) / 2;
+    float centerLong = (bounds.minLong + bounds.maxLong) / 2;
+    float centerLat = (bounds.minLat + bounds.maxLat) / 2;
 
     boundingBox.topLeft = Coordinate(bounds.minLong, bounds.maxLat);
     boundingBox.bottomRight = Coordinate(bounds.maxLong, bounds.minLat);
-    boundingBox.centerPoint = Coordinate((bounds.minLong + bounds.maxLong) / 2, halfHeight);
-    boundingBox.boxHalfWidth = Coordinate((bounds.maxLong - bounds.minLong) / 2, halfWidth);
+    boundingBox.centerPoint = Coordinate(centerLong, centerLat);
+    boundingBox.boxHalfWidth = Coordinate(boxHalfWidthLong, boxHalfWidthLat);
 
 }
 
@@ -23,28 +25,30 @@ void PRQuadTree::insert(Node node) {
     }
 
     // Check if current node has reached maximum nodes
-    if (quadNodes.size() < maxNodes)
-        quadNodes.push_back(node);
+    if (quadNodes.size() < maxNodes) {
+        this->quadNodes.push_back(node);
+
+    }
     else {
         // Subdivide the tree and insert the node into the appropriate quadrant
         if (topLeftQuad == nullptr) {
             // Split the bounding box into 4 quadrants
-            Bounds topLeftBounds = {boundingBox.topLeft.latitude, boundingBox.centerPoint.latitude,
+            Bounds topLeftBounds = {boundingBox.centerPoint.latitude, boundingBox.topLeft.latitude,
                                     boundingBox.topLeft.longitude, boundingBox.centerPoint.longitude};
             topLeftQuad = new PRQuadTree();
             topLeftQuad->setBoundary(topLeftBounds);
 
-            Bounds topRightBounds = {boundingBox.topLeft.latitude, boundingBox.centerPoint.latitude,
+            Bounds topRightBounds = {boundingBox.centerPoint.latitude, boundingBox.topLeft.latitude,
                                      boundingBox.centerPoint.longitude, boundingBox.bottomRight.longitude};
             topRightQuad = new PRQuadTree();
             topRightQuad->setBoundary(topRightBounds);
 
-            Bounds bottomLeftBounds = {boundingBox.centerPoint.latitude, boundingBox.bottomRight.latitude,
+            Bounds bottomLeftBounds = {boundingBox.bottomRight.latitude, boundingBox.centerPoint.latitude,
                                        boundingBox.topLeft.longitude, boundingBox.centerPoint.longitude};
             bottomLeftQuad = new PRQuadTree();
             bottomLeftQuad->setBoundary(bottomLeftBounds);
 
-            Bounds bottomRightBounds = {boundingBox.centerPoint.latitude, boundingBox.bottomRight.latitude,
+            Bounds bottomRightBounds = {boundingBox.bottomRight.latitude, boundingBox.centerPoint.latitude,
                                         boundingBox.centerPoint.longitude, boundingBox.bottomRight.longitude};
             bottomRightQuad = new PRQuadTree();
             bottomRightQuad->setBoundary(bottomRightBounds);
@@ -60,7 +64,36 @@ void PRQuadTree::insert(Node node) {
 }
 
 bool PRQuadTree::checkIfInBounds(Coordinate coord, BoundingBox box) {
-    return coord.latitude >= box.bottomRight.latitude && coord.latitude <= box.topLeft.latitude &&
-           coord.longitude >= box.topLeft.longitude && coord.longitude <= box.bottomRight.longitude;
+    // Check if the coordinate is not within the latitude boundaries of the box
+        if (coord.latitude < box.bottomRight.latitude || coord.latitude > box.topLeft.latitude) {
+        return false;
+    }
+
+    // Check if the coordinate is not within the longitude boundaries of the box
+    if (coord.longitude < box.topLeft.longitude || coord.longitude > box.bottomRight.longitude) {
+        return false;
+    }
+
+    // If none of the above conditions are met, the coordinate is within the box
+    return true;
 }
 
+int PRQuadTree::countAllQuadNodes() {
+int count = 0;
+    count += quadNodes.size();
+
+    if (topLeftQuad != nullptr) {
+        count += topLeftQuad->countAllQuadNodes();
+    }
+    if (topRightQuad != nullptr) {
+        count += topRightQuad->countAllQuadNodes();
+    }
+    if (bottomLeftQuad != nullptr) {
+        count += bottomLeftQuad->countAllQuadNodes();
+    }
+    if (bottomRightQuad != nullptr) {
+        count += bottomRightQuad->countAllQuadNodes();
+    }
+
+    return count;
+}

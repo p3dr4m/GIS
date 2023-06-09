@@ -1,8 +1,10 @@
 #include "CommandProcessor.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdexcept>
 #include "SystemManager.h"
+#include "CoordinateIndex.h"
 
 using namespace std;
 
@@ -25,7 +27,7 @@ void CommandProcessor::parseCmdScript(const string &filename) {
         } else if (arguments[0] == "quit") {
             command = quit;
         } else {
-            throw std::invalid_argument("Invalid command: " + arguments[0]);
+            throw invalid_argument("Invalid command: " + arguments[0]);
         }
 
         // process command
@@ -61,11 +63,11 @@ void CommandProcessor::parseCmdScript(const string &filename) {
  * world<tab><westLong><tab><eastLong><tab><southLat><tab><northLat>
  * @param arguments
  */
-void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
+void CommandProcessor::worldCmd(vector<string> arguments) {
     if (arguments.size() != 5) {
-        throw std::invalid_argument("Invalid world command\nUsage: world <westLong> <eastLong> <southLat> <northLat>");
+        throw invalid_argument("Invalid world command\nUsage: world <westLong> <eastLong> <southLat> <northLat>");
     }
-    std::cout << "world command" << std::endl;
+    cout << "world command" << endl;
     DMS westLong{}, eastLong{}, northLat{}, southLat{};
 
     westLong = systemManager.fillDMS(arguments[1]);
@@ -84,40 +86,60 @@ void CommandProcessor::worldCmd(std::vector<std::string> arguments) {
  *
  * @param arguments
  */
-void CommandProcessor::importCmd(std::vector<std::string> arguments) {
+void CommandProcessor::importCmd(vector<string> arguments) {
+
     if (arguments.size() != 2) {
-        std::cerr << "Invalid import command" << std::endl;
+        cerr << "Invalid import command" << endl;
         // explain how to use the command
-        std::cerr << "Usage: import <filename>" << std::endl;
+        cerr << "Usage: import <filename>" << endl;
         // exit with error
         exit(1);
     }
-    std::cout << "import command" << std::endl;
-    std::cout << "filepath: " << arguments[1] << std::endl;
+    cout << "import command" << endl;
+    cout << "filepath: " << arguments[1] << endl;
 
     // open the file
-    std::ifstream input(arguments[1]);
-    std::string line;
+    ifstream input(arguments[1]);
+    string line, word;
+    vector<string> row;
+    int countingLines = 0;
     // print out each line
-    while (std::getline(input, line)) {
-        break;
+    while (getline(input, line)) {
+        int fileOffset = input.tellg();
+
+        // skip first line in file
+        if (countingLines == 0) {
+            countingLines++;
+            continue;
+        }
+        // split line using "|"
+         stringstream s(line);
+         while (getline(s, word, '|')) {
+            row.push_back(word);
+        }
+        countingLines++;
+        gisRecord.insertRecord(row, countingLines, fileOffset);
+        row.clear();
+
+
     }
+    gisRecord.printNodes();
 }
 
 /**
  * debug<tab><quad|hash|pool|world>
  * @param arguments
  */
-void CommandProcessor::debugCmd(std::vector<std::string> arguments) {
+void CommandProcessor::debugCmd(vector<string> arguments) {
     if (arguments.size() != 2) {
-        std::cerr << "Invalid debug command" << std::endl;
+        cerr << "Invalid debug command" << endl;
         // explain how to use the command
-        std::cerr << "Usage: debug <quad|hash|pool|world>" << std::endl;
+        cerr << "Usage: debug <quad|hash|pool|world>" << endl;
         // exit with error
         exit(1);
     }
-    std::cout << "debug command" << std::endl;
-    std::cout << "debug type: " << arguments[1] << std::endl;
+    cout << "debug command" << endl;
+    cout << "debug type: " << arguments[1] << endl;
     if (arguments[1] == "quad") {
         // print out the quadtree
     } else if (arguments[1] == "hash") {
@@ -127,9 +149,9 @@ void CommandProcessor::debugCmd(std::vector<std::string> arguments) {
     } else if (arguments[1] == "world") {
         // print out the world
     } else {
-        std::cerr << "Invalid debug type" << std::endl;
+        cerr << "Invalid debug type" << endl;
         // explain how to use the command
-        std::cerr << "Usage: debug <quad|hash|pool|world>" << std::endl;
+        cerr << "Usage: debug <quad|hash|pool|world>" << endl;
         // exit with error
         exit(1);
     }
@@ -139,36 +161,36 @@ void CommandProcessor::debugCmd(std::vector<std::string> arguments) {
  * what_is_at<tab><latitude><space><longitude>.
  * @param arguments
  */
-void CommandProcessor::whatIsAtCmd(std::vector<std::string> arguments) {
+void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
     // print arguments
 
     if (arguments.size() != 3) {
-        std::cerr << "Invalid what_is_at command" << std::endl;
+        cerr << "Invalid what_is_at command" << endl;
         // explain how to use the command
-        std::cerr << "Usage: what_is_at <latitude> <longitude>" << std::endl;
+        cerr << "Usage: what_is_at <latitude> <longitude>" << endl;
         // exit with error
         exit(1);
     }
-    std::cout << "what_is_at command" << std::endl;
-    std::cout << "latitude: " << arguments[1] << std::endl;
-    std::cout << "longitude: " << arguments[2] << std::endl;
+    cout << "what_is_at command" << endl;
+    cout << "latitude: " << arguments[1] << endl;
+    cout << "longitude: " << arguments[2] << endl;
 }
 
 /**
  * what_is<tab><feature name><tab><state abbreviation>
  * @param arguments
  */
-void CommandProcessor::whatIsCmd(std::vector<std::string> arguments) {
+void CommandProcessor::whatIsCmd(vector<string> arguments) {
     if (arguments.size() != 3) {
-        std::cerr << "Invalid what_is command" << std::endl;
+        cerr << "Invalid what_is command" << endl;
         // explain how to use the command
-        std::cerr << "Usage: what_is <feature name> <state abbreviation>" << std::endl;
+        cerr << "Usage: what_is <feature name> <state abbreviation>" << endl;
         // exit with error
         exit(1);
     }
-    std::cout << "what_is command" << std::endl;
-    std::cout << "feature name: " << arguments[0] << std::endl;
-    std::cout << "state abbreviation: " << arguments[1] << std::endl;
+    cout << "what_is command" << endl;
+    cout << "feature name: " << arguments[0] << endl;
+    cout << "state abbreviation: " << arguments[1] << endl;
 }
 
 /**
@@ -179,20 +201,20 @@ void CommandProcessor::whatIsCmd(std::vector<std::string> arguments) {
  * what_is_in<tab>-long<tab><latitude><space><longitude<tab><half-height><tab><half-width>
  * @param arguments
  */
-void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
+void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     // check if the number of arguments isn't greater than 5 and less than 7
     if (arguments.size() < 5 || arguments.size() > 7) {
-        std::cerr << "Invalid what_is_in command" << std::endl;
+        cerr << "Invalid what_is_in command" << endl;
         // explain how to use the command
-        std::cerr << "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>" << std::endl;
+        cerr << "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>" << endl;
         // exit with error
         exit(1);
     }
 
-    std::string filterOption = "None";
+    string filterOption = "None";
     bool longLog = false;
-    std::string latitude;
-    std::string longitude;
+    string latitude;
+    string longitude;
     int halfHeight;
     int halfWidth;
 
@@ -201,40 +223,40 @@ void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
         if (arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure") {
             filterOption = arguments[2];
         } else {
-            std::cerr << "Invalid filter option" << std::endl;
+            cerr << "Invalid filter option" << endl;
             // explain how to use the command
-            std::cerr
+            cerr
                     << "Usage: what_is_in<tab>-filter<tab><pop|water|structure> <latitude> <longitude> <half-height> <half-width>"
-                    << std::endl;
+                    << endl;
             // exit with error
             exit(1);
         }
 
         latitude = arguments[3];
         longitude = arguments[4];
-        halfHeight = std::stoi(arguments[5]);
-        halfWidth = std::stoi(arguments[6]);
+        halfHeight = stoi(arguments[5]);
+        halfWidth = stoi(arguments[6]);
 
     } else if (arguments[1] == "-long") {
         longLog = true;
         latitude = arguments[2];
         longitude = arguments[3];
-        halfHeight = std::stoi(arguments[4]);
-        halfWidth = std::stoi(arguments[5]);
+        halfHeight = stoi(arguments[4]);
+        halfWidth = stoi(arguments[5]);
     } else {
         latitude = arguments[1];
         longitude = arguments[2];
-        halfHeight = std::stoi(arguments[3]);
-        halfWidth = std::stoi(arguments[4]);
+        halfHeight = stoi(arguments[3]);
+        halfWidth = stoi(arguments[4]);
     }
 
-    std::cout << "what_is_in command" << std::endl;
-    std::cout << "filter option: " << filterOption << std::endl;
-    std::cout << "long log: " << longLog << std::endl;
-    std::cout << "latitude: " << latitude << std::endl;
-    std::cout << "longitude: " << longitude << std::endl;
-    std::cout << "half-height: " << halfHeight << std::endl;
-    std::cout << "half-width: " << halfWidth << std::endl;
+    cout << "what_is_in command" << endl;
+    cout << "filter option: " << filterOption << endl;
+    cout << "long log: " << longLog << endl;
+    cout << "latitude: " << latitude << endl;
+    cout << "longitude: " << longitude << endl;
+    cout << "half-height: " << halfHeight << endl;
+    cout << "half-width: " << halfWidth << endl;
 }
 
 
@@ -242,8 +264,8 @@ void CommandProcessor::whatIsInCmd(std::vector<std::string> arguments) {
  * quit<tab>
  */
 void CommandProcessor::quitCmd() {
-    std::cout << "quit command" << std::endl;
-    std::cout << "Exiting..." << std::endl;
+    cout << "quit command" << endl;
+    cout << "Exiting..." << endl;
     exit(0);
 }
 

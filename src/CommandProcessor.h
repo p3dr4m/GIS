@@ -3,6 +3,8 @@
 
 #include "GISRecord.h"
 #include "SystemManager.h"
+#include "CoordinateIndex.h"
+#include "PRQuadTree.h"
 
 enum Command {
     world, import, debug, what_is_at, what_is, what_is_in, quit
@@ -26,6 +28,7 @@ private:
 
     GISRecord gisRecord;
     SystemManager systemManager;
+
 public:
     void parseCmdScript(const std::string &filename);
 

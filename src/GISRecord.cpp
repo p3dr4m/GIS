@@ -47,3 +47,21 @@ void GISRecord::setBounds(DMS minLat, DMS maxLat, DMS minLong, DMS maxLong) {
     coordinateIndex->updateBoundsOfTree(bounds);
 }
 
+void GISRecord::insertRecord(vector<string> row, int lineNum, int offset){
+    // file offset
+    // db line
+    // get lat, long
+    float latDec = stof(row[PRIM_LAT_DEC]);
+    float longDec = stof(row[PRIM_LONG_DEC]);
+
+
+    // float of dms lat, long
+    coordinateIndex->insert(latDec, longDec, lineNum, offset);
+
+
+
+    // get feature name
+    // get state alpha
+//    nameIndex->insert();
+}
+

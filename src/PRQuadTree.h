@@ -14,8 +14,8 @@ struct Bounds {
 };
 
 struct Coordinate {
-    float latitude;
     float longitude;
+    float latitude;
 
     Coordinate(float x, float y) {
         longitude = x;
@@ -30,6 +30,7 @@ struct Coordinate {
 
 struct Node {
     Coordinate coordinate;
+    std::vector<int> fileOffset, databaseLine;
 };
 
 struct BoundingBox {
@@ -67,6 +68,8 @@ public:
     void insert(Node node);
 
     bool checkIfInBounds(Coordinate coord, BoundingBox box);
+
+    int countAllQuadNodes();
 };
 
 
