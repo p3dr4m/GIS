@@ -3,6 +3,36 @@
 using namespace std;
 
 
+DMS GISRecord::fillDMS(string value) {
+    DMS dms{};
+
+    int degreeSize;
+    int minSecSize = 2;
+    int charSize = 1;
+
+    if (value.length() == 8) {
+        degreeSize = 3;
+
+        dms.degrees = stoi(value.substr(0, degreeSize));
+        dms.minutes = stoi(value.substr(3, minSecSize));
+        dms.seconds = stoi(value.substr(5, minSecSize));
+        dms.direction = (char) ((value.substr(7, charSize))[0]);
+
+    } else if (value.length() == 7) {
+        degreeSize = 2;
+
+        dms.degrees = stoi(value.substr(0, degreeSize));
+        dms.minutes = stoi(value.substr(2, minSecSize));
+        dms.seconds = stoi(value.substr(4, minSecSize));
+        dms.direction = (char) ((value.substr(6, charSize))[0]);
+    } else {
+        throw invalid_argument("Invalid DMS format");
+    }
+
+    return dms;
+}
+
+
 /**
  * Converts a DMS coordinate to a decimal coordinate
  * @param dms
@@ -51,8 +81,19 @@ void GISRecord::insertRecord(vector<string> row, int lineNum, int offset){
     // file offset
     // db line
     // get lat, long
-    float latDec = stof(row[PRIM_LAT_DEC]);
-    float longDec = stof(row[PRIM_LONG_DEC]);
+
+//    float latDec = stof(row[PRIM_LAT_DEC]);
+//    float longDec = stof(row[PRIM_LONG_DEC]);
+
+    string latDMS = row[PRIMARY_LAT_DMS];
+    string longDMS = row[PRIM_LONG_DMS];
+
+    DMS Lat = fillDMS(latDMS);
+    DMS Lng = fillDMS(longDMS);
+
+    float latDec = convertDMS(Lat);
+    float longDec = convertDMS(Lng);
+
 
 
     // float of dms lat, long
@@ -65,3 +106,14 @@ void GISRecord::insertRecord(vector<string> row, int lineNum, int offset){
 //    nameIndex->insert();
 }
 
+vector<int> GISRecord::findRecords(float lat, float lng) {
+    vector<int> result = coordinateIndex->searchRecords(lat, lng);
+    return  result;
+}
+
+vector<int> GISRecord::findRecordsInBounds(float longitude, float latitude, float halfWidth, float halfHeight) {
+    Coordinate centralLocation = Coordinate(longitude, latitude);
+
+    vector<int> result = coordinateIndex->searchRecordsInBounds(centralLocation, halfWidth, halfHeight);
+    return result;
+}

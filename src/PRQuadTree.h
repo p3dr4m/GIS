@@ -40,6 +40,9 @@ struct BoundingBox {
     Coordinate bottomRight;
 
     BoundingBox() = default;
+
+    // Constructor to create bounding box search area
+    BoundingBox(Coordinate centerPoint, float halfWidth, float halfHeight);
 };
 
 // A QuadTree, containing 4 subtrees
@@ -56,7 +59,7 @@ private:
     PRQuadTree *bottomRightQuad;
 public:
     PRQuadTree()
-            : boundingBox{Coordinate(), Coordinate(), Coordinate(), Coordinate()},
+            : boundingBox{},
               topLeftQuad(nullptr),
               topRightQuad(nullptr),
               bottomLeftQuad(nullptr),
@@ -67,9 +70,17 @@ public:
 
     void insert(Node node);
 
-    bool checkIfInBounds(Coordinate coord, BoundingBox box);
+    bool isCoordInBox(Coordinate coord, BoundingBox box);
+
+    bool isBoxinBox(BoundingBox box);
+
+    void getNodeByCoordinate(std::vector<Node> &nodes, Coordinate coord);
+
+    void getNodesInBounds(std::vector<Node> &nodes, BoundingBox box);
+
 
     int countAllQuadNodes();
+
 };
 
 

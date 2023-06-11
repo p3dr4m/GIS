@@ -11,9 +11,7 @@ public:
 
     std::vector<int> searchRecords(float latitude, float longitude);
 
-    std::vector<int> searchRecords(Coordinate centralLocation, float height,
-                                   float width);
-
+    std::vector<int> searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight);
 
     void updateBoundsOfTree(Bounds bounds) {
         quadTree.setBoundary(bounds);
@@ -26,6 +24,7 @@ public:
 
 private:
     PRQuadTree quadTree;
+    static std::vector<int> getOffsetsFromNodes(std::vector<Node> nodes);
 };
 
 

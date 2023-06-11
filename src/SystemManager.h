@@ -27,7 +27,7 @@ public:
 
     Logger logger;
 
-    DMS fillDMS(std::string value);
+
 
     std::vector<std::vector<std::string>> readScript(const std::string& filename);
 

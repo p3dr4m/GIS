@@ -20,7 +20,7 @@ void PRQuadTree::setBoundary(Bounds bounds) {
 }
 
 void PRQuadTree::insert(Node node) {
-    if (!checkIfInBounds(node.coordinate, boundingBox)) {
+    if (!isCoordInBox(node.coordinate, boundingBox)) {
         return;
     }
 
@@ -28,8 +28,7 @@ void PRQuadTree::insert(Node node) {
     if (quadNodes.size() < maxNodes) {
         this->quadNodes.push_back(node);
 
-    }
-    else {
+    } else {
         // Subdivide the tree and insert the node into the appropriate quadrant
         if (topLeftQuad == nullptr) {
             // Split the bounding box into 4 quadrants
@@ -63,9 +62,9 @@ void PRQuadTree::insert(Node node) {
 
 }
 
-bool PRQuadTree::checkIfInBounds(Coordinate coord, BoundingBox box) {
+bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
     // Check if the coordinate is not within the latitude boundaries of the box
-        if (coord.latitude < box.bottomRight.latitude || coord.latitude > box.topLeft.latitude) {
+    if (coord.latitude < box.bottomRight.latitude || coord.latitude > box.topLeft.latitude) {
         return false;
     }
 
@@ -78,8 +77,26 @@ bool PRQuadTree::checkIfInBounds(Coordinate coord, BoundingBox box) {
     return true;
 }
 
+bool PRQuadTree::isBoxinBox(BoundingBox box) {
+    // Check if the box is not within the latitude boundaries of the box
+    if (box.bottomRight.latitude < boundingBox.bottomRight.latitude ||
+        box.topLeft.latitude > boundingBox.topLeft.latitude) {
+        return false;
+    }
+
+    // Check if the box is not within the longitude boundaries of the box
+    if (box.topLeft.longitude < boundingBox.topLeft.longitude ||
+        box.bottomRight.longitude > boundingBox.bottomRight.longitude) {
+        return false;
+    }
+
+    // If none of the above conditions are met, the box is within the box
+    return true;
+}
+
+
 int PRQuadTree::countAllQuadNodes() {
-int count = 0;
+    int count = 0;
     count += quadNodes.size();
 
     if (topLeftQuad != nullptr) {
@@ -96,4 +113,90 @@ int count = 0;
     }
 
     return count;
+}
+
+void PRQuadTree::getNodesInBounds(std::vector<Node> &nodes, BoundingBox box) {
+    // Check if the current node is within the bounds
+    for (auto &quadNode: quadNodes) {
+        if (isCoordInBox(quadNode.coordinate, box)) {
+            nodes.push_back(quadNode);
+        }
+    }
+
+    // check if quadtree has been subdivided
+    if (topLeftQuad != nullptr) {
+        // Check if the top left quadrant is within the bounds
+        if (isBoxinBox(topLeftQuad->boundingBox)) {
+            topLeftQuad->getNodesInBounds(nodes, box);
+        }
+
+        // Check if the top right quadrant is within the bounds
+        if (isBoxinBox(topRightQuad->boundingBox)) {
+            topRightQuad->getNodesInBounds(nodes, box);
+        }
+
+        // Check if the bottom left quadrant is within the bounds
+        if (isBoxinBox(bottomLeftQuad->boundingBox)) {
+            bottomLeftQuad->getNodesInBounds(nodes, box);
+        }
+
+        // Check if the bottom right quadrant is within the bounds
+        if (isBoxinBox(bottomRightQuad->boundingBox)) {
+            bottomRightQuad->getNodesInBounds(nodes, box);
+        }
+    }
+
+}
+
+void PRQuadTree::getNodeByCoordinate(vector<Node> &nodes, Coordinate coord) {
+
+    if (!isCoordInBox(coord, this->boundingBox)) {
+        return;
+    }
+
+    for (auto &quadNode: quadNodes) {
+        if (quadNode.coordinate.latitude == coord.latitude && quadNode.coordinate.longitude == coord.longitude) {
+            nodes.push_back(quadNode);
+        }
+    }
+
+    // Check if the coordinate is in the top left quadrant
+    if (coord.longitude <= boundingBox.boxHalfWidth.longitude) {
+        if (topLeftQuad != nullptr) {
+            topLeftQuad->getNodeByCoordinate(nodes, coord);
+
+        }
+    }
+
+    // Check if the coordinate is in the top right quadrant
+    if (coord.latitude >= boundingBox.boxHalfWidth.latitude) {
+        if (topRightQuad != nullptr) {
+            topRightQuad->getNodeByCoordinate(nodes, coord);
+        }
+    }
+
+
+    // Check if the coordinate is in the bottom left quadrant
+    if (coord.latitude <= boundingBox.boxHalfWidth.latitude) {
+        if (bottomLeftQuad != nullptr) {
+            bottomLeftQuad->getNodeByCoordinate(nodes, coord);
+        }
+    }
+
+    // Check if the coordinate is in the bottom right quadrant
+    if (coord.longitude >= boundingBox.boxHalfWidth.longitude) {
+        if (bottomRightQuad != nullptr) {
+            bottomRightQuad->getNodeByCoordinate(nodes, coord);
+        }
+    }
+}
+
+BoundingBox::BoundingBox(Coordinate centerPoint, float halfWidth, float halfHeight)
+        : centerPoint(centerPoint),
+          boxHalfWidth(halfWidth, halfHeight),
+          topLeft(centerPoint.longitude - halfWidth, centerPoint.latitude + halfHeight) {
+    this->centerPoint = centerPoint;
+    this->boxHalfWidth = Coordinate(halfWidth, halfHeight);
+    this->topLeft = Coordinate(centerPoint.longitude - halfWidth, centerPoint.latitude + halfHeight);
+    this->bottomRight = Coordinate(centerPoint.longitude + halfWidth, centerPoint.latitude - halfHeight);
 }

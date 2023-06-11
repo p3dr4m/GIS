@@ -70,10 +70,10 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
     cout << "world command" << endl;
     DMS westLong{}, eastLong{}, northLat{}, southLat{};
 
-    westLong = systemManager.fillDMS(arguments[1]);
-    eastLong = systemManager.fillDMS(arguments[2]);
-    southLat = systemManager.fillDMS(arguments[3]);
-    northLat = systemManager.fillDMS(arguments[4]);
+    westLong = gisRecord.fillDMS(arguments[1]);
+    eastLong = gisRecord.fillDMS(arguments[2]);
+    southLat = gisRecord.fillDMS(arguments[3]);
+    northLat = gisRecord.fillDMS(arguments[4]);
 
     gisRecord.setBounds(southLat, northLat, westLong, eastLong);
 
@@ -113,8 +113,8 @@ void CommandProcessor::importCmd(vector<string> arguments) {
             continue;
         }
         // split line using "|"
-         stringstream s(line);
-         while (getline(s, word, '|')) {
+        stringstream s(line);
+        while (getline(s, word, '|')) {
             row.push_back(word);
         }
         countingLines++;
@@ -174,6 +174,17 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
     cout << "what_is_at command" << endl;
     cout << "latitude: " << arguments[1] << endl;
     cout << "longitude: " << arguments[2] << endl;
+
+
+//    DMS lat = gisRecord.fillDMS(arguments[1]);
+//    DMS lng = gisRecord.fillDMS(arguments[2]);
+    DMS lat = gisRecord.fillDMS("382607N");
+    DMS lng = gisRecord.fillDMS("0793312W");
+
+
+    float latDec = gisRecord.convertDMS(lat);
+    float lngDec = gisRecord.convertDMS(lng);
+    vector<int> recordOffsets = gisRecord.findRecords(latDec, lngDec);
 }
 
 /**
@@ -215,8 +226,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     bool longLog = false;
     string latitude;
     string longitude;
-    int halfHeight;
-    int halfWidth;
+    float halfHeight;
+    float halfWidth;
 
     if (arguments[1] == "-filter") {
         ///  -filter [ pop | water | structure ]
@@ -234,20 +245,32 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
 
         latitude = arguments[3];
         longitude = arguments[4];
-        halfHeight = stoi(arguments[5]);
-        halfWidth = stoi(arguments[6]);
+        halfHeight = stof(arguments[5]) / 3600.f;
+        halfWidth = stof(arguments[6]) / 3600.f;
 
     } else if (arguments[1] == "-long") {
         longLog = true;
         latitude = arguments[2];
         longitude = arguments[3];
-        halfHeight = stoi(arguments[4]);
-        halfWidth = stoi(arguments[5]);
+        halfHeight = stof(arguments[4]) / 3600.f;
+        halfWidth = stof(arguments[5]) / 3600.f;
     } else {
+        // convert seconds to decimal
+
+
         latitude = arguments[1];
         longitude = arguments[2];
-        halfHeight = stoi(arguments[3]);
-        halfWidth = stoi(arguments[4]);
+        halfHeight = stof(arguments[3]) / 3600.f;
+        halfWidth = stof(arguments[4]) / 3600.f;
+        DMS lngDMS = gisRecord.fillDMS(longitude);
+        DMS latDMS = gisRecord.fillDMS(latitude);
+        float latDec = gisRecord.convertDMS(latDMS);
+        float lngDec = gisRecord.convertDMS(lngDMS);
+
+        vector<int> records = gisRecord.findRecordsInBounds(lngDec, latDec, halfWidth, halfHeight);
+        for (int record : records) {
+            cout << record << endl;
+        }
     }
 
     cout << "what_is_in command" << endl;

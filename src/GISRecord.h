@@ -59,9 +59,13 @@ public:
     Bounds bounds{};
 
     float convertDMS(DMS dms);
-
+    DMS fillDMS(std::string value);
     void setBounds(DMS minLat, DMS maxLat, DMS minLong, DMS maxLong);
     void insertRecord(std::vector<std::string> row, int lineNum, int offset);
+
+    std::vector<int> findRecords(float lat, float lng);
+    std::vector<int> findRecordsInBounds(float longitude, float latitude, float halfWidth, float halfHeight);
+
     void printNodes() {
         coordinateIndex->printNodeCountOfTree();
     };
@@ -69,6 +73,7 @@ private:
     Logger logger;
     CoordinateIndex *coordinateIndex;
     NameIndex *nameIndex;
+
 };
 
 
