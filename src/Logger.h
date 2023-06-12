@@ -2,38 +2,58 @@
 #define INC_8042_PROJECT_LOGGER_H
 
 #include <string>
+#include <vector>
+#include <fstream>
+#include "SystemManager.h"
 
 class Logger {
 public:
-    enum LogType {
-        INFO,
-        WARNING,
-        ERROR,
-        END,
-        WORLD,
-        IMPORT,
-        DEBUG,
-        WHAT_IS,
-        WHAT_IS_AT,
-        WHAT_IS_IN
-    };
+    static Logger &getInstance(const std::string &logFilePath = "", const std::string &databaseFilePath = "") {
+        static Logger instance(logFilePath, databaseFilePath);
+        return instance;
+    }
 
-    std::string logFileName;
 
-    void log(std::string msg);
+    void logHeader(const std::string &databaseFilePath, const std::string &cmdScriptFilePath,
+                   const std::string &logFilePath);
 
-    void log(std::string message, LogType type, bool sepBegin, bool sepEnd);
+    void importLog(const std::vector<std::string> &arguments, std::vector<int> data);
 
-    void writeToLog(std::string line, std::string filename);
+    void worldLog(const std::vector<std::string> &arguments);
 
-    std::string separator = "\n------------------------------------------------------------------------------------------\n";
+    void closeFiles();
+
 private:
-    int cmdNum = 0;
-    std::string worldLog =
-            "Latitude / longitude values in index entries are shown as floating point values, in decimal long/lat format." +
-            separator + "\t\t\t\t\t\tWorld boundaries are set to:\n";
-    std::string initialLog = "Course Project for COMP 8042\nStudent Name : Kevin Vilanova, Student Id : A01019400\nBegin of GIS Program log : \n";
 
+    Logger(const std::string &logFilePath, const std::string &databaseFilePath) {
+        // create or truncate log file and database file
+        SystemManager::createOrTruncateFile(logFile, logFilePath);
+        SystemManager::createOrTruncateFile(databaseFile, databaseFilePath);
+        SystemManager::closeFile(logFile);
+        SystemManager::closeFile(databaseFile);
+        SystemManager::createOrAppendFile(logFile, logFilePath);
+        SystemManager::createOrAppendFile(databaseFile, databaseFilePath);
+    }
+
+    ~Logger() {
+        if (logFile.is_open()) {
+            logFile.close();
+        }
+        if (databaseFile.is_open()) {
+            databaseFile.close();
+        }
+    }
+
+    Logger(const Logger &) = delete;
+
+    Logger &operator=(const Logger &) = delete;
+
+    int cmdCount = 0;
+    std::string separator = "------------------------------------------------------------------------------------------";
+    std::ofstream logFile;       // File stream for log.
+    std::ofstream databaseFile;  // File stream for database.
+
+    static std::string getTime();
 
 };
 

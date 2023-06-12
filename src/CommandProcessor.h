@@ -2,7 +2,6 @@
 #define INC_8042_PROJECT_COMMANDPROCESSOR_H
 
 #include "GISRecord.h"
-#include "SystemManager.h"
 #include "CoordinateIndex.h"
 #include "PRQuadTree.h"
 
@@ -24,13 +23,13 @@ private:
 
     void whatIsInCmd(std::vector<std::string> arguments);
 
-    static void quitCmd();
+    void quitCmd();
 
     GISRecord gisRecord;
-    SystemManager systemManager;
+
 
 public:
-    void parseCmdScript(const std::string &filename);
+    void runCommand(const std::vector<std::string> &commands);
 
 
 };

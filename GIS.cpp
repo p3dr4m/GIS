@@ -1,7 +1,6 @@
 #include <iostream>
-#include "src/SystemManager.h"
 #include "src/CommandProcessor.h"
-
+#include "src/SystemManager.h"
 using namespace std;
 
 /**
@@ -12,21 +11,14 @@ using namespace std;
  */
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        cerr << "Invalid number of arguments" << endl;
-        // explain how to use the command
-        cerr << "Usage: GIS <database file name> <command script file name> <log file name>" << endl;
-        // exit with error
-        exit(1);
+        throw invalid_argument("Invalid number of arguments\n"
+                               "Usage: GIS <database file name> <command script file name> <log file name>");
     }
     char *databaseFilePath = argv[1];
     char *cmdScriptFilePath = argv[2];
     char *logFilePath = argv[3];
 
-    cout << "database file name: " << databaseFilePath << endl;
-    cout << "command script file name: " << cmdScriptFilePath << endl;
-    cout << "log file name: " << logFilePath << endl;
-
-    CommandProcessor commandProcessor;
-    commandProcessor.parseCmdScript(cmdScriptFilePath);
+    SystemManager systemManager;
+    systemManager.run(databaseFilePath, cmdScriptFilePath, logFilePath);
     return 0;
 }

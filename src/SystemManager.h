@@ -1,12 +1,11 @@
-
-
 #ifndef INC_8042_PROJECT_SYSTEMMANAGER_H
 #define INC_8042_PROJECT_SYSTEMMANAGER_H
 
 #include <string>
 #include <vector>
-#include "Logger.h"
-#include "GISRecord.h"
+#include <functional>
+#include <fstream>
+#include "CommandProcessor.h"
 
 class SystemManager {
 public:
@@ -17,6 +16,7 @@ public:
         static SystemManager instance;
         return instance;
     }
+    CommandProcessor commandProcessor;
 
     SystemManager() = default;
 
@@ -25,11 +25,25 @@ public:
 
     SystemManager &operator=(const SystemManager &) = delete;
 
-    Logger logger;
+    static void
+    readLines(const std::string &filename, const std::function<void(std::vector<std::string> &)> &runCommand);
 
+    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &)> &processLine);
 
+    void run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath);
 
-    std::vector<std::vector<std::string>> readScript(const std::string& filename);
+    static void writeLineToFile(std::ofstream &file, const std::string &line);
+
+    static void writeLinesToFile(std::ofstream &file, const std::vector<std::string> &lines);
+
+    // Method to create a file or truncate it if it exists.
+    static void createOrTruncateFile(std::ofstream &file, const std::string &filename);
+
+    // Method to create a file or open it for appending if it exists.
+    static void createOrAppendFile(std::ofstream &file, const std::string &filename);
+
+    // Don't forget to close the file when you're done with it.
+    static void closeFile(std::ofstream &file);
 
 };
 

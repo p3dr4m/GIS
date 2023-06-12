@@ -1,19 +1,38 @@
 #include "SystemManager.h"
-#include <stdexcept>
+#include "Logger.h"
 #include <fstream>
 #include <sstream>
-
+#include <iterator>
 
 using namespace std;
 
 
-vector<vector<string>> SystemManager::readScript(const string &filename) {
+void SystemManager::run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath) {
+
+    auto commandFunction = [this](const vector<string> &arguments) {
+        commandProcessor.runCommand(arguments);
+    };
+
+
+
+    Logger& logger = Logger::getInstance(logFilePath, databaseFilePath);
+    logger.logHeader(databaseFilePath, cmdScriptFilePath, logFilePath);
+
+    readLines(cmdScriptFilePath, commandFunction);
+}
+
+void SystemManager::readLines(const string &filename, const function<void(vector<string> &)> &runCommand) {
     ifstream input(filename);
+
+    if (!input.is_open()) {
+        throw runtime_error("Unable to open file: " + filename);
+    }
+
     string line;
-    vector<vector<string>> commands;
     while (getline(input, line)) {
         istringstream iss(line);
         vector<string> arguments;
+        arguments.reserve(6);
         string argument;
 
         // split line by tab
@@ -25,70 +44,63 @@ vector<vector<string>> SystemManager::readScript(const string &filename) {
             // empty or comment line, skip
             continue;
         }
-
-        commands.push_back(arguments);
+        // run the command
+        runCommand(arguments);
     }
-    return commands;
 }
 
-//void read_record()
-//{
-//
-//    // File pointer
-//    fstream fin;
-//
-//    // Open an existing file
-//    fin.open("reportcard.csv", ios::in);
-//
-//    // Get the roll number
-//    // of which the data is required
-//    int rollnum, roll2, count = 0;
-//    cout << "Enter the roll number "
-//         << "of the student to display details: ";
-//    cin >> rollnum;
-//
-//    // Read the Data from the file
-//    // as String Vector
-//    vector<string> row;
-//    string line, word, temp;
-//
-//    while (fin >> temp) {
-//
-//        row.clear();
-//
-//        // read an entire row and
-//        // store it in a string variable 'line'
-//        getline(fin, line);
-//
-//        // used for breaking words
-//        stringstream s(line);
-//
-//        // read every column data of a row and
-//        // store it in a string variable, 'word'
-//        while (getline(s, word, ', ')) {
-//
-//            // add all the column data
-//            // of a row to a vector
-//            row.push_back(word);
-//        }
-//
-//        // convert string to integer for comparision
-//        roll2 = stoi(row[0]);
-//
-//        // Compare the roll number
-//        if (roll2 == rollnum) {
-//
-//            // Print the found data
-//            count = 1;
-//            cout << "Details of Roll " << row[0] << " : \n";
-//            cout << "Name: " << row[1] << "\n";
-//            cout << "Maths: " << row[2] << "\n";
-//            cout << "Physics: " << row[3] << "\n";
-//            cout << "Chemistry: " << row[4] << "\n";
-//            cout << "Biology: " << row[5] << "\n";
-//            break;
-//        }
-//    }
-//    if (count == 0)
-//        cout << "Record not found\n";
-//}
+void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &)> &processLine) {
+    ifstream file(filename);
+    string line;
+
+    while (getline(file, line)) {
+        vector<string> words;
+        string word;
+        stringstream ss(line);
+
+        while (getline(ss, word, '|')) {
+            words.push_back(word);
+        }
+
+        // Add file offset as the last element
+        words.push_back(to_string(file.tellg()));
+
+        processLine(words);
+    }
+}
+
+void SystemManager::writeLinesToFile(ofstream &file, const vector<string> &lines) {
+    if (file.is_open()) {
+        copy(lines.begin(), lines.end(), ostream_iterator<string>(file, "\n"));
+    } else {
+        throw runtime_error("File is not open");
+    }
+}
+
+void SystemManager::writeLineToFile(ofstream &file, const string &line) {
+    if (file.is_open()) {
+        file << line << "\n";
+    } else {
+        throw runtime_error("File is not open");
+    }
+}
+
+void SystemManager::createOrTruncateFile(ofstream &file, const string &filename) {
+    file.open(filename, ios::out);  // open in output mode (create or truncate)
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << filename << endl;
+    }
+}
+
+void SystemManager::createOrAppendFile(ofstream &file, const string &filename) {
+    file.open(filename, ios::app);  // open in append mode (create or append)
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << filename << endl;
+    }
+}
+
+void SystemManager::closeFile(ofstream &file) {
+    if (file.is_open()) {
+        file.close();
+    }
+}

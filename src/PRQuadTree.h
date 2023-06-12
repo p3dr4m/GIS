@@ -11,6 +11,14 @@ struct Bounds {
     float maxLat;
     float minLong;
     float maxLong;
+
+    Bounds(float minLat, float maxLat, float minLong, float maxLong) {
+        this->minLat = minLat;
+        this->maxLat = maxLat;
+        this->minLong = minLong;
+        this->maxLong = maxLong;
+    }
+
 };
 
 struct Coordinate {
@@ -60,8 +68,7 @@ private:
     PRQuadTree *bottomRightQuad;
 public:
     PRQuadTree()
-            : boundingBox{},
-              topLeftQuad(nullptr),
+            : topLeftQuad(nullptr),
               topRightQuad(nullptr),
               bottomLeftQuad(nullptr),
               bottomRightQuad(nullptr) {

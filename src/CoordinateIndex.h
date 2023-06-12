@@ -17,8 +17,8 @@ public:
         quadTree.setBoundary(bounds);
     }
 
-    void printNodeCountOfTree() {
-        std::cout << "Node count: " << quadTree.countAllQuadNodes() << std::endl;
+    int getNodeCount() {
+        return quadTree.countAllQuadNodes();
     }
 
 

@@ -12,10 +12,7 @@ void PRQuadTree::setBoundary(Bounds bounds) {
     float centerLong = (bounds.minLong + bounds.maxLong) / 2;
     float centerLat = (bounds.minLat + bounds.maxLat) / 2;
 
-    boundingBox.topLeft = Coordinate(bounds.minLong, bounds.maxLat);
-    boundingBox.bottomRight = Coordinate(bounds.maxLong, bounds.minLat);
-    boundingBox.centerPoint = Coordinate(centerLong, centerLat);
-    boundingBox.boxHalfWidth = Coordinate(boxHalfWidthLong, boxHalfWidthLat);
+    boundingBox = BoundingBox(Coordinate(centerLong, centerLat), boxHalfWidthLong, boxHalfWidthLat);
 
 }
 

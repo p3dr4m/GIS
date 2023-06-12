@@ -3,59 +3,55 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include "SystemManager.h"
 #include "CoordinateIndex.h"
+#include "Logger.h"
 
 using namespace std;
 
-void CommandProcessor::parseCmdScript(const string &filename) {
-    vector<vector<string>> commands = systemManager.readScript(filename);
+void CommandProcessor::runCommand(const vector<string> &arguments) {
     Command command;
-    for (auto &&arguments: commands) {
-        if (arguments[0] == "world") {
-            command = world;
-        } else if (arguments[0] == "import") {
-            command = import;
-        } else if (arguments[0] == "debug") {
-            command = debug;
-        } else if (arguments[0] == "what_is_at") {
-            command = what_is_at;
-        } else if (arguments[0] == "what_is") {
-            command = what_is;
-        } else if (arguments[0] == "what_is_in") {
-            command = what_is_in;
-        } else if (arguments[0] == "quit") {
-            command = quit;
-        } else {
-            throw invalid_argument("Invalid command: " + arguments[0]);
-        }
-
-        // process command
-        switch (command) {
-            case world:
-                worldCmd(arguments);
-                break;
-            case import:
-                importCmd(arguments);
-                break;
-            case debug:
-                debugCmd(arguments);
-                break;
-            case what_is_at:
-                whatIsAtCmd(arguments);
-                break;
-            case what_is:
-                whatIsCmd(arguments);
-                break;
-            case what_is_in:
-                whatIsInCmd(arguments);
-                break;
-            case quit:
-                quitCmd();
-                break;
-        }
+    if (arguments[0] == "world") {
+        command = world;
+    } else if (arguments[0] == "import") {
+        command = import;
+    } else if (arguments[0] == "debug") {
+        command = debug;
+    } else if (arguments[0] == "what_is_at") {
+        command = what_is_at;
+    } else if (arguments[0] == "what_is") {
+        command = what_is;
+    } else if (arguments[0] == "what_is_in") {
+        command = what_is_in;
+    } else if (arguments[0] == "quit") {
+        command = quit;
+    } else {
+        throw invalid_argument("Invalid command: " + arguments[0]);
     }
 
+    // process command
+    switch (command) {
+        case world:
+            worldCmd(arguments);
+            break;
+        case import:
+            importCmd(arguments);
+            break;
+        case debug:
+            debugCmd(arguments);
+            break;
+        case what_is_at:
+            whatIsAtCmd(arguments);
+            break;
+        case what_is:
+            whatIsCmd(arguments);
+            break;
+        case what_is_in:
+            whatIsInCmd(arguments);
+            break;
+        case quit:
+            quitCmd();
+            break;
+    }
 }
 
 
@@ -69,12 +65,22 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
     }
     cout << "world command" << endl;
 
-    float westLong = DMS(arguments[1]).toFloat();
-    float eastLong = DMS(arguments[2]).toFloat();
-    float southLat = DMS(arguments[3]).toFloat();
-    float northLat = DMS(arguments[4]).toFloat();
+    DMS westLong = DMS(arguments[1]);
+    DMS eastLong = DMS(arguments[2]);
+    DMS southLat = DMS(arguments[3]);
+    DMS northLat = DMS(arguments[4]);
+    float westLongDec = westLong.toFloat();
+    float eastLongDec = eastLong.toFloat();
+    float southLatDec = southLat.toFloat();
+    float northLatDec = northLat.toFloat();
+    string westLongSecs = westLong.toTotalSeconds();
+    string eastLongSecs = eastLong.toTotalSeconds();
+    string southLatSecs = southLat.toTotalSeconds();
+    string northLatSecs = northLat.toTotalSeconds();
+    Logger &logger = Logger::getInstance();
+    logger.worldLog(arguments);
 
-    gisRecord.setBounds(southLat, northLat, westLong, eastLong);
+    gisRecord.setBounds(southLatDec, northLatDec, westLongDec, eastLongDec);
 
 
 }
@@ -99,27 +105,27 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     string line, word;
     vector<string> row;
     int countingLines = 0;
-    // print out each line
-    while (getline(input, line)) {
-        int fileOffset = input.tellg();
-
+    // Use SystemManager to read the file
+    SystemManager::readDatabase(arguments[1], [&](vector<string>& row) {
         // skip first line in file
         if (countingLines == 0) {
             countingLines++;
-            continue;
+            return;
         }
-        // split line using "|"
-        stringstream s(line);
-        while (getline(s, word, '|')) {
-            row.push_back(word);
-        }
-        countingLines++;
+
+        int fileOffset = stoi(row.back());
+        row.pop_back();  // remove the fileOffset from row
+
         gisRecord.insertRecord(row, countingLines, fileOffset);
-        row.clear();
-
-
-    }
-    gisRecord.printNodes();
+        countingLines++;
+    });
+    int nodeCount = gisRecord.getNodeCount();
+    int importedNames = gisRecord.getImportedNames();
+    int longestProbe = gisRecord.getLongestProbe();
+    int avgNameLength = gisRecord.getAvgNameLength();
+    vector<int> data = {importedNames, longestProbe, nodeCount, avgNameLength};
+    Logger &logger = Logger::getInstance();
+    logger.importLog(arguments, data);
 }
 
 /**
@@ -195,47 +201,51 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
                                "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>");
     }
 
-    string filterOption = "None";
-    bool longLog = false;
+    string filterOption;
     string latitude;
     string longitude;
     float halfHeight;
     float halfWidth;
+    float latDec;
+    float lngDec;
 
     if (arguments[1] == "-filter") {
-        if (arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure") {
-            filterOption = arguments[2];
-        } else {
+        if (!(arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure")) {
             throw invalid_argument("Invalid what_is_in command\n"
-                                   "Usage: what_is_in<tab>-filter<tab><pop|water|structure> <latitude> <longitude> <half-height> <half-width>");
+                                   "Usage: what_is_in<tab>-filter<tab><pop|water|structure>"
+                                   " <latitude> <longitude> <half-height> <half-width>");
         }
 
+        filterOption = arguments[2];
         latitude = arguments[3];
         longitude = arguments[4];
         halfHeight = stof(arguments[5]) / 3600.f;
         halfWidth = stof(arguments[6]) / 3600.f;
-        float latDec = DMS(latitude).toFloat();
-        float lngDec = DMS(longitude).toFloat();
+        latDec = DMS(latitude).toFloat();
+        lngDec = DMS(longitude).toFloat();
         vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
 
     } else if (arguments[1] == "-long") {
-        longLog = true;
         latitude = arguments[2];
         longitude = arguments[3];
         halfHeight = stof(arguments[4]) / 3600.f;
         halfWidth = stof(arguments[5]) / 3600.f;
-        float latDec = DMS(latitude).toFloat();
-        float lngDec = DMS(longitude).toFloat();
+        latDec = DMS(latitude).toFloat();
+        lngDec = DMS(longitude).toFloat();
         vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
     } else {
         latitude = arguments[1];
         longitude = arguments[2];
         halfHeight = stof(arguments[3]) / 3600.f;
         halfWidth = stof(arguments[4]) / 3600.f;
-        float latDec = DMS(latitude).toFloat();
-        float lngDec = DMS(longitude).toFloat();
+        DMS latDms = DMS(latitude);
+        latDec = latDms.toFloat();
+        lngDec = DMS(longitude).toFloat();
 
         vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        for (auto &record: records) {
+            cout << record << endl;
+        }
     }
 }
 
@@ -246,6 +256,7 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
 void CommandProcessor::quitCmd() {
     cout << "quit command" << endl;
     cout << "Exiting..." << endl;
+    // logger close files
     exit(0);
 }
 

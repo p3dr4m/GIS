@@ -2,9 +2,9 @@
 #define INC_8042_PROJECT_GISRECORD_H
 
 #include <string>
-#include "Logger.h"
 #include "CoordinateIndex.h"
 #include "NameIndex.h"
+#include <stdexcept>
 
 
 struct DMS {
@@ -15,24 +15,14 @@ struct DMS {
 
     DMS() = default;
 
-    explicit DMS(std::string dms) {
-        degrees = std::stoi(dms.substr(0, dms.find('d')));
-        minutes = std::stoi(dms.substr(dms.find('d') + 1, dms.find('m')));
-        seconds = std::stoi(dms.substr(dms.find('m') + 1, dms.find('s')));
-        direction = dms[dms.length() - 1];
-    }
 
-    std::string toString() const {
-        return std::to_string(degrees) + "d " + std::to_string(minutes) + "m " +
-               std::to_string(seconds) + "s " + direction;
-    }
+    explicit DMS(const std::string &dms);
 
-    float toFloat() const {
-        auto decimalVersion = static_cast<float>(degrees);
-        decimalVersion += static_cast<float>(minutes) / 60.f;
-        decimalVersion += static_cast<float>(seconds) / 3600.f;
-        return decimalVersion;
-    }
+    std::string toString() const;
+
+    std::string toTotalSeconds() const;
+
+    float toFloat() const;
 };
 
 enum GIS_Record_Header {
@@ -73,10 +63,6 @@ public:
         nameIndex = new NameIndex();
     }
 
-    Bounds bounds{};
-
-    float convertDmsToFloat(DMS dms);
-
     void setBounds(float minLat, float maxLat, float minLong, float maxLong);
 
     void insertRecord(std::vector<std::string> row, int lineNum, int offset);
@@ -85,11 +71,17 @@ public:
 
     std::vector<int> findRecords(float longitude, float latitude, float halfWidth, float halfHeight);
 
-    void printNodes() {
-        coordinateIndex->printNodeCountOfTree();
+    int getNodeCount() {
+        return coordinateIndex->getNodeCount();
     };
+
+    int getImportedNames();
+
+    int getLongestProbe();
+
+    int getAvgNameLength();
+
 private:
-    Logger logger;
     CoordinateIndex *coordinateIndex;
     NameIndex *nameIndex;
 
