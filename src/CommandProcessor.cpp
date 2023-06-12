@@ -68,12 +68,11 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
         throw invalid_argument("Invalid world command\nUsage: world <westLong> <eastLong> <southLat> <northLat>");
     }
     cout << "world command" << endl;
-    DMS westLong{}, eastLong{}, northLat{}, southLat{};
 
-    westLong = gisRecord.fillDMS(arguments[1]);
-    eastLong = gisRecord.fillDMS(arguments[2]);
-    southLat = gisRecord.fillDMS(arguments[3]);
-    northLat = gisRecord.fillDMS(arguments[4]);
+    float westLong = DMS(arguments[1]).toFloat();
+    float eastLong = DMS(arguments[2]).toFloat();
+    float southLat = DMS(arguments[3]).toFloat();
+    float northLat = DMS(arguments[4]).toFloat();
 
     gisRecord.setBounds(southLat, northLat, westLong, eastLong);
 
@@ -89,11 +88,8 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
 void CommandProcessor::importCmd(vector<string> arguments) {
 
     if (arguments.size() != 2) {
-        cerr << "Invalid import command" << endl;
-        // explain how to use the command
-        cerr << "Usage: import <filename>" << endl;
-        // exit with error
-        exit(1);
+        throw invalid_argument("Invalid import command\n"
+                               "Usage: import <filename>");
     }
     cout << "import command" << endl;
     cout << "filepath: " << arguments[1] << endl;
@@ -132,11 +128,8 @@ void CommandProcessor::importCmd(vector<string> arguments) {
  */
 void CommandProcessor::debugCmd(vector<string> arguments) {
     if (arguments.size() != 2) {
-        cerr << "Invalid debug command" << endl;
-        // explain how to use the command
-        cerr << "Usage: debug <quad|hash|pool|world>" << endl;
-        // exit with error
-        exit(1);
+        throw invalid_argument("Invalid debug command\n"
+                               "Usage: debug <quad|hash|pool|world>");
     }
     cout << "debug command" << endl;
     cout << "debug type: " << arguments[1] << endl;
@@ -162,28 +155,13 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
  * @param arguments
  */
 void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
-    // print arguments
-
     if (arguments.size() != 3) {
-        cerr << "Invalid what_is_at command" << endl;
-        // explain how to use the command
-        cerr << "Usage: what_is_at <latitude> <longitude>" << endl;
-        // exit with error
-        exit(1);
+        throw invalid_argument("Invalid what_is_at command\n"
+                               "Usage: what_is_at <latitude> <longitude>");
     }
-    cout << "what_is_at command" << endl;
-    cout << "latitude: " << arguments[1] << endl;
-    cout << "longitude: " << arguments[2] << endl;
 
-
-//    DMS lat = gisRecord.fillDMS(arguments[1]);
-//    DMS lng = gisRecord.fillDMS(arguments[2]);
-    DMS lat = gisRecord.fillDMS("382607N");
-    DMS lng = gisRecord.fillDMS("0793312W");
-
-
-    float latDec = gisRecord.convertDMS(lat);
-    float lngDec = gisRecord.convertDMS(lng);
+    float latDec = DMS(arguments[1]).toFloat();
+    float lngDec = DMS(arguments[2]).toFloat();
     vector<int> recordOffsets = gisRecord.findRecords(latDec, lngDec);
 }
 
@@ -193,11 +171,9 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
  */
 void CommandProcessor::whatIsCmd(vector<string> arguments) {
     if (arguments.size() != 3) {
-        cerr << "Invalid what_is command" << endl;
-        // explain how to use the command
-        cerr << "Usage: what_is <feature name> <state abbreviation>" << endl;
-        // exit with error
-        exit(1);
+
+        throw invalid_argument("Invalid what_is command\n"
+                               "Usage: what_is <feature name> <state abbreviation>");
     }
     cout << "what_is command" << endl;
     cout << "feature name: " << arguments[0] << endl;
@@ -215,11 +191,8 @@ void CommandProcessor::whatIsCmd(vector<string> arguments) {
 void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     // check if the number of arguments isn't greater than 5 and less than 7
     if (arguments.size() < 5 || arguments.size() > 7) {
-        cerr << "Invalid what_is_in command" << endl;
-        // explain how to use the command
-        cerr << "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>" << endl;
-        // exit with error
-        exit(1);
+        throw invalid_argument("Invalid what_is_in command\n"
+                               "Usage: what_is_in <latitude> <longitude> <half-height> <half-width>");
     }
 
     string filterOption = "None";
@@ -230,23 +203,20 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     float halfWidth;
 
     if (arguments[1] == "-filter") {
-        ///  -filter [ pop | water | structure ]
         if (arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure") {
             filterOption = arguments[2];
         } else {
-            cerr << "Invalid filter option" << endl;
-            // explain how to use the command
-            cerr
-                    << "Usage: what_is_in<tab>-filter<tab><pop|water|structure> <latitude> <longitude> <half-height> <half-width>"
-                    << endl;
-            // exit with error
-            exit(1);
+            throw invalid_argument("Invalid what_is_in command\n"
+                                   "Usage: what_is_in<tab>-filter<tab><pop|water|structure> <latitude> <longitude> <half-height> <half-width>");
         }
 
         latitude = arguments[3];
         longitude = arguments[4];
         halfHeight = stof(arguments[5]) / 3600.f;
         halfWidth = stof(arguments[6]) / 3600.f;
+        float latDec = DMS(latitude).toFloat();
+        float lngDec = DMS(longitude).toFloat();
+        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
 
     } else if (arguments[1] == "-long") {
         longLog = true;
@@ -254,32 +224,19 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         longitude = arguments[3];
         halfHeight = stof(arguments[4]) / 3600.f;
         halfWidth = stof(arguments[5]) / 3600.f;
+        float latDec = DMS(latitude).toFloat();
+        float lngDec = DMS(longitude).toFloat();
+        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
     } else {
-        // convert seconds to decimal
-
-
         latitude = arguments[1];
         longitude = arguments[2];
         halfHeight = stof(arguments[3]) / 3600.f;
         halfWidth = stof(arguments[4]) / 3600.f;
-        DMS lngDMS = gisRecord.fillDMS(longitude);
-        DMS latDMS = gisRecord.fillDMS(latitude);
-        float latDec = gisRecord.convertDMS(latDMS);
-        float lngDec = gisRecord.convertDMS(lngDMS);
+        float latDec = DMS(latitude).toFloat();
+        float lngDec = DMS(longitude).toFloat();
 
-        vector<int> records = gisRecord.findRecordsInBounds(lngDec, latDec, halfWidth, halfHeight);
-        for (int record : records) {
-            cout << record << endl;
-        }
+        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
     }
-
-    cout << "what_is_in command" << endl;
-    cout << "filter option: " << filterOption << endl;
-    cout << "long log: " << longLog << endl;
-    cout << "latitude: " << latitude << endl;
-    cout << "longitude: " << longitude << endl;
-    cout << "half-height: " << halfHeight << endl;
-    cout << "half-width: " << halfWidth << endl;
 }
 
 

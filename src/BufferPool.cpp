@@ -15,8 +15,8 @@ BufferPool::~BufferPool() {
 size_t BufferPool::read(void *data, size_t size) {
     size_t bytes_read = 0;
     while (size > 0 && read_pos_ < write_pos_) {
-        size_t bytes_to_read = std::min(size, write_pos_ - read_pos_);
-        std::memcpy(data, buffer_ + read_pos_, bytes_to_read);
+        size_t bytes_to_read = min(size, write_pos_ - read_pos_);
+        memcpy(data, buffer_ + read_pos_, bytes_to_read);
         read_pos_ += bytes_to_read;
         size -= bytes_to_read;
         bytes_read += bytes_to_read;
@@ -27,8 +27,8 @@ size_t BufferPool::read(void *data, size_t size) {
 size_t BufferPool::write(const void *data, size_t size) {
     size_t bytes_written = 0;
     while (size > 0) {
-        size_t bytes_to_write = std::min(size, buffer_size_ - write_pos_);
-        std::memcpy(buffer_ + write_pos_, data, bytes_to_write);
+        size_t bytes_to_write = min(size, buffer_size_ - write_pos_);
+        memcpy(buffer_ + write_pos_, data, bytes_to_write);
         write_pos_ += bytes_to_write;
         size -= bytes_to_write;
         bytes_written += bytes_to_write;

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-std::vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
+vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
     vector<Node> nodes;
     Coordinate coordinate = Coordinate(longitude, latitude);
     quadTree.getNodeByCoordinate(nodes, coordinate);
@@ -14,7 +14,7 @@ std::vector<int> CoordinateIndex::searchRecords(float latitude, float longitude)
     return fileOffsets;
 }
 
-std::vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight) {
+vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight) {
     vector<Node> nodes;
     BoundingBox boundingBox = BoundingBox(coord, halfWidth, halfHeight);
     quadTree.getNodesInBounds(nodes, boundingBox);
@@ -39,7 +39,7 @@ void CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
     quadTree.insert(node);
 }
 
-std::vector<int> CoordinateIndex::getOffsetsFromNodes(std::vector<Node> nodes) {
+vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Node> nodes) {
     vector<int> fileOffsets;
 
     for (auto &node: nodes) {

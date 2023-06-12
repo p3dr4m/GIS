@@ -30,7 +30,8 @@ struct Coordinate {
 
 struct Node {
     Coordinate coordinate;
-    std::vector<int> fileOffset, databaseLine;
+    std::vector<int> fileOffset;
+    std::vector<int> databaseLine;
 };
 
 struct BoundingBox {

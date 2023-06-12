@@ -8,16 +8,30 @@
 
 
 struct DMS {
-    DMS() = default;
-
     int degrees;
     int minutes;
     int seconds;
     char direction;
 
-    std::string toString() {
+    DMS() = default;
+
+    explicit DMS(std::string dms) {
+        degrees = std::stoi(dms.substr(0, dms.find('d')));
+        minutes = std::stoi(dms.substr(dms.find('d') + 1, dms.find('m')));
+        seconds = std::stoi(dms.substr(dms.find('m') + 1, dms.find('s')));
+        direction = dms[dms.length() - 1];
+    }
+
+    std::string toString() const {
         return std::to_string(degrees) + "d " + std::to_string(minutes) + "m " +
                std::to_string(seconds) + "s " + direction;
+    }
+
+    float toFloat() const {
+        auto decimalVersion = static_cast<float>(degrees);
+        decimalVersion += static_cast<float>(minutes) / 60.f;
+        decimalVersion += static_cast<float>(seconds) / 3600.f;
+        return decimalVersion;
     }
 };
 
@@ -49,22 +63,27 @@ class GISRecord {
 public:
     GISRecord() {
         coordinateIndex = new CoordinateIndex();
+        nameIndex = new NameIndex();
     };
 
     ~GISRecord() {
         delete coordinateIndex;
+        delete nameIndex;
         coordinateIndex = new CoordinateIndex();
+        nameIndex = new NameIndex();
     }
 
     Bounds bounds{};
 
-    float convertDMS(DMS dms);
-    DMS fillDMS(std::string value);
-    void setBounds(DMS minLat, DMS maxLat, DMS minLong, DMS maxLong);
+    float convertDmsToFloat(DMS dms);
+
+    void setBounds(float minLat, float maxLat, float minLong, float maxLong);
+
     void insertRecord(std::vector<std::string> row, int lineNum, int offset);
 
     std::vector<int> findRecords(float lat, float lng);
-    std::vector<int> findRecordsInBounds(float longitude, float latitude, float halfWidth, float halfHeight);
+
+    std::vector<int> findRecords(float longitude, float latitude, float halfWidth, float halfHeight);
 
     void printNodes() {
         coordinateIndex->printNodeCountOfTree();

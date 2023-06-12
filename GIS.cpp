@@ -12,9 +12,9 @@ using namespace std;
  */
 int main(int argc, char *argv[]) {
     if (argc != 4) {
-        std::cerr << "Invalid number of arguments" << std::endl;
+        cerr << "Invalid number of arguments" << endl;
         // explain how to use the command
-        std::cerr << "Usage: GIS <database file name> <command script file name> <log file name>" << std::endl;
+        cerr << "Usage: GIS <database file name> <command script file name> <log file name>" << endl;
         // exit with error
         exit(1);
     }
@@ -22,9 +22,9 @@ int main(int argc, char *argv[]) {
     char *cmdScriptFilePath = argv[2];
     char *logFilePath = argv[3];
 
-    std::cout << "database file name: " << databaseFilePath << std::endl;
-    std::cout << "command script file name: " << cmdScriptFilePath << std::endl;
-    std::cout << "log file name: " << logFilePath << std::endl;
+    cout << "database file name: " << databaseFilePath << endl;
+    cout << "command script file name: " << cmdScriptFilePath << endl;
+    cout << "log file name: " << logFilePath << endl;
 
     CommandProcessor commandProcessor;
     commandProcessor.parseCmdScript(cmdScriptFilePath);

@@ -115,7 +115,7 @@ int PRQuadTree::countAllQuadNodes() {
     return count;
 }
 
-void PRQuadTree::getNodesInBounds(std::vector<Node> &nodes, BoundingBox box) {
+void PRQuadTree::getNodesInBounds(vector<Node> &nodes, BoundingBox box) {
     // Check if the current node is within the bounds
     for (auto &quadNode: quadNodes) {
         if (isCoordInBox(quadNode.coordinate, box)) {
