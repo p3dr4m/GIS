@@ -72,8 +72,12 @@ public:
     std::vector<int> findRecords(float longitude, float latitude, float halfWidth, float halfHeight);
 
     int getNodeCount() {
-        return coordinateIndex->getNodeCount();
+        return coordinateIndex->getTotalLocations();
     };
+
+    PRQuadTree &getTree() {
+        return coordinateIndex->getTree();
+    }
 
     int getImportedNames();
 

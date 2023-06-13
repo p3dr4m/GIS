@@ -11,12 +11,8 @@ using namespace std;
  * @param maxLong
  */
 void GISRecord::setBounds(float minLat, float maxLat, float minLong, float maxLong) {
-    Bounds bounds = Bounds(minLat, maxLat, minLong, maxLong);
-
-    // log bounds from logger class
-
-    // update bounds of coordinate index
-    coordinateIndex->updateBoundsOfTree(bounds);
+    BoundingBox boundingBox = BoundingBox(Coordinate(minLong, minLat), maxLong - minLong, maxLat - minLat);
+    coordinateIndex->updateBoundsOfTree(boundingBox);
 }
 
 void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {

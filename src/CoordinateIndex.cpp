@@ -17,7 +17,7 @@ vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
 vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight) {
     vector<Node> nodes;
     BoundingBox boundingBox = BoundingBox(coord, halfWidth, halfHeight);
-    quadTree.getNodesInBounds(nodes, boundingBox);
+    quadTree.getLocationsInBounds(nodes, boundingBox);
 
     // loop through the nodes and get the file offsets
     vector<int> fileOffsets = getOffsetsFromNodes(nodes);
@@ -51,3 +51,4 @@ vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Node> nodes) {
 
     return fileOffsets;
 }
+

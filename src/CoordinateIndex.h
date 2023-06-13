@@ -7,23 +7,30 @@
 
 class CoordinateIndex {
 public:
+
     void insert(float latitude, float longitude, int fileOffset, int dbLine);
 
     std::vector<int> searchRecords(float latitude, float longitude);
 
     std::vector<int> searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight);
 
-    void updateBoundsOfTree(Bounds bounds) {
-        quadTree.setBoundary(bounds);
+    void updateBoundsOfTree(BoundingBox boundingBox) {
+        quadTree = PRQuadTree(4, boundingBox);
     }
 
-    int getNodeCount() {
-        return quadTree.countAllQuadNodes();
+    int getTotalLocations() {
+        return quadTree.getTotalLocations();
+    }
+
+    PRQuadTree &getTree() {
+        // return reference to quadTree
+        return quadTree;
     }
 
 
 private:
-    PRQuadTree quadTree;
+    PRQuadTree quadTree = PRQuadTree(4, BoundingBox());
+
     static std::vector<int> getOffsetsFromNodes(std::vector<Node> nodes);
 };
 

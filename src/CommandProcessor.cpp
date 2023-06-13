@@ -1,8 +1,6 @@
-#include "CommandProcessor.h"
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <stdexcept>
+#include "CommandProcessor.h"
 #include "CoordinateIndex.h"
 #include "Logger.h"
 
@@ -63,7 +61,6 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
     if (arguments.size() != 5) {
         throw invalid_argument("Invalid world command\nUsage: world <westLong> <eastLong> <southLat> <northLat>");
     }
-    cout << "world command" << endl;
 
     DMS westLong = DMS(arguments[1]);
     DMS eastLong = DMS(arguments[2]);
@@ -97,8 +94,6 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         throw invalid_argument("Invalid import command\n"
                                "Usage: import <filename>");
     }
-    cout << "import command" << endl;
-    cout << "filepath: " << arguments[1] << endl;
 
     // open the file
     ifstream input(arguments[1]);
@@ -106,7 +101,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     vector<string> row;
     int countingLines = 0;
     // Use SystemManager to read the file
-    SystemManager::readDatabase(arguments[1], [&](vector<string>& row) {
+    SystemManager::readDatabase(arguments[1], [&](vector<string> &row) {
         // skip first line in file
         if (countingLines == 0) {
             countingLines++;
@@ -133,26 +128,30 @@ void CommandProcessor::importCmd(vector<string> arguments) {
  * @param arguments
  */
 void CommandProcessor::debugCmd(vector<string> arguments) {
-    if (arguments.size() != 2) {
+    if (arguments.size() != 2 || (!(arguments[1] == "quad"
+                                    || arguments[1] == "hash" || arguments[1] == "pool" ||
+                                    arguments[1] == "world"))) {
         throw invalid_argument("Invalid debug command\n"
                                "Usage: debug <quad|hash|pool|world>");
     }
-    cout << "debug command" << endl;
-    cout << "debug type: " << arguments[1] << endl;
+    PRQuadTree &quadTree = gisRecord.getTree();
+
+    if (quadTree.isEmpty()) {
+        throw invalid_argument("No data has been imported yet");
+    }
+
+    Logger &logger = Logger::getInstance();
     if (arguments[1] == "quad") {
         // print out the quadtree
+        logger.debugQuad(arguments, quadTree);
     } else if (arguments[1] == "hash") {
         // print out the hash table
     } else if (arguments[1] == "pool") {
         // print out the memory pool
     } else if (arguments[1] == "world") {
         // print out the world
-    } else {
-        cerr << "Invalid debug type" << endl;
-        // explain how to use the command
-        cerr << "Usage: debug <quad|hash|pool|world>" << endl;
-        // exit with error
-        exit(1);
+        logger.debugWorld(arguments, quadTree);
+
     }
 }
 
@@ -181,9 +180,6 @@ void CommandProcessor::whatIsCmd(vector<string> arguments) {
         throw invalid_argument("Invalid what_is command\n"
                                "Usage: what_is <feature name> <state abbreviation>");
     }
-    cout << "what_is command" << endl;
-    cout << "feature name: " << arguments[0] << endl;
-    cout << "state abbreviation: " << arguments[1] << endl;
 }
 
 /**
@@ -208,7 +204,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     float halfWidth;
     float latDec;
     float lngDec;
-
+    vector<int> records;
+    Logger &logger = Logger::getInstance();
     if (arguments[1] == "-filter") {
         if (!(arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure")) {
             throw invalid_argument("Invalid what_is_in command\n"
@@ -223,8 +220,9 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         halfWidth = stof(arguments[6]) / 3600.f;
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
-        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-
+        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        // print out the records
+        logger.whatIsInLog(arguments, records);
     } else if (arguments[1] == "-long") {
         latitude = arguments[2];
         longitude = arguments[3];
@@ -232,7 +230,9 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         halfWidth = stof(arguments[5]) / 3600.f;
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
-        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        // print out the records
+        logger.whatIsInLog(arguments, records);
     } else {
         latitude = arguments[1];
         longitude = arguments[2];
@@ -242,10 +242,9 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         latDec = latDms.toFloat();
         lngDec = DMS(longitude).toFloat();
 
-        vector<int> records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        for (auto &record: records) {
-            cout << record << endl;
-        }
+        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        // print out the records
+        logger.whatIsInLog(arguments, records);
     }
 }
 
@@ -254,8 +253,6 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
  * quit<tab>
  */
 void CommandProcessor::quitCmd() {
-    cout << "quit command" << endl;
-    cout << "Exiting..." << endl;
     // logger close files
     exit(0);
 }

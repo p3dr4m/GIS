@@ -16,7 +16,7 @@ void SystemManager::run(const char *databaseFilePath, const char *cmdScriptFileP
 
 
     Logger& logger = Logger::getInstance(logFilePath, databaseFilePath);
-    logger.logHeader(databaseFilePath, cmdScriptFilePath, logFilePath);
+    logger.headerLog(databaseFilePath, cmdScriptFilePath, logFilePath);
 
     readLines(cmdScriptFilePath, commandFunction);
 }

@@ -14,14 +14,17 @@ public:
     }
 
 
-    void logHeader(const std::string &databaseFilePath, const std::string &cmdScriptFilePath,
+    void headerLog(const std::string &databaseFilePath, const std::string &cmdScriptFilePath,
                    const std::string &logFilePath);
 
     void importLog(const std::vector<std::string> &arguments, std::vector<int> data);
 
     void worldLog(const std::vector<std::string> &arguments);
 
-    void closeFiles();
+    void debugWorld(const std::vector<std::string> &option, PRQuadTree &tree);
+    void debugQuad(const std::vector<std::string> &option, PRQuadTree &tree);
+
+    void whatIsInLog(std::vector<std::string> arguments, std::vector<int> records);
 
 private:
 
@@ -47,14 +50,15 @@ private:
     Logger(const Logger &) = delete;
 
     Logger &operator=(const Logger &) = delete;
-
     int cmdCount = 0;
     std::string separator = "------------------------------------------------------------------------------------------";
     std::ofstream logFile;       // File stream for log.
+
     std::ofstream databaseFile;  // File stream for database.
 
     static std::string getTime();
 
+    void printWorld(PRQuadTree &tree, std::vector<std::string> &lines);
 };
 
 
