@@ -44,7 +44,9 @@ std::vector<Node> PRQuadTree::retrieve(std::vector<Node> returnNodes, const Node
 }
 
 void PRQuadTree::insert(Node location) {
-    if (nodes[0] != nullptr) {
+    // is it a leaf node?
+        if (nodes[0] != nullptr) {
+        // find the index of the node that the location belongs in
         int index = getIndex(location);
         if (index != -1) {
             nodes[index]->insert(location);
@@ -52,7 +54,7 @@ void PRQuadTree::insert(Node location) {
         }
     }
     locations.push_back(location);
-    if (locations.size() > MAX_NODES) {
+    if (locations.size() > MAX_NODES && level < MAX_LEVELS) {
         if (nodes[0] == nullptr) {
             split();
         }
@@ -71,16 +73,19 @@ void PRQuadTree::insert(Node location) {
 
 int PRQuadTree::getIndex(Node location) {
     int index = -1;
-    float verticalMidpoint = boundingBox.centerPoint.longitude;
-    float horizontalMidpoint = boundingBox.centerPoint.latitude;
+    float centerX = boundingBox.getCenterX();
+    float centerY = boundingBox.getCenterY();
+
+    float x = location.getX();
+    float y = location.getY();
 
     // Object can completely fit within the top quadrants
-    bool topQuadrant = (location.coordinate.latitude > horizontalMidpoint);
+    bool topQuadrant = (y > centerY);
     // Object can completely fit within the bottom quadrants
-    bool bottomQuadrant = (location.coordinate.latitude < horizontalMidpoint);
+    bool bottomQuadrant = (y < centerY);
 
     // Object can completely fit within the left quadrants
-    if (location.coordinate.longitude < verticalMidpoint) {
+    if (x < centerX) {
         if (topQuadrant) {
             index = 0;
         } else if (bottomQuadrant) {
@@ -88,7 +93,7 @@ int PRQuadTree::getIndex(Node location) {
         }
     }
         // Object can completely fit within the right quadrants
-    else if (location.coordinate.longitude > verticalMidpoint) {
+    else if (x > centerX) {
         if (topQuadrant) {
             index = 1;
         } else if (bottomQuadrant) {
@@ -99,8 +104,8 @@ int PRQuadTree::getIndex(Node location) {
 }
 
 void PRQuadTree::split() {
-    float halfWidth = boundingBox.halfWidths.longitude / 2;
-    float halfHeight = boundingBox.halfWidths.latitude / 2;
+    float halfWidth = boundingBox.halfWidthHeights.longitude / 2;
+    float halfHeight = boundingBox.halfWidthHeights.latitude / 2;
     float x = boundingBox.centerPoint.longitude;
     float y = boundingBox.centerPoint.latitude;
 
@@ -125,7 +130,7 @@ void PRQuadTree::clear() {
 }
 
 int PRQuadTree::getTotalLocations() {
-    int totalLocations = (int)locations.size();
+    int totalLocations = (int) locations.size();
     for (auto &node: nodes) {
         if (node != nullptr) {
             totalLocations += node->getTotalLocations();
@@ -161,14 +166,34 @@ void PRQuadTree::getLocationsInBounds(vector<Node> &returnNodes, BoundingBox box
     }
 }
 
+bool PRQuadTree::isLeaf() {
+    return nodes[0] == nullptr;
+}
 
-BoundingBox::BoundingBox(Coordinate centerPoint, float halfWidth, float halfHeight)
-        : centerPoint(centerPoint),
-          halfWidths(halfWidth, halfHeight),
-          topLeft(centerPoint.longitude - halfWidth, centerPoint.latitude + halfHeight) {
-    this->centerPoint = centerPoint;
-    this->halfWidths = Coordinate(halfWidth, halfHeight);
-    this->topLeft = Coordinate(centerPoint.longitude - halfWidth, centerPoint.latitude + halfHeight);
-    this->bottomRight = Coordinate(centerPoint.longitude + halfWidth, centerPoint.latitude - halfHeight);
+int PRQuadTree::getLocations() {
+    return (int) locations.size();
+}
+
+Coordinate PRQuadTree::getPoint() {
+    return boundingBox.centerPoint;
+}
+
+std::vector<PRQuadTree *> PRQuadTree::getChildren() {
+    return nodes;
+}
+
+
+BoundingBox::BoundingBox(Coordinate coord, float halfWidth, float halfHeight) {
+    this->centerPoint = coord;
+    this->halfWidthHeights = Coordinate(halfWidth, halfHeight);
+    this->topLeft = Coordinate(coord.longitude - halfWidth, coord.latitude + halfHeight);
+    this->bottomRight = Coordinate(coord.longitude + halfWidth, coord.latitude - halfHeight);
+}
+
+BoundingBox::BoundingBox(float minLat, float maxLat, float minLong, float maxLong) {
+    this->centerPoint = Coordinate((minLong + maxLong) / 2, (minLat + maxLat) / 2);
+    this->halfWidthHeights = Coordinate((maxLong - minLong) / 2, (maxLat - minLat) / 2);
+    this->topLeft = Coordinate(minLong, maxLat);
+    this->bottomRight = Coordinate(maxLong, minLat);
 }
 

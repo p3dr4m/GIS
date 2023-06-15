@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "SystemManager.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -114,6 +115,7 @@ void Logger::debugWorld(const std::vector<std::string> &option, PRQuadTree &tree
     }
     string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
     lines.push_back(cmd);
+    int nodeCount = tree.getTotalLocations();
 
     printWorld(tree, lines);
     lines.push_back(separator);
@@ -135,6 +137,11 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     }
     dashLine += "+";
     lines.push_back(dashLine);
+    int nodeCount = tree.getTotalLocations();
+
+
+    recurseTree(tree, grid);
+
     for (const auto &row: grid) {
         string rowStr;
         // add | to the beginning of the row and | to the end of the row
@@ -148,7 +155,43 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
         rowStr += "|";
         lines.push_back(rowStr);
     }
+
     lines.push_back(dashLine);
+}
+
+void Logger::recurseTree(PRQuadTree &tree, vector<vector<int>> &grid) {
+    if (tree.isLeaf()) {
+
+        // if the node is a leaf, and it has locations, get the size of the locations
+        if (tree.getLocations() > 0) {
+            BoundingBox boundary = tree.getBoundary();
+
+            // get the x and y coordinates of the node
+            float x = boundary.getCenter().longitude;
+            float y = boundary.getCenter().latitude;
+
+            float min_x = boundary.topLeft.longitude;
+            float max_y = boundary.topLeft.latitude;
+            float max_x = boundary.bottomRight.longitude;
+            float min_y = boundary.bottomRight.latitude;
+            // normalize the coordinates to fit into the grid
+
+
+            int grid_x = (int) ((x - min_x) * (grid[0].size() - 1) / (max_x - min_x));
+            int grid_y = (int) ((max_y - y) * (grid.size() - 1) / (max_y - min_y));
+
+            // add the node to the grid
+            grid[grid_y][grid_x] = tree.getLocations();
+        }
+
+    } else {
+        // recurse on the children
+        for (int i = 0; i < 4; i++) {
+            if (tree.getChildren()[i] != nullptr) {
+                recurseTree(*tree.getChildren()[i], grid);
+            }
+        }
+    }
 }
 
 

@@ -136,6 +136,8 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
     }
     PRQuadTree &quadTree = gisRecord.getTree();
 
+    int nodeCount = quadTree.getTotalLocations();
+
     Logger &logger = Logger::getInstance();
     if (arguments[1] == "quad") {
         // print out the quadtree

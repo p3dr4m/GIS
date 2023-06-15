@@ -11,7 +11,7 @@ using namespace std;
  * @param maxLong
  */
 void GISRecord::setBounds(float minLat, float maxLat, float minLong, float maxLong) {
-    BoundingBox boundingBox = BoundingBox(Coordinate(minLong, minLat), maxLong - minLong, maxLat - minLat);
+    BoundingBox boundingBox = BoundingBox(minLat, maxLat, minLong, maxLong);
     coordinateIndex->updateBoundsOfTree(boundingBox);
 }
 

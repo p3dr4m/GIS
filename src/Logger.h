@@ -25,7 +25,7 @@ public:
     void debugQuad(const std::vector<std::string> &option, PRQuadTree &tree);
 
     void whatIsInLog(std::vector<std::string> arguments, std::vector<int> records);
-
+    void recurseTree(PRQuadTree &tree, std::vector<std::vector<int>> &grid);
 private:
 
     Logger(const std::string &logFilePath, const std::string &databaseFilePath) {
