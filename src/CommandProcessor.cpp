@@ -136,10 +136,6 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
     }
     PRQuadTree &quadTree = gisRecord.getTree();
 
-`//    if (quadTree.isEmpty()) {
-//        throw invalid_argument("No data has been imported yet");
-//    }
-
     Logger &logger = Logger::getInstance();
     if (arguments[1] == "quad") {
         // print out the quadtree

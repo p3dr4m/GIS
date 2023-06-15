@@ -72,6 +72,10 @@ private:
 public:
     PRQuadTree(int pLevel, BoundingBox pBox) : level(pLevel), boundingBox(pBox) {
         nodes.reserve(4);
+        // initialize the nodes to nullptr
+        for (int i = 0; i < 4; i++) {
+            nodes.push_back(nullptr);
+        }
     };
 
     void clear();
