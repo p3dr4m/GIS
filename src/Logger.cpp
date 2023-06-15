@@ -4,6 +4,7 @@
 #include "SystemManager.h"
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -140,7 +141,12 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     int nodeCount = tree.getTotalLocations();
 
 
-    recurseTree(tree, grid);
+    recurseTree(tree, grid, 0, 140, 0, 40);  // update grid with values from quad tree
+
+    // reverse the grid and the nested vectors
+    reverse(grid.begin(), grid.end());
+
+    // reve
 
     for (const auto &row: grid) {
         string rowStr;
@@ -159,36 +165,51 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     lines.push_back(dashLine);
 }
 
-void Logger::recurseTree(PRQuadTree &tree, vector<vector<int>> &grid) {
+void Logger::recurseTree(PRQuadTree &tree, vector<vector<int>> &grid, int minX, int maxX, int minY, int maxY) {
+    int locations = tree.getLocations();
     if (tree.isLeaf()) {
-
-        // if the node is a leaf, and it has locations, get the size of the locations
-        if (tree.getLocations() > 0) {
-            BoundingBox boundary = tree.getBoundary();
-
-            // get the x and y coordinates of the node
-            float x = boundary.getCenter().longitude;
-            float y = boundary.getCenter().latitude;
-
-            float min_x = boundary.topLeft.longitude;
-            float max_y = boundary.topLeft.latitude;
-            float max_x = boundary.bottomRight.longitude;
-            float min_y = boundary.bottomRight.latitude;
-            // normalize the coordinates to fit into the grid
-
-
-            int grid_x = (int) ((x - min_x) * (grid[0].size() - 1) / (max_x - min_x));
-            int grid_y = (int) ((max_y - y) * (grid.size() - 1) / (max_y - min_y));
-
-            // add the node to the grid
-            grid[grid_y][grid_x] = tree.getLocations();
-        }
-
+        // place locations in the center of the grid
+        int x = (minX + maxX) / 2;
+        int y = (minY + maxY) / 2;
+        grid[y][x] = locations;
     } else {
-        // recurse on the children
-        for (int i = 0; i < 4; i++) {
+        // Calculate the midpoints to divide the current grid range into quadrants
+        int midX = minX + (maxX - minX) / 2;
+        int midY = minY + (maxY - minY) / 2;
+
+        // Recurse on the children, updating the grid range for each one
+        for (int i = 0; i < 4; ++i) {
             if (tree.getChildren()[i] != nullptr) {
-                recurseTree(*tree.getChildren()[i], grid);
+                // 0 means top left, 1 means top right, 2 means bottom left, 3 means bottom right
+                int childMinX, childMaxX, childMinY, childMaxY;
+                switch (i) {
+                    case 2:
+                        childMinX = minX;
+                        childMaxX = midX;
+                        childMinY = midY;
+                        childMaxY = maxY;
+                        break;
+                    case 0:
+                        childMinX = midX;
+                        childMaxX = maxX;
+                        childMinY = midY;
+                        childMaxY = maxY;
+                        break;
+                    case 3:
+                        childMinX = minX;
+                        childMaxX = midX;
+                        childMinY = minY;
+                        childMaxY = midY;
+                        break;
+                    case 1:
+                        childMinX = midX;
+                        childMaxX = maxX;
+                        childMinY = minY;
+                        childMaxY = midY;
+                        break;
+                }
+
+                recurseTree(*tree.getChildren()[i], grid, childMinX, childMaxX, childMinY, childMaxY);
             }
         }
     }
