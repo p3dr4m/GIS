@@ -34,13 +34,6 @@ bool PRQuadTree::isBoxInBox(BoundingBox box) {
     return true;
 }
 
-bool PRQuadTree::isEmpty() {
-    if (getTotalLocations() != 0) {
-        return false;
-    }
-    return true;
-}
-
 std::vector<Node> PRQuadTree::retrieve(std::vector<Node> returnNodes, const Node &location) {
     int index = getIndex(location);
     if (index != -1 && nodes[0] != nullptr) {
@@ -59,7 +52,7 @@ void PRQuadTree::insert(Node location) {
         }
     }
     locations.push_back(location);
-    if (locations.size() > MAX_NODES && level < MAX_LEVELS) {
+    if (locations.size() > MAX_NODES) {
         if (nodes[0] == nullptr) {
             split();
         }

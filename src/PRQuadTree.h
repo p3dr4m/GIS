@@ -88,8 +88,6 @@ public:
 
     bool isBoxInBox(BoundingBox box);
 
-    bool isEmpty();
-
     int getTotalLocations();
 
     void getLocationsInBounds(std::vector<Node> &returnNodes, BoundingBox box);
