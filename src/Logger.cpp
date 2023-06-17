@@ -3,7 +3,6 @@
 #include "Logger.h"
 #include "SystemManager.h"
 #include <iostream>
-#include <cmath>
 #include <algorithm>
 
 using namespace std;
@@ -18,8 +17,8 @@ string Logger::getTime() {
     return s;
 }
 
-void Logger::headerLog(const std::string &databaseFilePath, const std::string &cmdScriptFilePath,
-                       const std::string &logFilePath) {
+void Logger::headerLog(const string &databaseFilePath, const string &cmdScriptFilePath,
+                       const string &logFilePath) {
     // write to the logFile ofstream from SystemManager
     vector<string> lines;
 
@@ -76,7 +75,7 @@ void Logger::worldLog(const vector<string> &arguments) {
     cmdCount++;
 }
 
-void Logger::importLog(const std::vector<std::string> &arguments, std::vector<int> data) {
+void Logger::importLog(const vector<string> &arguments, vector<int> data) {
     vector<string> lines;
 
     if (cmdCount == 1) {
@@ -107,7 +106,7 @@ void Logger::importLog(const std::vector<std::string> &arguments, std::vector<in
  * @param option
  * @param tree
  */
-void Logger::debugWorld(const std::vector<std::string> &option, PRQuadTree &tree) {
+void Logger::debugWorld(const vector<string> &option, PRQuadTree &tree) {
     vector<string> lines;
     if (cmdCount == 2) {
         string comment = ";\n"
@@ -116,7 +115,6 @@ void Logger::debugWorld(const std::vector<std::string> &option, PRQuadTree &tree
     }
     string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
     lines.push_back(cmd);
-    int nodeCount = tree.getTotalLocations();
 
     printWorld(tree, lines);
     lines.push_back(separator);
@@ -128,7 +126,7 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     // create an empty grid
     vector<vector<int>> grid(40, vector<int>(150));
 
-    std::vector<Node> nodes;
+    vector<Location> nodes;
 
     // print the grid
     // add a line of dashes to the beginning and end of the grid. the dash lines also have + at the beginning and end
@@ -138,7 +136,6 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     }
     dashLine += "+";
     lines.push_back(dashLine);
-    int nodeCount = tree.getTotalLocations();
 
 
     recurseTree(tree, grid, 0, 140, 0, 40);  // update grid with values from quad tree
@@ -166,73 +163,80 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
 }
 
 void Logger::recurseTree(PRQuadTree &tree, vector<vector<int>> &grid, int minX, int maxX, int minY, int maxY) {
-    int locations = tree.getLocations();
+    int midX = (maxX + minX) / 2;
+    int midY = (maxY + minY) / 2;
+
     if (tree.isLeaf()) {
-        // place locations in the center of the grid
-        int x = (minX + maxX) / 2;
-        int y = (minY + maxY) / 2;
-        grid[y][x] = locations;
+        grid[midY][midX] = tree.getLocationsSize();
     } else {
-        // Calculate the midpoints to divide the current grid range into quadrants
-        int midX = minX + (maxX - minX) / 2;
-        int midY = minY + (maxY - minY) / 2;
+        int childBoundsX[4][2] = {{midX, maxX},
+                                  {midX, maxX},
+                                  {minX, midX},
+                                  {minX, midX}};
+        int childBoundsY[4][2] = {{midY, maxY},
+                                  {minY, midY},
+                                  {midY, maxY},
+                                  {minY, midY}};
 
-        // Recurse on the children, updating the grid range for each one
         for (int i = 0; i < 4; ++i) {
-            if (tree.getChildren()[i] != nullptr) {
-                // 0 means top left, 1 means top right, 2 means bottom left, 3 means bottom right
-                int childMinX, childMaxX, childMinY, childMaxY;
-                switch (i) {
-                    case 2:
-                        childMinX = minX;
-                        childMaxX = midX;
-                        childMinY = midY;
-                        childMaxY = maxY;
-                        break;
-                    case 0:
-                        childMinX = midX;
-                        childMaxX = maxX;
-                        childMinY = midY;
-                        childMaxY = maxY;
-                        break;
-                    case 3:
-                        childMinX = minX;
-                        childMaxX = midX;
-                        childMinY = minY;
-                        childMaxY = midY;
-                        break;
-                    case 1:
-                        childMinX = midX;
-                        childMaxX = maxX;
-                        childMinY = minY;
-                        childMaxY = midY;
-                        break;
-                }
-
-                recurseTree(*tree.getChildren()[i], grid, childMinX, childMaxX, childMinY, childMaxY);
+            if (tree.getNodes()[i] != nullptr) {
+                recurseTree(*tree.getNodes()[i], grid,
+                            childBoundsX[i][0], childBoundsX[i][1],
+                            childBoundsY[i][0], childBoundsY[i][1]);
             }
         }
     }
 }
 
 
-void Logger::debugQuad(const vector<std::string> &option, PRQuadTree &tree) {
+void Logger::debugQuad(const vector<string> &option, PRQuadTree &tree) {
     vector<string> lines;
-    if (cmdCount == 3) {
-        string comment = ";\n"
-                         "; Debug mode is on\n"
-                         ";";
-        lines.push_back(comment);
-    }
-    string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
-    lines.push_back(cmd);
+
+    printDebugQuad(lines, tree, 0);
     lines.push_back(separator);
+
     SystemManager::writeLinesToFile(logFile, lines);
     cmdCount++;
 
 }
 
-void Logger::whatIsInLog(std::vector<string> arguments, std::vector<int> records) {
+
+void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth = 0) {
+    string padding(depth * 3, ' '); // three spaces for each level of depth
+
+    if (tree.isLeaf()) {
+        if (!tree.getLocations().empty()) {
+            string bufferLine;
+            for (auto &location: tree.getLocations()) {
+                string databaseLine;
+                for (const auto &line: location.getDatabaseLine()) {
+                    databaseLine += to_string(line) + "|";
+                }
+                if (!databaseLine.empty()) {
+                    databaseLine.pop_back();
+                }
+                string line =
+                        "[(" + to_string(location.getYInSec()) + "," + to_string(location.getXInSec()) +
+                        "), " + databaseLine + "]";
+                bufferLine += line;
+            }
+            lines.push_back(padding + bufferLine);
+        } else {
+            lines.push_back(padding + "*");
+        }
+    } else {
+        // Node indicator @ added here
+        lines.push_back(padding + "@");
+        for (int i = 0; i < 4; ++i) {
+            if (tree.getNodes()[i] != nullptr) {
+                printDebugQuad(lines, *tree.getNodes()[i], depth + 1);
+            }
+        }
+    }
+}
+
+
+void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
     //  The following 7 feature(s) were found in (38d 28m 12s North +/- 60, 79d 31m 56s West +/- 90)
     //
     //	10:  "Forks of Waters"  "VA"  "(38d 28m 56s North, 79d 30m 31s West)
@@ -270,5 +274,5 @@ void Logger::whatIsInLog(std::vector<string> arguments, std::vector<int> records
     }
 
 
-
 }
+

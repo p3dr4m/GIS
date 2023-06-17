@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <cmath>
 
 
 struct Coordinate {
@@ -30,10 +31,14 @@ struct Coordinate {
     }
 };
 
-struct Node {
+struct Location {
     Coordinate coordinate;
     std::vector<int> fileOffset;
     std::vector<int> databaseLine;
+
+    Coordinate getCoordinate() const {
+        return coordinate;
+    }
 
     float getX() const {
         return coordinate.longitude;
@@ -42,6 +47,23 @@ struct Node {
     float getY() const {
         return coordinate.latitude;
     }
+
+    int getXInSec() const {
+        return static_cast<int>(std::round(coordinate.longitude * 3600));
+    }
+
+    int getYInSec() const {
+        return static_cast<int>(std::round(coordinate.latitude * 3600));
+    }
+
+    std::vector<int> getFileOffset() const {
+        return fileOffset;
+    }
+
+    std::vector<int> getDatabaseLine() const {
+        return databaseLine;
+    }
+
 };
 
 struct BoundingBox {
@@ -50,16 +72,11 @@ struct BoundingBox {
     Coordinate topLeft;
     Coordinate bottomRight;
 
-    //getCenter()
-    Coordinate getCenter() {
-        return centerPoint;
-    }
-
-    float getCenterX() {
+    float getCenterX() const {
         return centerPoint.longitude;
     }
 
-    float getCenterY() {
+    float getCenterY() const {
         return centerPoint.latitude;
     }
 
@@ -82,13 +99,14 @@ class PRQuadTree {
 private:
     int MAX_NODES = 4; // max number of nodes in a leaf node
     int MAX_LEVELS = 1000; // max number of levels in the tree
-    int level; // the current level of the tree
-    std::vector<Node> locations; // the locations in the tree
+    int level = 0; // the current level of the tree
+    std::vector<Location> locations; // the locations in the tree
     BoundingBox boundingBox; // the bounding box of the tree
     std::vector<PRQuadTree *> nodes; // the subtrees of the tree
 public:
     PRQuadTree(int pLevel, BoundingBox pBox) : level(pLevel), boundingBox(pBox) {
         nodes.reserve(4);
+        level = pLevel;
         // initialize the nodes to nullptr
         for (int i = 0; i < 4; i++) {
             nodes.push_back(nullptr);
@@ -101,11 +119,11 @@ public:
 
     void split();
 
-    int getIndex(Node location);;
+    int getIndex(Location location);;
 
-    void insert(Node location);
+    void insert(Location location);
 
-    std::vector<Node> retrieve(std::vector<Node> returnNodes, const Node &location);
+    std::vector<Location> retrieve(std::vector<Location> returnNodes, const Location &location);
 
     bool isCoordInBox(Coordinate coord, BoundingBox box);
 
@@ -113,21 +131,25 @@ public:
 
     int getTotalLocations();
 
-    int getLocations();
+    int getLocationsSize();
+    std::vector<Location> getLocations();
 
     Coordinate getPoint();
 
-    // getChildren returns the children of the node
-    std::vector<PRQuadTree *> getChildren();
+    // getNodes returns the children of the node
+    std::vector<PRQuadTree *> getNodes();
 
-    //getBoundary()
+    int getLevel() const {
+        return level;
+    }
+
     BoundingBox getBoundary() {
         return boundingBox;
     }
 
-    void getLocationsInBounds(std::vector<Node> &returnNodes, BoundingBox box);
+    void getLocationsInBounds(std::vector<Location> &returnNodes, BoundingBox box);
 
-    void getNodeByCoordinate(std::vector<Node> &returnNodes, Coordinate coord);
+    void getNodeByCoordinate(std::vector<Location> &returnNodes, Coordinate coord);
 
 
 };

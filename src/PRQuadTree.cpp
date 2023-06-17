@@ -34,7 +34,7 @@ bool PRQuadTree::isBoxInBox(BoundingBox box) {
     return true;
 }
 
-std::vector<Node> PRQuadTree::retrieve(std::vector<Node> returnNodes, const Node &location) {
+std::vector<Location> PRQuadTree::retrieve(std::vector<Location> returnNodes, const Location &location) {
     int index = getIndex(location);
     if (index != -1 && nodes[0] != nullptr) {
         nodes[index]->retrieve(returnNodes, location);
@@ -43,9 +43,15 @@ std::vector<Node> PRQuadTree::retrieve(std::vector<Node> returnNodes, const Node
     return returnNodes;
 }
 
-void PRQuadTree::insert(Node location) {
+void PRQuadTree::insert(Location location) {
+    // Check if the location is inside the bounding box of the quadtree
+    if (!isCoordInBox(location.getCoordinate(), boundingBox)) {
+        return;  // Location is outside the bounding box, do nothing
+    }
+
+
     // is it a leaf node?
-        if (nodes[0] != nullptr) {
+    if (nodes[0] != nullptr) {
         // find the index of the node that the location belongs in
         int index = getIndex(location);
         if (index != -1) {
@@ -53,13 +59,14 @@ void PRQuadTree::insert(Node location) {
             return;
         }
     }
+
     locations.push_back(location);
+
     if (locations.size() > MAX_NODES && level < MAX_LEVELS) {
         if (nodes[0] == nullptr) {
             split();
         }
-        int i = 0;
-        while (i < locations.size()) {
+        for (int i = 0; i < locations.size();) {
             int index = getIndex(locations[i]);
             if (index != -1) {
                 nodes[index]->insert(locations[i]);
@@ -71,7 +78,7 @@ void PRQuadTree::insert(Node location) {
     }
 }
 
-int PRQuadTree::getIndex(Node location) {
+int PRQuadTree::getIndex(Location location) {
     int index = -1;
     float centerX = boundingBox.getCenterX();
     float centerY = boundingBox.getCenterY();
@@ -139,7 +146,7 @@ int PRQuadTree::getTotalLocations() {
     return totalLocations;
 }
 
-void PRQuadTree::getNodeByCoordinate(vector<Node> &returnNodes, Coordinate coord) {
+void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate coord) {
     if (isCoordInBox(coord, boundingBox)) {
         if (nodes[0] != nullptr) {
             for (int i = 0; i < 4; i++) {
@@ -151,7 +158,7 @@ void PRQuadTree::getNodeByCoordinate(vector<Node> &returnNodes, Coordinate coord
     }
 }
 
-void PRQuadTree::getLocationsInBounds(vector<Node> &returnNodes, BoundingBox box) {
+void PRQuadTree::getLocationsInBounds(vector<Location> &returnNodes, BoundingBox box) {
     // recursively get all locations that are in the box
     if (isBoxInBox(box)) {
         if (nodes[0] != nullptr) {
@@ -170,7 +177,7 @@ bool PRQuadTree::isLeaf() {
     return nodes[0] == nullptr;
 }
 
-int PRQuadTree::getLocations() {
+int PRQuadTree::getLocationsSize() {
     return (int) locations.size();
 }
 
@@ -178,8 +185,12 @@ Coordinate PRQuadTree::getPoint() {
     return boundingBox.centerPoint;
 }
 
-std::vector<PRQuadTree *> PRQuadTree::getChildren() {
+std::vector<PRQuadTree *> PRQuadTree::getNodes() {
     return nodes;
+}
+
+vector<Location> PRQuadTree::getLocations() {
+    return locations;
 }
 
 

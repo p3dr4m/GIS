@@ -16,25 +16,31 @@ void GISRecord::setBounds(float minLat, float maxLat, float minLong, float maxLo
 }
 
 void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {
-    // file offset
-    // db line
-    // get lat, long
+    float latDec, lngDec;
 
-//    float latDec = stof(row[PRIM_LAT_DEC]);
-//    float longDec = stof(row[PRIM_LONG_DEC]);
+    // Trim the string
+    string latDecStr = row[PRIM_LAT_DEC];
+    string lngDecStr = row[PRIM_LONG_DEC];
 
-    string lat = row[PRIMARY_LAT_DMS];
-    string lng = row[PRIM_LONG_DMS];
+    string latDmsStr = row[PRIMARY_LAT_DMS];
+    string lngDmsStr = row[PRIM_LONG_DMS];
 
-    float latDec = DMS(lat).toFloat();
-    float lngDec = DMS(lng).toFloat();
+    // Check if either DEC or DMS are missing
+    if (!latDecStr.empty() && !lngDecStr.empty()) {
+        // Both DEC values are present
+        latDec = stof(latDecStr);
+        lngDec = stof(lngDecStr);
+    } else if (!latDmsStr.empty() && !lngDmsStr.empty()) {
+        // DEC values are missing, but DMS are present
+        latDec = DMS(latDmsStr).toFloat();
+        lngDec = DMS(lngDmsStr).toFloat();
+    } else {
+        // Both DEC and DMS are missing
+        return;  // do nothing
+    }
 
-    // float of dms lat, long
+    // Insert lat/long into the coordinate index
     coordinateIndex->insert(latDec, lngDec, offset, lineNum);
-
-    // get feature name
-    // get state alpha
-//    nameIndex->insert();
 }
 
 vector<int> GISRecord::findRecords(float lat, float lng) {

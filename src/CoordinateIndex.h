@@ -31,7 +31,7 @@ public:
 private:
     PRQuadTree quadTree = PRQuadTree(0, BoundingBox());
 
-    static std::vector<int> getOffsetsFromNodes(std::vector<Node> nodes);
+    static std::vector<int> getOffsetsFromNodes(std::vector<Location> nodes);
 };
 
 

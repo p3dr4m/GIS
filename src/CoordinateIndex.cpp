@@ -3,7 +3,7 @@
 using namespace std;
 
 vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
-    vector<Node> nodes;
+    vector<Location> nodes;
     Coordinate coordinate = Coordinate(longitude, latitude);
     quadTree.getNodeByCoordinate(nodes, coordinate);
 
@@ -15,7 +15,7 @@ vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
 }
 
 vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight) {
-    vector<Node> nodes;
+    vector<Location> nodes;
     BoundingBox boundingBox = BoundingBox(coord, halfWidth, halfHeight);
     quadTree.getLocationsInBounds(nodes, boundingBox);
 
@@ -28,8 +28,8 @@ vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfW
 
 void CoordinateIndex::insert(float latitude, float longitude, int fileOffset, int dbLine) {
 
-    // create the Quad Tree Node
-    Node node;
+    // create the Quad Tree Location
+    Location node;
     node.coordinate.latitude = latitude;
     node.coordinate.longitude = longitude;
     node.fileOffset.push_back(fileOffset);
@@ -39,7 +39,7 @@ void CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
     quadTree.insert(node);
 }
 
-vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Node> nodes) {
+vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
     vector<int> fileOffsets;
 
     for (auto &node: nodes) {

@@ -99,11 +99,11 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     ifstream input(arguments[1]);
     string line, word;
     vector<string> row;
-    int countingLines = 0;
+    int countingLines = -1;
     // Use SystemManager to read the file
     SystemManager::readDatabase(arguments[1], [&](vector<string> &row) {
         // skip first line in file
-        if (countingLines == 0) {
+        if (countingLines == -1) {
             countingLines++;
             return;
         }

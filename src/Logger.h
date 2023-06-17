@@ -26,6 +26,8 @@ public:
 
     void whatIsInLog(std::vector<std::string> arguments, std::vector<int> records);
     void recurseTree(PRQuadTree &tree, std::vector<std::vector<int>> &grid, int minX, int maxX, int minY, int maxY);
+    void printDebugQuad(std::vector<std::string> &lines, PRQuadTree &tree, int depth);
+
 private:
 
     Logger(const std::string &logFilePath, const std::string &databaseFilePath) {
@@ -59,6 +61,7 @@ private:
     static std::string getTime();
 
     void printWorld(PRQuadTree &tree, std::vector<std::string> &lines);
+
 };
 
 
