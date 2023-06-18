@@ -1,6 +1,6 @@
 #include <iostream>
-#include "src/CommandProcessor.h"
-#include "src/SystemManager.h"
+#include "src/interface/CommandProcessor.h"
+#include "src/interface/SystemManager.h"
 using namespace std;
 
 /**

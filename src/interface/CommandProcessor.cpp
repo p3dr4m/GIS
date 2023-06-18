@@ -1,7 +1,6 @@
 #include <fstream>
 #include <stdexcept>
 #include "CommandProcessor.h"
-#include "CoordinateIndex.h"
 #include "Logger.h"
 
 using namespace std;

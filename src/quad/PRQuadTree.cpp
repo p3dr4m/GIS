@@ -117,13 +117,13 @@ void PRQuadTree::split() {
     float y = boundingBox.centerPoint.latitude;
 
     nodes[0] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(x - halfWidth, y + halfHeight), halfWidth, halfHeight));
+                              BoundingBox(Coordinate(x - halfWidth, y + halfHeight), halfWidth, halfHeight), "tl");
     nodes[1] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(x + halfWidth, y + halfHeight), halfWidth, halfHeight));
+                              BoundingBox(Coordinate(x + halfWidth, y + halfHeight), halfWidth, halfHeight), "tr");
     nodes[2] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(x - halfWidth, y - halfHeight), halfWidth, halfHeight));
+                              BoundingBox(Coordinate(x - halfWidth, y - halfHeight), halfWidth, halfHeight), "bl");
     nodes[3] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(x + halfWidth, y - halfHeight), halfWidth, halfHeight));
+                              BoundingBox(Coordinate(x + halfWidth, y - halfHeight), halfWidth, halfHeight), "br");
 }
 
 void PRQuadTree::clear() {

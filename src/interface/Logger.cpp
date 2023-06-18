@@ -1,8 +1,5 @@
-#include <chrono>
-#include <vector>
 #include "Logger.h"
 #include "SystemManager.h"
-#include <iostream>
 #include <algorithm>
 
 using namespace std;
@@ -217,16 +214,16 @@ void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth =
                 }
                 string line =
                         "[(" + to_string(location.getYInSec()) + "," + to_string(location.getXInSec()) +
-                        "), " + databaseLine + "]";
+                        "), " + databaseLine + "] ";
                 bufferLine += line;
             }
-            lines.push_back(padding + bufferLine);
+            lines.push_back(padding + tree.getId() + bufferLine);
         } else {
-            lines.push_back(padding + "*");
+            lines.push_back(padding + tree.getId() + "*");
         }
     } else {
         // Node indicator @ added here
-        lines.push_back(padding + "@");
+        lines.push_back(padding + tree.getId() + "@");
         for (int i = 0; i < 4; ++i) {
             if (tree.getNodes()[i] != nullptr) {
                 printDebugQuad(lines, *tree.getNodes()[i], depth + 1);

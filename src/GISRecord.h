@@ -2,8 +2,8 @@
 #define INC_8042_PROJECT_GISRECORD_H
 
 #include <string>
-#include "CoordinateIndex.h"
-#include "NameIndex.h"
+#include "quad/CoordinateIndex.h"
+#include "hash/NameIndex.h"
 #include <stdexcept>
 
 

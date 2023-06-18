@@ -4,6 +4,7 @@
 
 #include <string>
 #include <memory>
+#include <utility>
 #include <vector>
 #include <cmath>
 
@@ -103,8 +104,9 @@ private:
     std::vector<Location> locations; // the locations in the tree
     BoundingBox boundingBox; // the bounding box of the tree
     std::vector<PRQuadTree *> nodes; // the subtrees of the tree
+    std::string id; // the id of the tree
 public:
-    PRQuadTree(int pLevel, BoundingBox pBox) : level(pLevel), boundingBox(pBox) {
+    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id) : level(pLevel), boundingBox(pBox), id(std::move(_id)) {
         nodes.reserve(4);
         level = pLevel;
         // initialize the nodes to nullptr
@@ -145,6 +147,10 @@ public:
 
     BoundingBox getBoundary() {
         return boundingBox;
+    }
+
+    std::string getId() {
+        return id;
     }
 
     void getLocationsInBounds(std::vector<Location> &returnNodes, BoundingBox box);
