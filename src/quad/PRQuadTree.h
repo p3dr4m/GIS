@@ -115,6 +115,46 @@ public:
         }
     };
 
+    ~PRQuadTree() {
+        for (int i = 0; i < 4; i++) {
+            delete nodes[i];
+        }
+    }
+
+    // copy constructor
+    PRQuadTree(const PRQuadTree &other) {
+        level = other.level;
+        boundingBox = other.boundingBox;
+        nodes = other.nodes;
+        id = other.id;
+    }
+
+    // copy assignment operator
+    PRQuadTree &operator=(const PRQuadTree &other) {
+        level = other.level;
+        boundingBox = other.boundingBox;
+        nodes = other.nodes;
+        id = other.id;
+        return *this;
+    }
+
+    // move constructor
+    PRQuadTree(PRQuadTree &&other) noexcept {
+        level = other.level;
+        boundingBox = other.boundingBox;
+        nodes = other.nodes;
+        id = other.id;
+    }
+
+    // move assignment operator
+    PRQuadTree &operator=(PRQuadTree &&other) noexcept {
+        level = other.level;
+        boundingBox = other.boundingBox;
+        nodes = other.nodes;
+        id = other.id;
+        return *this;
+    }
+
     bool isLeaf();
 
     void clear();

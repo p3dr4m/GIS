@@ -2,8 +2,9 @@
 #define INC_8042_PROJECT_COMMANDPROCESSOR_H
 
 #include "../GISRecord.h"
-#include "../quad/CoordinateIndex.h"
-#include "../quad/PRQuadTree.h"
+//#include "../quad/CoordinateIndex.h"
+//#include "../quad/PRQuadTree.h"
+
 
 enum Command {
     world, import, debug, what_is_at, what_is, what_is_in, quit
@@ -26,11 +27,10 @@ private:
     void quitCmd();
 
     GISRecord gisRecord;
-
-
 public:
-    void runCommand(const std::vector<std::string> &commands);
 
+
+    void runCommand(const std::vector<std::string> &commands);
 
 };
 

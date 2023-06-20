@@ -67,6 +67,7 @@ int GISRecord::getAvgNameLength() {
     return 0;
 }
 
+
 /**
  * The constructor takes a DMS (Degrees, Minutes, Seconds) string as an argument.
  * The string size must be either 7 or 8 characters long, excluding the direction character.

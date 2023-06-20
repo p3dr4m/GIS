@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <iterator>
+#include <iostream>
 
 using namespace std;
 
@@ -14,8 +15,7 @@ void SystemManager::run(const char *databaseFilePath, const char *cmdScriptFileP
     };
 
 
-
-    Logger& logger = Logger::getInstance(logFilePath, databaseFilePath);
+    Logger &logger = Logger::getInstance(logFilePath, databaseFilePath);
     logger.headerLog(databaseFilePath, cmdScriptFilePath, logFilePath);
 
     readLines(cmdScriptFilePath, commandFunction);
@@ -69,6 +69,7 @@ void SystemManager::readDatabase(const string &filename, const function<void(vec
     }
 }
 
+
 void SystemManager::writeLinesToFile(ofstream &file, const vector<string> &lines) {
     if (file.is_open()) {
         copy(lines.begin(), lines.end(), ostream_iterator<string>(file, "\n"));
@@ -103,4 +104,29 @@ void SystemManager::closeFile(ofstream &file) {
     if (file.is_open()) {
         file.close();
     }
+}
+
+Record SystemManager::goToOffset(ifstream &file, const string &filename, int offset) {
+    // Open the file in binary mode
+    file.open(filename, ios::binary);
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << filename << endl;
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    // Seek to the specified offset
+    file.seekg(offset, ios::beg);
+    if(!file.good()) {
+        cerr << "Failed to seek to offset: " << offset << endl;
+        throw std::runtime_error("Failed to seek to offset: " + std::to_string(offset));
+    }
+
+    // Read the line
+    string row;
+    getline(file, row);
+
+    // Close the file
+    file.close();
+
+    return {offset, row};
 }

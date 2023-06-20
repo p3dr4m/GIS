@@ -1,6 +1,8 @@
 #include "Logger.h"
 #include "SystemManager.h"
 #include <algorithm>
+#include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -273,3 +275,12 @@ void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
 
 }
 
+void Logger::debugPool(BufferPool<Record> bufferPool) {
+    string bufferPoolStr;
+    // add "BufferPool: " to the beginning of the string
+    bufferPoolStr += "Command " + to_string(cmdCount) + ": debug\tpool\n";
+    bufferPoolStr += bufferPool.str();
+
+    SystemManager::writeLineToFile(logFile, bufferPoolStr);
+    cmdCount++;
+}

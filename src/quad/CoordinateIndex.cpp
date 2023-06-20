@@ -45,7 +45,7 @@ vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
     for (auto &node: nodes) {
         for (int index = 0; index < node.fileOffset.size(); index++) {
             fileOffsets.push_back(node.fileOffset[index]);
-            fileOffsets.push_back(node.databaseLine[index]);
+//            fileOffsets.push_back(node.databaseLine[index]);
         }
     }
 

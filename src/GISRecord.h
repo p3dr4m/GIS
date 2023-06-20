@@ -4,7 +4,9 @@
 #include <string>
 #include "quad/CoordinateIndex.h"
 #include "hash/NameIndex.h"
+#include "BufferPool.h"
 #include <stdexcept>
+#include <utility>
 
 
 struct DMS {
@@ -48,6 +50,46 @@ enum GIS_Record_Header {
     DATE_EDITED
 };
 
+struct Record {
+    int offset{};
+    std::string row;
+    std::vector<std::string> rowVector;
+
+    Record() = default;
+
+    Record(int offset, std::string row) : offset(offset), row(std::move(row)) {
+        rowVector = split();
+    }
+
+    // split string by delimiter
+    std::vector<std::string> split() {
+        std::string temp;
+        for (char i : row) {
+            if (i == '|') {
+                rowVector.push_back(temp);
+                temp = "";
+            } else {
+                temp += i;
+            }
+        }
+        return rowVector;
+    }
+
+    int getKey() const {
+        return offset;
+    }
+
+    std::string getValue() const {
+        return row;
+    }
+
+    // str() function
+    std::string str() const {
+        return row;
+    }
+
+};
+
 
 class GISRecord {
 public:
@@ -71,6 +113,7 @@ public:
 
     std::vector<int> findRecords(float longitude, float latitude, float halfWidth, float halfHeight);
 
+
     int getNodeCount() {
         return coordinateIndex->getTotalLocations();
     };
@@ -79,16 +122,30 @@ public:
         return coordinateIndex->getTree();
     }
 
+    //getBuffer
+    // return   the buffer
+    BufferPool<Record> &getBuffer() {
+        return buffer;
+    }
+
+
     int getImportedNames();
 
     int getLongestProbe();
 
     int getAvgNameLength();
 
+    std::string dbFileName;
+
+    // getPool()
+    BufferPool<Record> &getPool() {
+        return buffer;
+    }
+
 private:
+    BufferPool<Record> buffer = BufferPool<Record>(15);
     CoordinateIndex *coordinateIndex;
     NameIndex *nameIndex;
-
 };
 
 

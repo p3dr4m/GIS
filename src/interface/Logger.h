@@ -23,6 +23,7 @@ public:
 
     void debugWorld(const std::vector<std::string> &option, PRQuadTree &tree);
     void debugQuad(const std::vector<std::string> &option, PRQuadTree &tree);
+    void debugPool(BufferPool<Record> bufferPool);
 
     void whatIsInLog(std::vector<std::string> arguments, std::vector<int> records);
     void recurseTree(PRQuadTree &tree, std::vector<std::vector<int>> &grid, int minX, int maxX, int minY, int maxY);

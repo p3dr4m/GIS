@@ -5,6 +5,7 @@
 #include <vector>
 #include <functional>
 #include <fstream>
+#include <sstream>
 #include "CommandProcessor.h"
 
 class SystemManager {
@@ -44,6 +45,8 @@ public:
 
     // Don't forget to close the file when you're done with it.
     static void closeFile(std::ofstream &file);
+
+    static Record goToOffset(std::ifstream &file, const std::string &filename, int offset);
 
 };
 

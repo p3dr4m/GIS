@@ -120,6 +120,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     vector<int> data = {importedNames, longestProbe, nodeCount, avgNameLength};
     Logger &logger = Logger::getInstance();
     logger.importLog(arguments, data);
+    gisRecord.dbFileName = arguments[1];
 }
 
 /**
@@ -145,6 +146,8 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
         // print out the hash table
     } else if (arguments[1] == "pool") {
         // print out the memory pool
+        BufferPool<Record> &pool = gisRecord.getPool();
+        logger.debugPool(pool);
     } else if (arguments[1] == "world") {
         // print out the world
         logger.debugWorld(arguments, quadTree);
@@ -165,6 +168,24 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
     float latDec = DMS(arguments[1]).toFloat();
     float lngDec = DMS(arguments[2]).toFloat();
     vector<int> recordOffsets = gisRecord.findRecords(latDec, lngDec);
+    // check the buffer with the record offsets. if the buffer does not contain the offsets, then read the file,
+    // and put the records in the buffer
+    // if the buffer does contain the offsets, then get the records from the buffer instead of reading the file.
+    // then log the records.
+    vector<Record> records;
+    ifstream file;
+    BufferPool<Record> &buffer = gisRecord.getBuffer();
+    Record record;
+    for (auto offset: recordOffsets) {
+        if(buffer.exists(offset)){
+            buffer.get(offset);
+        } else {
+            record = SystemManager::goToOffset(file, gisRecord.dbFileName, offset);
+            buffer.put(record);
+        }
+    }
+    string allRecords = buffer.str();
+    cout << allRecords << endl;
 }
 
 /**
