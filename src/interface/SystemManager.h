@@ -29,7 +29,7 @@ public:
     static void
     readLines(const std::string &filename, const std::function<void(std::vector<std::string> &)> &runCommand);
 
-    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &)> &processLine);
+    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &row, int fileOffset)> &processLine);
 
     void run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath);
 

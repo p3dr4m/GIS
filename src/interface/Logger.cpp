@@ -245,6 +245,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
     //	22:  "Laurel Run"  "VA"  "(38d 27m 25s North, 79d 31m 59s West)
     //	28:  "Peck Run"  "VA"  "(38d 28m 6s North, 79d 31m 9s West)
     //	41:  "Wooden Run"  "VA"  "(38d 27m 18s North, 79d 32m 1s West)
+
     vector<string> lines;
     DMS lat{};
     DMS lng{};
@@ -272,6 +273,24 @@ void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
         lines.push_back(firstLine);
     }
 
+
+}
+
+void Logger::whatIsAtLog(vector<string> arguments, std::string records) {
+    string whatIsAtLogStr;
+
+    whatIsAtLogStr += "Command " + to_string(cmdCount) + ": what_is_at\t" + arguments[1] + "\t" + arguments[2] + "\n\n";
+
+    //check for empty records
+    if (records.empty()) {
+        whatIsAtLogStr += "Nothing was found at (" + arguments[1] + ", " + arguments[2] + ")\n";
+    } else {
+        whatIsAtLogStr += records;
+    }
+
+
+    SystemManager::writeLineToFile(logFile, whatIsAtLogStr);
+    cmdCount++;
 
 }
 

@@ -39,12 +39,28 @@ void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {
         return;  // do nothing
     }
 
+//    if (!latDmsStr.empty() && !lngDmsStr.empty()) {
+//        // DEC values are missing, but DMS are present
+//        latDec = DMS(latDmsStr).toFloat();
+//        lngDec = DMS(lngDmsStr).toFloat();
+//    } else if (!latDecStr.empty() && !lngDecStr.empty()) {
+//        // Both DEC values are present
+//        latDec = stof(latDecStr);
+//        lngDec = stof(lngDecStr);
+//    } else {
+//        // Both DEC and DMS are missing
+//        return;  // do nothing
+//    }
+
     // Insert lat/long into the coordinate index
     coordinateIndex->insert(latDec, lngDec, offset, lineNum);
 }
 
 vector<int> GISRecord::findRecords(float lat, float lng) {
     vector<int> result = coordinateIndex->searchRecords(lat, lng);
+
+
+
     return result;
 }
 

@@ -26,6 +26,8 @@ public:
     void debugPool(BufferPool<Record> bufferPool);
 
     void whatIsInLog(std::vector<std::string> arguments, std::vector<int> records);
+    void whatIsAtLog(std::vector<std::string> arguments, std::string records);
+
     void recurseTree(PRQuadTree &tree, std::vector<std::vector<int>> &grid, int minX, int maxX, int minY, int maxY);
     void printDebugQuad(std::vector<std::string> &lines, PRQuadTree &tree, int depth);
 

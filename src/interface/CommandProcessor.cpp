@@ -100,15 +100,14 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     vector<string> row;
     int countingLines = -1;
     // Use SystemManager to read the file
-    SystemManager::readDatabase(arguments[1], [&](vector<string> &row) {
+    SystemManager::readDatabase(arguments[1], [&](vector<string> &row, int fileOffset) {
         // skip first line in file
         if (countingLines == -1) {
             countingLines++;
             return;
         }
 
-        int fileOffset = stoi(row.back());
-        row.pop_back();  // remove the fileOffset from row
+        row.pop_back();
 
         gisRecord.insertRecord(row, countingLines, fileOffset);
         countingLines++;
@@ -176,16 +175,21 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
     ifstream file;
     BufferPool<Record> &buffer = gisRecord.getBuffer();
     Record record;
+    Logger &logger = Logger::getInstance();
+    string logString;
     for (auto offset: recordOffsets) {
-        if(buffer.exists(offset)){
-            buffer.get(offset);
+        if (buffer.exists(offset)) {
+            record = buffer.get(offset);
+
         } else {
             record = SystemManager::goToOffset(file, gisRecord.dbFileName, offset);
             buffer.put(record);
         }
+            logString += "\t" + to_string(offset) + ":  " + record.getValue() + "\n";
     }
-    string allRecords = buffer.str();
-    cout << allRecords << endl;
+
+
+    logger.whatIsAtLog(arguments, logString);
 }
 
 /**

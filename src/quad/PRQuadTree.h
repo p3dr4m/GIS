@@ -174,20 +174,10 @@ public:
     int getTotalLocations();
 
     int getLocationsSize();
+
     std::vector<Location> getLocations();
 
-    Coordinate getPoint();
-
-    // getNodes returns the children of the node
     std::vector<PRQuadTree *> getNodes();
-
-    int getLevel() const {
-        return level;
-    }
-
-    BoundingBox getBoundary() {
-        return boundingBox;
-    }
 
     std::string getId() {
         return id;
@@ -195,7 +185,7 @@ public:
 
     void getLocationsInBounds(std::vector<Location> &returnNodes, BoundingBox box);
 
-    void getNodeByCoordinate(std::vector<Location> &returnNodes, Coordinate coord);
+    void getNodeByCoordinate(std::vector<Location> &returnLocations, Coordinate coord);
 
 
 };

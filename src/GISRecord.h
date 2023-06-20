@@ -20,6 +20,12 @@ struct DMS {
 
     explicit DMS(const std::string &dms);
 
+    DMS(float point) {
+        degrees = static_cast<int>(point);
+        minutes = static_cast<int>((point - degrees) * 60);
+        seconds = static_cast<int>((point - degrees - minutes / 60.0) * 3600);
+    }
+
     std::string toString() const;
 
     std::string toTotalSeconds() const;
@@ -27,7 +33,7 @@ struct DMS {
     float toFloat() const;
 };
 
-enum GIS_Record_Header {
+enum RecordHeader {
     FEATURE_ID = 0,
     FEATURE_NAME,
     FEATURE_CLASS,
@@ -64,7 +70,7 @@ struct Record {
     // split string by delimiter
     std::vector<std::string> split() {
         std::string temp;
-        for (char i : row) {
+        for (char i: row) {
             if (i == '|') {
                 rowVector.push_back(temp);
                 temp = "";
@@ -83,6 +89,10 @@ struct Record {
         return row;
     }
 
+    std::vector<std::string> getRowVector() const {
+        return rowVector;
+    }
+
     // str() function
     std::string str() const {
         return row;
@@ -90,6 +100,29 @@ struct Record {
 
 };
 
+class RecordHash {
+public:
+    RecordHash() = default;
+
+    // hash function
+    size_t operator()(const Record &record) const {
+        size_t hashVal = 0;
+        auto rowVector = record.getRowVector();
+
+        if (rowVector.empty()) {
+            throw std::invalid_argument("Record is empty");
+        }
+
+        std::string d = rowVector[FEATURE_NAME] + rowVector[STATE_ALPHA];
+
+        // The number 37 is a commonly used prime number in hash functions
+        for (char i: d) {
+            hashVal = 37 * hashVal + i;
+        }
+
+        return hashVal;
+    }
+};
 
 class GISRecord {
 public:

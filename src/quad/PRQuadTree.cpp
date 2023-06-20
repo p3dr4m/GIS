@@ -1,3 +1,4 @@
+#include <limits>
 #include "PRQuadTree.h"
 
 using namespace std;
@@ -146,6 +147,20 @@ int PRQuadTree::getTotalLocations() {
     return totalLocations;
 }
 
+bool nearlyEqual(float a, float b, float epsilon) {
+    float absA = fabs(a);
+    float absB = fabs(b);
+    float diff = fabs(a - b);
+
+    if (a == b) {
+        return true;
+    } else if (a == 0 || b == 0 || diff < numeric_limits<float>::min()) {
+        return diff < epsilon;
+    } else {
+        return diff / (absA + absB) < epsilon;
+    }
+}
+
 void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate coord) {
     if (isCoordInBox(coord, boundingBox)) {
         if (nodes[0] != nullptr) {
@@ -153,7 +168,17 @@ void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate c
                 nodes[i]->getNodeByCoordinate(returnNodes, coord);
             }
         } else {
-            returnNodes.insert(returnNodes.end(), locations.begin(), locations.end());
+            // check each location in the node if it has the same coordinates
+            for (const auto &location: locations) {
+                float locationX = location.getX();
+                float locationY = location.getY();
+                float compareX = coord.getX();
+                float compareY = coord.getY();
+                if (nearlyEqual(locationX, compareX, 0.00001) && nearlyEqual(locationY, compareY, 0.00001)) {
+                    returnNodes.push_back(location);
+                }
+
+            }
         }
     }
 }
@@ -181,9 +206,6 @@ int PRQuadTree::getLocationsSize() {
     return (int) locations.size();
 }
 
-Coordinate PRQuadTree::getPoint() {
-    return boundingBox.centerPoint;
-}
 
 std::vector<PRQuadTree *> PRQuadTree::getNodes() {
     return nodes;

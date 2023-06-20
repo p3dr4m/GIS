@@ -49,23 +49,29 @@ void SystemManager::readLines(const string &filename, const function<void(vector
     }
 }
 
-void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &)> &processLine) {
+void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &, int fileOffset)> &processLine) {
     ifstream file(filename);
     string line;
+    streampos offset = 0;
 
-    while (getline(file, line)) {
-        vector<string> words;
+    while (true) {
+        offset = file.tellg();
+        if (!getline(file, line)) {
+            break;
+        }
+
+        vector<string> row;
         string word;
         stringstream ss(line);
 
         while (getline(ss, word, '|')) {
-            words.push_back(word);
+            row.push_back(word);
         }
 
         // Add file offset as the last element
-        words.push_back(to_string(file.tellg()));
+        row.push_back(to_string(static_cast<long long>(offset)));
 
-        processLine(words);
+        processLine(row, offset);
     }
 }
 

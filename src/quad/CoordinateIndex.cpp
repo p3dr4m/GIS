@@ -6,7 +6,6 @@ vector<int> CoordinateIndex::searchRecords(float latitude, float longitude) {
     vector<Location> nodes;
     Coordinate coordinate = Coordinate(longitude, latitude);
     quadTree.getNodeByCoordinate(nodes, coordinate);
-
     // loop through the nodes and get the file offsets
     vector<int> fileOffsets = getOffsetsFromNodes(nodes);
 
