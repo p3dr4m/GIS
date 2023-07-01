@@ -29,11 +29,11 @@ public:
     static void
     readLines(const std::string &filename, const std::function<void(std::vector<std::string> &)> &runCommand);
 
-    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &row, int fileOffset)> &processLine);
+    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &row, std::string line, int fileOffset)> &processLine);
 
     void run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath);
 
-    static void writeLineToFile(std::ofstream &file, const std::string &line);
+    static std::fpos<mbstate_t> writeLineToFile(std::ofstream &file, const std::string &line);
 
     static void writeLinesToFile(std::ofstream &file, const std::vector<std::string> &lines);
 

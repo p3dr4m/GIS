@@ -1,4 +1,7 @@
+#include <fstream>
 #include "GISRecord.h"
+#include "interface/SystemManager.h"
+#include "interface/Logger.h"
 
 using namespace std;
 
@@ -36,31 +39,21 @@ void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {
         lngDec = DMS(lngDmsStr).toFloat();
     } else {
         // Both DEC and DMS are missing
-        return;  // do nothing
+        return;
     }
-
-//    if (!latDmsStr.empty() && !lngDmsStr.empty()) {
-//        // DEC values are missing, but DMS are present
-//        latDec = DMS(latDmsStr).toFloat();
-//        lngDec = DMS(lngDmsStr).toFloat();
-//    } else if (!latDecStr.empty() && !lngDecStr.empty()) {
-//        // Both DEC values are present
-//        latDec = stof(latDecStr);
-//        lngDec = stof(lngDecStr);
-//    } else {
-//        // Both DEC and DMS are missing
-//        return;  // do nothing
-//    }
 
     // Insert lat/long into the coordinate index
     coordinateIndex->insert(latDec, lngDec, offset, lineNum);
+    nameIndex->insert(row[FEATURE_NAME], row[STATE_ALPHA], offset);
 }
 
+
+vector<int> GISRecord::findRecords(const string& name, const string& state) {
+    vector<int> result = nameIndex->find(name, state);
+    return result;
+}
 vector<int> GISRecord::findRecords(float lat, float lng) {
     vector<int> result = coordinateIndex->searchRecords(lat, lng);
-
-
-
     return result;
 }
 
@@ -70,6 +63,25 @@ vector<int> GISRecord::findRecords(float longitude, float latitude, float halfWi
     vector<int> result = coordinateIndex->searchRecordsInBounds(centralLocation, halfWidth, halfHeight);
     return result;
 }
+
+vector<Record> GISRecord::getRecords(const std::vector<int>& offsets) {
+    vector<Record> records;
+    ifstream file;
+    Logger &logger = Logger::getInstance();
+
+    for (auto offset: offsets) {
+        if (buffer.exists(offset)) {
+            records.push_back(buffer.get(offset));
+
+        } else {
+            Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
+            buffer.put(record);
+            records.push_back(record);
+        }
+    }
+    return records;
+}
+
 
 int GISRecord::getImportedNames() {
     return 0;

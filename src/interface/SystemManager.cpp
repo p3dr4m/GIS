@@ -49,7 +49,7 @@ void SystemManager::readLines(const string &filename, const function<void(vector
     }
 }
 
-void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &, int fileOffset)> &processLine) {
+void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &, string line, int fileOffset)> &processLine) {
     ifstream file(filename);
     string line;
     streampos offset = 0;
@@ -71,7 +71,7 @@ void SystemManager::readDatabase(const string &filename, const function<void(vec
         // Add file offset as the last element
         row.push_back(to_string(static_cast<long long>(offset)));
 
-        processLine(row, offset);
+        processLine(row, line, offset);
     }
 }
 
@@ -84,9 +84,11 @@ void SystemManager::writeLinesToFile(ofstream &file, const vector<string> &lines
     }
 }
 
-void SystemManager::writeLineToFile(ofstream &file, const string &line) {
+fpos<mbstate_t> SystemManager::writeLineToFile(ofstream &file, const string &line) {
     if (file.is_open()) {
+        fpos<mbstate_t> offset = file.tellp();
         file << line << "\n";
+        return offset;
     } else {
         throw runtime_error("File is not open");
     }

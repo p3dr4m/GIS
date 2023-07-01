@@ -1,65 +1,50 @@
-
+//HashTable.h
 #ifndef INC_8042_PROJECT_HASHTABLE_H
 #define INC_8042_PROJECT_HASHTABLE_H
+
 #include <string>
 #include <vector>
 
-template<class K, class V>
-struct Bucket {
-    K offset;
-    V row;
-    Bucket(const K &k, const V &v) : row(v), offset(k) {}
+// create a hash table with fixed size 1024
+// the hash table must use quadratic probing to resolve collisions
+// the table will double in size when the load factor is 0.7
+// the hash table will store a vector
+
+struct HashEntry {
+    std::string featureName;
+    std::string stateAbbreviation;
+    std::vector<int> offsets;
+    bool exists = false;
 };
 
-template<class T> struct myHash {
-};
-
-template<> struct myHash<std::string> {
-    static size_t hashFunction(const std::string& s) {
-        return std::hash<std::string>()(s);
-    }
-};
-
-template<> struct myHash<int> {
-    static size_t hashFunction(const int m) {
-        return std::hash<int>()(m);
-    }
-};
-
-template<class K, class V, class HashGenerator = myHash<K> >
 class HashTable {
 public:
-    std::vector<std::vector<Bucket<K, V> > > table;
-    HashTable(int size) {
-        for(int i = 0; i < size; i++) {
-            std::vector<Bucket<K, V> > v;
-            table.push_back(v);
-        }
+
+    explicit HashTable(int _capacity) : size{0}, capacity{_capacity} {
+        data.resize(capacity);
     }
-    ~HashTable() {}
-    void set(const K &k, const V &v) {
-        Bucket<K, V> b(k, v);
-        for(int i = 0; i < table[hash(k)].size(); i++)
-            if(table[hash(k)][i].key == k) {
-                table[hash(k)][i] = b;
-                return;
-            }
-        table[hash(k)].push_back(b);
-    }
-    V get(const K &k) {
-        for(int i = 0; i < table[hash(k)].size(); i++)
-            if(table[hash(k)][i].key == k)
-                return table[hash(k)][i].val;
-    }
-    bool exist(const K &k) {
-        for(int i = 0; i < table[hash(k)].size(); i++)
-            if(table[hash(k)][i].key == k)
-                return true;
-        return false;
-    }
-    size_t hash(const K &k) {
-        return HashGenerator::hashFunction(k) % table.size();
-    }
+
+    ~HashTable() = default;
+
+    void insert(std::string featureName, std::string stateAbbreviation, int offset);
+
+    std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation);
+
+    int getProbeCount();
+
+    std::string str();
+
+private:
+    std::vector<HashEntry> data;
+    int longestProbe = 1;
+    int size; // current number of elements in the hash table
+    int capacity; // max capacity of the hash table
+    float loadFactor = 0.7;
+
+    int hash(const std::string &featureName, const std::string &stateAbbreviation);
+
+    void resize();
+
 };
 
 #endif //INC_8042_PROJECT_HASHTABLE_H

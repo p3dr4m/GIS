@@ -26,6 +26,21 @@ struct DMS {
         seconds = static_cast<int>((point - degrees - minutes / 60.0) * 3600);
     }
 
+    std::string toLogString() const {
+        std::string logDirection;
+        if (direction == 'N') {
+            logDirection = "North";
+        } else if (direction == 'S') {
+            logDirection = "South";
+        } else if (direction == 'E') {
+            logDirection = "East";
+        } else if (direction == 'W') {
+            logDirection = "West";
+        }
+        return std::to_string(degrees) + "d " + std::to_string(minutes) + "m " + std::to_string(seconds) + "s " +
+               logDirection;
+    }
+
     std::string toString() const;
 
     std::string toTotalSeconds() const;
@@ -95,7 +110,13 @@ struct Record {
 
     // str() function
     std::string str() const {
-        return row;
+        // restore the row to original format
+        std::string temp;
+        for (const auto &i: rowVector) {
+            temp += i + "|";
+        }
+        temp.pop_back();
+        return temp;
     }
 
 };
@@ -146,6 +167,7 @@ public:
 
     std::vector<int> findRecords(float longitude, float latitude, float halfWidth, float halfHeight);
 
+    std::vector<int> findRecords(const std::string &name, const std::string &state);
 
     int getNodeCount() {
         return coordinateIndex->getTotalLocations();
@@ -155,11 +177,17 @@ public:
         return coordinateIndex->getTree();
     }
 
+    std::string getHashTableStr() {
+        return nameIndex->str();
+    }
+
     //getBuffer
     // return   the buffer
     BufferPool<Record> &getBuffer() {
         return buffer;
     }
+
+    std::vector<Record> getRecords(const std::vector<int> &offsets);
 
 
     int getImportedNames();

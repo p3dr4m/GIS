@@ -23,7 +23,7 @@ void Logger::headerLog(const string &databaseFilePath, const string &cmdScriptFi
 
 
     lines.emplace_back("Course Project for COMP 8042");
-    lines.emplace_back("Student Name: Raziq Khan, Student Id: A");
+    lines.emplace_back("Student Name: Raziq Khan, Student Id: A00990021");
     lines.emplace_back("Student Name: Pedram Nazari, Student Id: A00931203");
     lines.emplace_back("Begin of GIS Program log:");
     lines.push_back("dbFile:\t" + databaseFilePath);
@@ -235,7 +235,7 @@ void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth =
 }
 
 
-void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
+void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
     //  The following 7 feature(s) were found in (38d 28m 12s North +/- 60, 79d 31m 56s West +/- 90)
     //
     //	10:  "Forks of Waters"  "VA"  "(38d 28m 56s North, 79d 30m 31s West)
@@ -245,6 +245,10 @@ void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
     //	22:  "Laurel Run"  "VA"  "(38d 27m 25s North, 79d 31m 59s West)
     //	28:  "Peck Run"  "VA"  "(38d 28m 6s North, 79d 31m 9s West)
     //	41:  "Wooden Run"  "VA"  "(38d 27m 18s North, 79d 32m 1s West)
+
+    string cmdStr = "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" + arguments[3] + "\t" + arguments[4] + "\n";
+
+    SystemManager::writeLineToFile(logFile, cmdStr);
 
     vector<string> lines;
     DMS lat{};
@@ -265,31 +269,47 @@ void Logger::whatIsInLog(vector<string> arguments, vector<int> records) {
 
     if (records.empty()) {
         //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
-        string firstLine = "Nothing was found in (" + arguments[1] + ", " + arguments[2] + ")\n";
+        string firstLine = "Nothing was found in (" + arguments[1] + ", " + arguments[2] +")\n";
     } else {
         // print the first line in the comment above
-        string firstLine = "The following " + to_string(records[0]) + " feature(s) were found in " +
+        string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
                            arguments[1] + "\n";
         lines.push_back(firstLine);
+
+        // sort records by record.offset
+        sort(records.begin(), records.end(), [](const Record &a, const Record &b) {
+            return a.offset < b.offset;
+        });
+        for (const Record &record: records) {
+            vector<string> row = record.getRowVector();
+            DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
+            DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
+            string line = "\t" + to_string(record.offset)  + "  " +  record.str() + "\n";
+            lines.push_back(line);
+        }
+
     }
 
-
+    SystemManager::writeLinesToFile(logFile, lines);
+    cmdCount++;
 }
 
-void Logger::whatIsAtLog(vector<string> arguments, std::string records) {
-    string whatIsAtLogStr;
+void Logger::whatIsAtLog(vector<string> arguments, vector<Record> records, vector<int> offsets) {
+    stringstream whatIsAtLogStr;
 
-    whatIsAtLogStr += "Command " + to_string(cmdCount) + ": what_is_at\t" + arguments[1] + "\t" + arguments[2] + "\n\n";
+    whatIsAtLogStr << "Command " << cmdCount << ": what_is_at\t" << arguments[1] << "\t" << arguments[2] << "\n\n";
 
     //check for empty records
     if (records.empty()) {
-        whatIsAtLogStr += "Nothing was found at (" + arguments[1] + ", " + arguments[2] + ")\n";
+        whatIsAtLogStr << "Nothing was found at (" << arguments[1] << ", " << arguments[2] << ")\n";
     } else {
-        whatIsAtLogStr += records;
+        for (size_t i = 0; i < records.size(); ++i) {
+            whatIsAtLogStr << "\t" << offsets[i] << ":  " << records[i].str() << "\n";
+        }
     }
 
 
-    SystemManager::writeLineToFile(logFile, whatIsAtLogStr);
+    SystemManager::writeLineToFile(logFile, whatIsAtLogStr.str());
     cmdCount++;
 
 }
@@ -301,5 +321,46 @@ void Logger::debugPool(BufferPool<Record> bufferPool) {
     bufferPoolStr += bufferPool.str();
 
     SystemManager::writeLineToFile(logFile, bufferPoolStr);
+    cmdCount++;
+}
+
+int Logger::logToDatabase(const string &line, int offset) {
+    // concat all the strings in the row vector
+    offset = (int) SystemManager::writeLineToFile(databaseFile, line);
+    return offset;
+}
+
+void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<int> offsets) {
+    string logStr;
+    openDbFile();
+    string cmdStr = "Command " + to_string(cmdCount) + ": what_is\t" + arguments[1] + "\t" + arguments[2] + "\n";
+
+    SystemManager::writeLineToFile(logFile, cmdStr);
+    if (records.empty()) {
+        logStr = "No records match " + arguments[1] + ", " + arguments[2];
+        SystemManager::writeLineToFile(logFile, logStr);
+    } else {
+        for (int i = 0; i < records.size(); i++) {
+            vector<string> row = records[i].getRowVector();
+            DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
+            DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
+            logStr =  "  " + to_string(offsets[i]) + ": " + row[COUNTY_NAME] + " " + "(" + latDMS.toLogString() + ", " +
+                     lngDMS.toLogString() + ")";
+
+            SystemManager::writeLineToFile(logFile, logStr);
+        }
+    }
+    // new line
+    SystemManager::writeLineToFile(logFile, separator);
+    closeDbFile();
+    cmdCount++;
+}
+
+void Logger::debugHash(const std::string& hashTableStr) {
+    string debugHashStr;
+    debugHashStr += "Command " + to_string(cmdCount) + ": debug\thash\n";
+    debugHashStr += hashTableStr;
+
+    SystemManager::writeLineToFile(logFile, debugHashStr);
     cmdCount++;
 }

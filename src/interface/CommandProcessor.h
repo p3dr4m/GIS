@@ -2,8 +2,6 @@
 #define INC_8042_PROJECT_COMMANDPROCESSOR_H
 
 #include "../GISRecord.h"
-//#include "../quad/CoordinateIndex.h"
-//#include "../quad/PRQuadTree.h"
 
 
 enum Command {
@@ -23,6 +21,7 @@ private:
     void whatIsCmd(std::vector<std::string> arguments);
 
     void whatIsInCmd(std::vector<std::string> arguments);
+
 
     void quitCmd();
 

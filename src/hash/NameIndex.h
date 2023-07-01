@@ -1,14 +1,38 @@
-
+//NameIndex.h
 #ifndef INC_8042_PROJECT_NAMEINDEX_H
 #define INC_8042_PROJECT_NAMEINDEX_H
 
-//#include "HashTable.h"
+#include <utility>
+
+#include "HashTable.h"
 //#include "../GISRecord.h"
 
 class NameIndex {
-private:
-//    HashTable<Record, RecordHash> hashTable{1024};
+public:
+    NameIndex() : hashTable(1024) {};
 
+    ~NameIndex() = default;
+
+    void insert(const std::string &featureName, const std::string &stateAbbreviation, int offset) {
+        hashTable.insert(featureName, stateAbbreviation, offset);
+    }
+
+    std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation) {
+        return hashTable.find(featureName, stateAbbreviation);
+    }
+
+    int getProbeCount() {
+        return hashTable.getProbeCount();
+    }
+
+    std::string str() {
+        return hashTable.str();
+    }
+
+
+
+private:
+    HashTable hashTable;
 };
 
 

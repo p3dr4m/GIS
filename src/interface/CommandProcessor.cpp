@@ -1,5 +1,6 @@
 #include <fstream>
 #include <stdexcept>
+#include <utility>
 #include "CommandProcessor.h"
 #include "Logger.h"
 
@@ -100,7 +101,12 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     vector<string> row;
     int countingLines = -1;
     // Use SystemManager to read the file
-    SystemManager::readDatabase(arguments[1], [&](vector<string> &row, int fileOffset) {
+    Logger &logger = Logger::getInstance();
+
+    // reading the file from import command and inserting into the quadtree
+    logger.openDbFile();
+//    logger.log("\nImporting " + arguments[1] + "...");
+    SystemManager::readDatabase(arguments[1], [&](vector<string> &row, const string line, int fileOffset) {
         // skip first line in file
         if (countingLines == -1) {
             countingLines++;
@@ -109,15 +115,22 @@ void CommandProcessor::importCmd(vector<string> arguments) {
 
         row.pop_back();
 
-        gisRecord.insertRecord(row, countingLines, fileOffset);
-        countingLines++;
+        int offset;
+        Coordinate coord = Coordinate(stof(row[PRIM_LONG_DEC]), stof(row[PRIM_LAT_DEC]));
+        bool inserted = gisRecord.getTree().isCoordInBox(coord);
+
+        if (inserted) {
+            offset = logger.logToDatabase(line, fileOffset);
+            gisRecord.insertRecord(row, countingLines, offset);
+            countingLines++;
+        }
     });
+    logger.closeDbFile();
     int nodeCount = gisRecord.getNodeCount();
     int importedNames = gisRecord.getImportedNames();
     int longestProbe = gisRecord.getLongestProbe();
     int avgNameLength = gisRecord.getAvgNameLength();
     vector<int> data = {importedNames, longestProbe, nodeCount, avgNameLength};
-    Logger &logger = Logger::getInstance();
     logger.importLog(arguments, data);
     gisRecord.dbFileName = arguments[1];
 }
@@ -134,6 +147,8 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
                                "Usage: debug <quad|hash|pool|world>");
     }
     PRQuadTree &quadTree = gisRecord.getTree();
+    string hashStr = gisRecord.getHashTableStr();
+
 
     int nodeCount = quadTree.getTotalLocations();
 
@@ -143,6 +158,7 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
         logger.debugQuad(arguments, quadTree);
     } else if (arguments[1] == "hash") {
         // print out the hash table
+        logger.debugHash(hashStr);
     } else if (arguments[1] == "pool") {
         // print out the memory pool
         BufferPool<Record> &pool = gisRecord.getPool();
@@ -166,30 +182,18 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
 
     float latDec = DMS(arguments[1]).toFloat();
     float lngDec = DMS(arguments[2]).toFloat();
-    vector<int> recordOffsets = gisRecord.findRecords(latDec, lngDec);
+    vector<int> offsets = gisRecord.findRecords(latDec, lngDec);
     // check the buffer with the record offsets. if the buffer does not contain the offsets, then read the file,
     // and put the records in the buffer
     // if the buffer does contain the offsets, then get the records from the buffer instead of reading the file.
     // then log the records.
-    vector<Record> records;
     ifstream file;
-    BufferPool<Record> &buffer = gisRecord.getBuffer();
-    Record record;
     Logger &logger = Logger::getInstance();
     string logString;
-    for (auto offset: recordOffsets) {
-        if (buffer.exists(offset)) {
-            record = buffer.get(offset);
-
-        } else {
-            record = SystemManager::goToOffset(file, gisRecord.dbFileName, offset);
-            buffer.put(record);
-        }
-            logString += "\t" + to_string(offset) + ":  " + record.getValue() + "\n";
-    }
+    vector<Record> records = gisRecord.getRecords(offsets);
 
 
-    logger.whatIsAtLog(arguments, logString);
+    logger.whatIsAtLog(arguments, records, offsets);
 }
 
 /**
@@ -202,6 +206,14 @@ void CommandProcessor::whatIsCmd(vector<string> arguments) {
         throw invalid_argument("Invalid what_is command\n"
                                "Usage: what_is <feature name> <state abbreviation>");
     }
+    string featureName = arguments[1];
+    string stateAbbreviation = arguments[2];
+
+    vector<int> offsets = gisRecord.findRecords(featureName, stateAbbreviation);
+    Logger &logger = Logger::getInstance();
+    vector<Record> records = gisRecord.getRecords(offsets);
+
+    logger.whatIsLog(arguments, records, offsets);
 }
 
 /**
@@ -226,7 +238,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
     float halfWidth;
     float latDec;
     float lngDec;
-    vector<int> records;
+    vector<int> offsets;
+    vector<Record> records;
     Logger &logger = Logger::getInstance();
     if (arguments[1] == "-filter") {
         if (!(arguments[2] == "pop" || arguments[2] == "water" || arguments[2] == "structure")) {
@@ -242,8 +255,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         halfWidth = stof(arguments[6]) / 3600.f;
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
-        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        // print out the records
+        offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        // print out the offsets
         logger.whatIsInLog(arguments, records);
     } else if (arguments[1] == "-long") {
         latitude = arguments[2];
@@ -252,8 +265,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         halfWidth = stof(arguments[5]) / 3600.f;
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
-        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        // print out the records
+        offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        // print out the offsets
         logger.whatIsInLog(arguments, records);
     } else {
         latitude = arguments[1];
@@ -264,8 +277,9 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         latDec = latDms.toFloat();
         lngDec = DMS(longitude).toFloat();
 
-        records = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        // print out the records
+        offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
+        records = gisRecord.getRecords(offsets);
+        // print out the offsets
         logger.whatIsInLog(arguments, records);
     }
 }
@@ -278,4 +292,5 @@ void CommandProcessor::quitCmd() {
     // logger close files
     exit(0);
 }
+
 

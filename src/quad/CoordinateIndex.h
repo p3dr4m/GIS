@@ -8,7 +8,7 @@
 class CoordinateIndex {
 public:
 
-    void insert(float latitude, float longitude, int fileOffset, int dbLine);
+    bool insert(float latitude, float longitude, int fileOffset, int dbLine);
 
     std::vector<int> searchRecords(float latitude, float longitude);
 

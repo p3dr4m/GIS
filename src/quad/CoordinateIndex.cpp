@@ -25,7 +25,7 @@ vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfW
     return fileOffsets;
 }
 
-void CoordinateIndex::insert(float latitude, float longitude, int fileOffset, int dbLine) {
+bool CoordinateIndex::insert(float latitude, float longitude, int fileOffset, int dbLine) {
 
     // create the Quad Tree Location
     Location node;
@@ -35,7 +35,7 @@ void CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
     node.databaseLine.push_back(dbLine);
 
     // insert the node into the Quad Tree in the coordinate index
-    quadTree.insert(node);
+    return quadTree.insert(node);
 }
 
 vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
