@@ -21,12 +21,16 @@ public:
         return hashTable.find(featureName, stateAbbreviation);
     }
 
-    int getProbeCount() {
-        return hashTable.getProbeCount();
+    int getLongestProbe() {
+        return hashTable.getLongestProbe();
     }
 
     std::string str() {
         return hashTable.str();
+    }
+
+    int getSize() {
+        return hashTable.getSize();
     }
 
 

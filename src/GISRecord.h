@@ -194,8 +194,6 @@ public:
 
     int getLongestProbe();
 
-    int getAvgNameLength();
-
     std::string dbFileName;
 
     // getPool()

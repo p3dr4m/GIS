@@ -84,16 +84,14 @@ vector<Record> GISRecord::getRecords(const std::vector<int>& offsets) {
 
 
 int GISRecord::getImportedNames() {
-    return 0;
+    return nameIndex->getSize();
 }
 
 int GISRecord::getLongestProbe() {
-    return 0;
+    return nameIndex->getLongestProbe();
 }
 
-int GISRecord::getAvgNameLength() {
-    return 0;
-}
+
 
 
 /**

@@ -39,6 +39,8 @@ public:
 
     void debugHash(const std::string& hashTableStr);
 
+    void quitCmd(std::vector<std::string> arguments);
+
     int logToDatabase(const std::string &line, int offset);
 
     void openDbFile() {

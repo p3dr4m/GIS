@@ -41,7 +41,7 @@ void HashTable::insert(std::string featureName, std::string stateAbbreviation, i
  * @param stateAbbreviation
  * @return
  */
-int HashTable::hash(const std::string &featureName, const std::string &stateAbbreviation) {
+unsigned int HashTable::hash(const std::string &featureName, const std::string &stateAbbreviation) const {
     std::string key = featureName + stateAbbreviation;
     unsigned int hash = 0;
     unsigned int x = 0;
@@ -73,7 +73,7 @@ void HashTable::resize() {
 }
 
 std::vector<int> HashTable::find(const std::string &featureName, const std::string &stateAbbreviation) {
-    int index = hash(featureName, stateAbbreviation);
+    unsigned int index = hash(featureName, stateAbbreviation);
 
     for (int i = 0; i < capacity; i++) {
         if (data[index].featureName == featureName && data[index].stateAbbreviation == stateAbbreviation) {
@@ -86,7 +86,7 @@ std::vector<int> HashTable::find(const std::string &featureName, const std::stri
     return {};
 }
 
-int HashTable::getProbeCount() {
+int HashTable::getLongestProbe() {
     return longestProbe;
 }
 

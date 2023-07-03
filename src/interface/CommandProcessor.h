@@ -23,7 +23,7 @@ private:
     void whatIsInCmd(std::vector<std::string> arguments);
 
 
-    void quitCmd();
+    void quitCmd(std::vector<std::string> arguments);
 
     GISRecord gisRecord;
 public:

@@ -30,9 +30,13 @@ public:
 
     std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation);
 
-    int getProbeCount();
+    int getLongestProbe();
 
     std::string str();
+
+    int getSize() {
+        return size;
+    }
 
 private:
     std::vector<HashEntry> data;
@@ -41,7 +45,7 @@ private:
     int capacity; // max capacity of the hash table
     float loadFactor = 0.7;
 
-    int hash(const std::string &featureName, const std::string &stateAbbreviation);
+    unsigned int hash(const std::string &featureName, const std::string &stateAbbreviation) const;
 
     void resize();
 

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <fstream>
+#include <map>
 
 using namespace std;
 
@@ -235,19 +236,56 @@ void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth =
 }
 
 
+vector<Record> filterRecords(const vector<Record>& records, const string& filterOption) {
+    map<string, string> classMap = {
+            {"Airport",         "structure"},
+            {"Arroyo",          "water"},
+            {"Basin",           "water"},
+            {"Bay",             "water"},
+            {"Bend",            "water"},
+            {"Bridge",          "structure"},
+            {"Building",        "structure"},
+            {"Canal",           "water"},
+            {"Channel",         "water"},
+            {"Church",          "structure"},
+            {"Dam",             "structure"},
+            {"Falls",           "water"},
+            {"Glacier",         "water"},
+            {"Gut",             "water"},
+            {"Harbor",          "water"},
+            {"Hospital",        "structure"},
+            {"Lake",            "water"},
+            {"Levee",           "structure"},
+            {"Park",            "structure"},
+            {"Populated Place", "pop"},
+            {"Post Office",     "structure"},
+            {"Rapids",          "water"},
+            {"Reservoir",       "water"},
+            {"School",          "structure"},
+            {"Sea",             "water"},
+            {"Spring",          "water"},
+            {"Stream",          "water"},
+            {"Swamp",           "water"},
+            {"Tower",           "structure"},
+            {"Tunnel",          "structure"},
+            {"Well",            "water"}
+    };
+    vector<Record> result;
+    for (const auto &record: records) {
+        auto row  = record.getRowVector();
+        string featureClass = row[FEATURE_CLASS];
+        auto it = classMap.find(featureClass);
+        if (it != classMap.end() && it->second == filterOption) {
+            result.push_back(record);
+        }
+    }
+    return result;
+}
+
+
 void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
-    //  The following 7 feature(s) were found in (38d 28m 12s North +/- 60, 79d 31m 56s West +/- 90)
-    //
-    //	10:  "Forks of Waters"  "VA"  "(38d 28m 56s North, 79d 30m 31s West)
-    //	34:  "Strait Creek"  "VA"  "(38d 28m 56s North, 79d 30m 31s West)
-    //	47:  "Possum Trot"  "VA"  "(38d 28m 12s North, 79d 31m 56s West)
-    //	12:  "Ginseng Mountain"  "VA"  "(38d 28m 50s North, 79d 31m 39s West)
-    //	22:  "Laurel Run"  "VA"  "(38d 27m 25s North, 79d 31m 59s West)
-    //	28:  "Peck Run"  "VA"  "(38d 28m 6s North, 79d 31m 9s West)
-    //	41:  "Wooden Run"  "VA"  "(38d 27m 18s North, 79d 32m 1s West)
-
-    string cmdStr = "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" + arguments[3] + "\t" + arguments[4] + "\n";
-
+    string cmdStr = "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
+                    arguments[3] + "\t" + arguments[4] + "\n";
     SystemManager::writeLineToFile(logFile, cmdStr);
 
     vector<string> lines;
@@ -258,37 +296,107 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
         filterOption = arguments[2];
         lat = DMS(arguments[3]);
         lng = DMS(arguments[4]);
+        vector<Record> filtered = filterRecords(records, filterOption);
+        if (records.empty()) {
+            //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
+            string firstLine = "Nothing was found in (" + arguments[2] + ", " + arguments[3] + ")\n";
+        } else {
+            // print the first line in the comment above
+            string firstLine = "The following " + to_string(filtered.size()) + " feature(s) were found in " +
+                               arguments[2] + "\n";
+            lines.push_back(firstLine);
+
+            // sort records by record.offset
+            sort(filtered.begin(), filtered.end(), [](const Record &a, const Record &b) {
+                return a.offset < b.offset;
+            });
+            for (const Record &record: filtered) {
+                vector<string> row = record.getRowVector();
+                DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
+                DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
+                string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
+                lines.push_back(line);
+            }
+
+        }
+
+
     } else if (arguments[1] == "-long") {
         lng = DMS(arguments[2]);
         lat = DMS(arguments[3]);
+
+        // LONG WHAT IS IN
+        if (records.empty()) {
+            string firstLine = "Nothing was found in (" + arguments[2] + ", " + arguments[3] + ")\n";
+        } else {
+            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
+                               arguments[2] + " " + arguments[3] + "\n";
+
+            lines.push_back(firstLine);
+            // sort records by record.offset
+            sort(records.begin(), records.end(), [](const Record &a, const Record &b) {
+                return a.offset < b.offset;
+            });
+            for (const Record &record: records) {
+                vector<string> row = record.getRowVector();
+                DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
+                DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
+                string featureID = row[FEATURE_ID];
+                string featureName = row[FEATURE_NAME];
+                string featureCat = row[FEATURE_CLASS];
+                string stateAlpha = row[STATE_ALPHA];
+                string countyName = row[COUNTY_NAME];
+                string latStr = latDMS.toLogString();
+                string lngStr = lngDMS.toLogString();
+                string elevation = row[ELEV_IN_M];
+                string USGSQuad = row[MAP_NAME];
+                string dateCreated = row[DATE_CREATED];
+
+                string line = "\t Feature ID   : " + featureID + "\n";
+                line += "\t Feature Name : " + featureName + "\n";
+                line += "\t Feature Cat  : " + featureCat + "\n";
+                line += "\t State        : " + stateAlpha + "\n";
+                line += "\t County       : " + countyName + "\n";
+                line += "\t Longitude    : " + lngStr + "\n";
+                line += "\t Latitude     : " + latStr + "\n";
+                line += "\t Elev in ft   : " + elevation + "\n";
+                line += "\t USGS Quad    : " + USGSQuad + "\n";
+                line += "\t Date created : " + dateCreated + "\n";
+
+                lines.push_back(line);
+            }
+
+        }
+
     } else {
         lat = DMS(arguments[1]);
         lng = DMS(arguments[2]);
-    }
 
+        // REGULAR WHAT IS IN
+        if (records.empty()) {
+            //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
+            string firstLine = "Nothing was found in (" + arguments[1] + ", " + arguments[2] + ")\n";
+        } else {
+            // print the first line in the comment above
+            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
+                               arguments[1] + "\n";
+            lines.push_back(firstLine);
 
-    if (records.empty()) {
-        //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
-        string firstLine = "Nothing was found in (" + arguments[1] + ", " + arguments[2] +")\n";
-    } else {
-        // print the first line in the comment above
-        string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
-                           arguments[1] + "\n";
-        lines.push_back(firstLine);
+            // sort records by record.offset
+            sort(records.begin(), records.end(), [](const Record &a, const Record &b) {
+                return a.offset < b.offset;
+            });
+            for (const Record &record: records) {
+                vector<string> row = record.getRowVector();
+                DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
+                DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
+                string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
+                lines.push_back(line);
+            }
 
-        // sort records by record.offset
-        sort(records.begin(), records.end(), [](const Record &a, const Record &b) {
-            return a.offset < b.offset;
-        });
-        for (const Record &record: records) {
-            vector<string> row = record.getRowVector();
-            DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
-            DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
-            string line = "\t" + to_string(record.offset)  + "  " +  record.str() + "\n";
-            lines.push_back(line);
         }
-
     }
+
 
     SystemManager::writeLinesToFile(logFile, lines);
     cmdCount++;
@@ -344,7 +452,7 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
             vector<string> row = records[i].getRowVector();
             DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
             DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
-            logStr =  "  " + to_string(offsets[i]) + ": " + row[COUNTY_NAME] + " " + "(" + latDMS.toLogString() + ", " +
+            logStr = "  " + to_string(offsets[i]) + ": " + row[COUNTY_NAME] + " " + "(" + latDMS.toLogString() + ", " +
                      lngDMS.toLogString() + ")";
 
             SystemManager::writeLineToFile(logFile, logStr);
@@ -356,11 +464,24 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
     cmdCount++;
 }
 
-void Logger::debugHash(const std::string& hashTableStr) {
+void Logger::debugHash(const std::string &hashTableStr) {
     string debugHashStr;
     debugHashStr += "Command " + to_string(cmdCount) + ": debug\thash\n";
     debugHashStr += hashTableStr;
 
     SystemManager::writeLineToFile(logFile, debugHashStr);
     cmdCount++;
+}
+
+void Logger::quitCmd(vector<string> arguments) {
+    string quitStr;
+    quitStr += "Command " + to_string(cmdCount) + ": quit\n\n";
+    quitStr += "Terminating execution of commands. \n\n";
+    quitStr += separator + "\n";
+    quitStr += "End time: " + getTime();
+
+    SystemManager::writeLineToFile(logFile, quitStr);
+    cmdCount++;
+
+
 }

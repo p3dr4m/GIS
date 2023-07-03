@@ -47,7 +47,7 @@ void CommandProcessor::runCommand(const vector<string> &arguments) {
             whatIsInCmd(arguments);
             break;
         case quit:
-            quitCmd();
+            quitCmd(arguments);
             break;
     }
 }
@@ -105,7 +105,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
 
     // reading the file from import command and inserting into the quadtree
     logger.openDbFile();
-//    logger.log("\nImporting " + arguments[1] + "...");
+    string nameLengths;
     SystemManager::readDatabase(arguments[1], [&](vector<string> &row, const string line, int fileOffset) {
         // skip first line in file
         if (countingLines == -1) {
@@ -122,6 +122,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         if (inserted) {
             offset = logger.logToDatabase(line, fileOffset);
             gisRecord.insertRecord(row, countingLines, offset);
+            nameLengths += row[FEATURE_NAME];
             countingLines++;
         }
     });
@@ -129,8 +130,8 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     int nodeCount = gisRecord.getNodeCount();
     int importedNames = gisRecord.getImportedNames();
     int longestProbe = gisRecord.getLongestProbe();
-    int avgNameLength = gisRecord.getAvgNameLength();
-    vector<int> data = {importedNames, longestProbe, nodeCount, avgNameLength};
+    unsigned long avgNameLength = nameLengths.size() / nodeCount;
+    vector<int> data = {importedNames, longestProbe, nodeCount, static_cast<int>(avgNameLength)};
     logger.importLog(arguments, data);
     gisRecord.dbFileName = arguments[1];
 }
@@ -216,6 +217,7 @@ void CommandProcessor::whatIsCmd(vector<string> arguments) {
     logger.whatIsLog(arguments, records, offsets);
 }
 
+
 /**
  * required:
  * what_is_in<tab><latitude><space><longitude<tab><half-height><tab><half-width>
@@ -256,7 +258,7 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
         offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        // print out the offsets
+        records = gisRecord.getRecords(offsets);
         logger.whatIsInLog(arguments, records);
     } else if (arguments[1] == "-long") {
         latitude = arguments[2];
@@ -266,7 +268,7 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
         offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        // print out the offsets
+        records = gisRecord.getRecords(offsets);
         logger.whatIsInLog(arguments, records);
     } else {
         latitude = arguments[1];
@@ -276,10 +278,8 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         DMS latDms = DMS(latitude);
         latDec = latDms.toFloat();
         lngDec = DMS(longitude).toFloat();
-
         offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
         records = gisRecord.getRecords(offsets);
-        // print out the offsets
         logger.whatIsInLog(arguments, records);
     }
 }
@@ -288,8 +288,10 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
 /**
  * quit<tab>
  */
-void CommandProcessor::quitCmd() {
+void CommandProcessor::quitCmd(vector<string> arguments) {
     // logger close files
+    Logger &logger = Logger::getInstance();
+    logger.quitCmd(std::move(arguments));
     exit(0);
 }
 
