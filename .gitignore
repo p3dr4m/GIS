@@ -29,3 +29,5 @@ CTestTestfile.cmake
 _deps
 cmake-build-*/
 build/
+db_test.txt
+log_test.txt

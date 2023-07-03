@@ -37,7 +37,7 @@ public:
 
     void printDebugQuad(std::vector<std::string> &lines, PRQuadTree &tree, int depth);
 
-    void debugHash(const std::string& hashTableStr);
+    void debugHash(const std::string &hashTableStr);
 
     void quitCmd(std::vector<std::string> arguments);
 
@@ -45,7 +45,12 @@ public:
 
     void openDbFile() {
         if (!databaseFile.is_open()) {
-            databaseFile.open(databaseFilePath, std::ios::app);
+            try {
+                databaseFile.open(databaseFilePath, std::ios::app);
+            } catch (std::exception &e) {
+                std::cout << e.what() << std::endl;
+                exit(1);
+            }
         }
     }
 

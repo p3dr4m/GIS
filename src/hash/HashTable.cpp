@@ -76,7 +76,7 @@ std::vector<int> HashTable::find(const std::string &featureName, const std::stri
     unsigned int index = hash(featureName, stateAbbreviation);
 
     for (int i = 0; i < capacity; i++) {
-        if (data[index].featureName == featureName && data[index].stateAbbreviation == stateAbbreviation) {
+        if ((data[index].featureName.find(featureName) != std::string::npos) && data[index].stateAbbreviation == stateAbbreviation) {
             return data[index].offsets;
         } else {
             index = (index + i * i) % capacity;

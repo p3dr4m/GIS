@@ -97,6 +97,9 @@ void CommandProcessor::importCmd(vector<string> arguments) {
 
     // open the file
     ifstream input(arguments[1]);
+    if (!input.is_open()) {
+        throw invalid_argument("Unable to open file: " + arguments[1]);
+    }
     string line, word;
     vector<string> row;
     int countingLines = -1;
