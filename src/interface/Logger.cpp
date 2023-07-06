@@ -315,7 +315,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
-                string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
+                string line = "\t" + to_string(record.offset) + "  " +  record.str() + "\n";
                 lines.push_back(line);
             }
 
@@ -413,7 +413,12 @@ void Logger::whatIsAtLog(vector<string> arguments, vector<Record> records, vecto
         whatIsAtLogStr << "Nothing was found at (" << arguments[1] << ", " << arguments[2] << ")\n";
     } else {
         for (size_t i = 0; i < records.size(); ++i) {
-            whatIsAtLogStr << "\t" << offsets[i] << ":  " << records[i].str() << "\n";
+            string temp;
+            vector<string> row = records[i].getRow();
+            temp +=  "\"" + row[FEATURE_NAME] +"\"" + "  " + "\""+ row[COUNTY_NAME]+"\"" + "  " +
+                    "\""+row[STATE_ALPHA] + "\"";
+
+            whatIsAtLogStr << "\t" << offsets[i] << ":  " << temp << "\n";
         }
     }
 
