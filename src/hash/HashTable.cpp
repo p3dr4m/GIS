@@ -1,10 +1,9 @@
 //HashTable.cpp
 #include "HashTable.h"
 
-// the hash will use quadratic probing
-// we will also create a function to check the longest probe
+using namespace std;
 
-void HashTable::insert(std::string featureName, std::string stateAbbreviation, int offset) {
+void HashTable::insert(string featureName, string stateAbbreviation, int offset) {
     int index = hash(featureName, stateAbbreviation);
     HashEntry entry;
     entry.featureName = featureName;
@@ -41,8 +40,8 @@ void HashTable::insert(std::string featureName, std::string stateAbbreviation, i
  * @param stateAbbreviation
  * @return
  */
-unsigned int HashTable::hash(const std::string &featureName, const std::string &stateAbbreviation) const {
-    std::string key = featureName + stateAbbreviation;
+unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
+    string key = featureName + stateAbbreviation;
     unsigned int hash = 0;
     unsigned int x = 0;
     unsigned int i = 0;
@@ -61,7 +60,7 @@ unsigned int HashTable::hash(const std::string &featureName, const std::string &
 
 void HashTable::resize() {
     capacity *= 2;
-    std::vector<HashEntry> temp = data;
+    vector<HashEntry> temp = data;
     data.clear();
     data.resize(capacity);
     size = 0;
@@ -72,11 +71,11 @@ void HashTable::resize() {
     }
 }
 
-std::vector<int> HashTable::find(const std::string &featureName, const std::string &stateAbbreviation) {
+vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
 
     for (int i = 0; i < capacity; i++) {
-        if ((data[index].featureName.find(featureName) != std::string::npos) && data[index].stateAbbreviation == stateAbbreviation) {
+        if ((data[index].featureName.find(featureName) != string::npos) && data[index].stateAbbreviation == stateAbbreviation) {
             return data[index].offsets;
         } else {
             index = (index + i * i) % capacity;
@@ -90,15 +89,15 @@ int HashTable::getLongestProbe() {
     return longestProbe;
 }
 
-std::string HashTable::str() {
+string HashTable::str() {
     // show the hash table in a string
-    std::string result;
+    string result;
     for (int i = 0; i < capacity; i++) {
         if (data[i].exists) {
-            std::string offsetStr = "";
+            string offsetStr = "";
 
             for (int offset : data[i].offsets) {
-                offsetStr += std::to_string(offset);
+                offsetStr += to_string(offset);
                 if (data[i].offsets.size() > 1) {
                     offsetStr += ", ";
                 } else {
@@ -106,7 +105,7 @@ std::string HashTable::str() {
                 }
             }
 
-            result += "\t" + std::to_string(i) + ": [" + data[i].featureName + " " + data[i].stateAbbreviation + ", [" + offsetStr +
+            result += "\t" + to_string(i) + ": [" + data[i].featureName + " " + data[i].stateAbbreviation + ", [" + offsetStr +
                       "]]\n";
         }
     }

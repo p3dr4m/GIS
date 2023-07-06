@@ -18,7 +18,7 @@ bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
     return true;
 }
 
-std::vector<Location> PRQuadTree::retrieve(std::vector<Location> returnNodes, const Location &location) {
+vector<Location> PRQuadTree::retrieve(vector<Location> returnNodes, const Location &location) {
     int index = getIndex(location);
     if (index != -1 && nodes[0] != nullptr) {
         nodes[index]->retrieve(returnNodes, location);
@@ -212,7 +212,7 @@ int PRQuadTree::getLocationsSize() {
 }
 
 
-std::vector<PRQuadTree *> PRQuadTree::getNodes() {
+vector<PRQuadTree *> PRQuadTree::getNodes() {
     return nodes;
 }
 

@@ -467,7 +467,7 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
     cmdCount++;
 }
 
-void Logger::debugHash(const std::string &hashTableStr) {
+void Logger::debugHash(const string &hashTableStr) {
     string debugHashStr;
     debugHashStr += "Command " + to_string(cmdCount) + ": debug\thash\n";
     debugHashStr += hashTableStr;

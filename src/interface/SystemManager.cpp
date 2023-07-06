@@ -119,14 +119,14 @@ Record SystemManager::goToOffset(ifstream &file, const string &filename, int off
     file.open(normalizedPath, ios::binary | ios::in);  // add the ios::in flag to open for reading
     if (!file.is_open()) {
         cerr << "Failed to open file: " << filename << "\n";
-        throw std::runtime_error("Failed to open file: " + filename);
+        throw runtime_error("Failed to open file: " + filename);
     }
 
     // Seek to the specified offset
     file.seekg(offset, ios::beg);
     if (!file.good()) {
         cerr << "Failed to seek to offset: " << offset << "\n";
-        throw std::runtime_error("Failed to seek to offset: " + std::to_string(offset));
+        throw runtime_error("Failed to seek to offset: " + to_string(offset));
     }
 
     // Move the cursor to the beginning of the line.

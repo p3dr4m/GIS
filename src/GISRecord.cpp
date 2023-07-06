@@ -64,7 +64,7 @@ vector<int> GISRecord::findRecords(float longitude, float latitude, float halfWi
     return result;
 }
 
-vector<Record> GISRecord::getRecords(const std::vector<int> &offsets) {
+vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
     vector<Record> records;
     ifstream file;
     Logger &logger = Logger::getInstance();
