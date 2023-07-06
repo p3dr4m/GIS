@@ -8,7 +8,7 @@
 
 using namespace std;
 
-string SystemManager::replaceBackslashes(const string &path) {
+string replaceBackslashes(const string &path) {
     string pathCopy = path;
     replace(pathCopy.begin(), pathCopy.end(), '\\', '/');
     return pathCopy;
@@ -81,9 +81,9 @@ void SystemManager::writeLinesToFile(ofstream &file, const vector<string> &lines
     }
 }
 
-fpos<mbstate_t> SystemManager::writeLineToFile(ofstream &file, const string &line) {
+streampos SystemManager::writeLineToFile(ofstream &file, const string &line) {
     if (file.is_open()) {
-        fpos<mbstate_t> offset = file.tellp();
+        streampos offset = file.tellp();
         file << line << "\n";
         return offset;
     } else {

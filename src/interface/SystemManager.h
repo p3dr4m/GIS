@@ -33,7 +33,7 @@ public:
 
     void run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath);
 
-    static std::fpos<mbstate_t> writeLineToFile(std::ofstream &file, const std::string &line);
+    static std::streampos writeLineToFile(std::ofstream &file, const std::string &line);
 
     static void writeLinesToFile(std::ofstream &file, const std::vector<std::string> &lines);
 
@@ -47,8 +47,6 @@ public:
     static void closeFile(std::ofstream &file);
 
     static Record goToOffset(std::ifstream &file, const std::string &filename, int offset);
-
-    static std::string replaceBackslashes(const std::string &path);
 };
 
 

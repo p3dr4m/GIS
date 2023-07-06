@@ -215,12 +215,12 @@ public:
         return nameIndex->getLongestProbe();
     }
 
-    std::string dbFileName;
 
     BufferPool<Record> &getBuffer() {
         return buffer;
     }
 
+    std::string dbFileName;
 private:
     BufferPool<Record> buffer = BufferPool<Record>(15);
     CoordinateIndex *coordinateIndex;

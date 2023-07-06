@@ -286,7 +286,7 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
 void CommandProcessor::quitCmd(vector<string> arguments) {
     // logger close files
     Logger &logger = Logger::getInstance();
-    logger.quitCmd(move(arguments));
+    logger.quitLog(move(arguments));
     exit(0);
 }
 

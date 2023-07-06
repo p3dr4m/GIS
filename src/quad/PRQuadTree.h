@@ -67,26 +67,6 @@ struct Location {
 
 };
 
-//struct BoundingBox {
-//    Coordinate centerPoint;
-//    Coordinate halfWidthHeights; // the half width and height of the box
-//    Coordinate topLeft;
-//    Coordinate bottomRight;
-//
-//    // Default constructor
-//    BoundingBox() {
-//        centerPoint = Coordinate(0, 0);
-//        halfWidthHeights = Coordinate(0, 0);
-//        topLeft = Coordinate(0, 0);
-//        bottomRight = Coordinate(0, 0);
-//    }
-//
-//    BoundingBox(float minLat, float maxLat, float minLong, float maxLong);
-//
-//    // Constructor to create bounding box search area
-//    BoundingBox(Coordinate coord, float halfWidth, float halfHeight);
-//};
-
 struct BoundingBox {
     Coordinate centerPoint;
     float halfWidth;

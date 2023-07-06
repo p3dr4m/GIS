@@ -122,6 +122,32 @@ void Logger::debugWorld(const vector<string> &option, PRQuadTree &tree) {
     cmdCount++;
 }
 
+void recurseTree(PRQuadTree &tree, vector<vector<int>> &grid, int minX, int maxX, int minY, int maxY) {
+    int midX = (maxX + minX) / 2;
+    int midY = (maxY + minY) / 2;
+
+    if (tree.isLeaf()) {
+        grid[midY][midX] = tree.getLocationsSize();
+    } else {
+        int childBoundsX[4][2] = {{midX, maxX},
+                                  {midX, maxX},
+                                  {minX, midX},
+                                  {minX, midX}};
+        int childBoundsY[4][2] = {{midY, maxY},
+                                  {minY, midY},
+                                  {midY, maxY},
+                                  {minY, midY}};
+
+        for (int i = 0; i < 4; ++i) {
+            if (tree.getNodes()[i] != nullptr) {
+                recurseTree(*tree.getNodes()[i], grid,
+                            childBoundsX[i][0], childBoundsX[i][1],
+                            childBoundsY[i][0], childBoundsY[i][1]);
+            }
+        }
+    }
+}
+
 void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     // create an empty grid
     vector<vector<int>> grid(40, vector<int>(150));
@@ -162,46 +188,7 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     lines.push_back(dashLine);
 }
 
-void Logger::recurseTree(PRQuadTree &tree, vector<vector<int>> &grid, int minX, int maxX, int minY, int maxY) {
-    int midX = (maxX + minX) / 2;
-    int midY = (maxY + minY) / 2;
-
-    if (tree.isLeaf()) {
-        grid[midY][midX] = tree.getLocationsSize();
-    } else {
-        int childBoundsX[4][2] = {{midX, maxX},
-                                  {midX, maxX},
-                                  {minX, midX},
-                                  {minX, midX}};
-        int childBoundsY[4][2] = {{midY, maxY},
-                                  {minY, midY},
-                                  {midY, maxY},
-                                  {minY, midY}};
-
-        for (int i = 0; i < 4; ++i) {
-            if (tree.getNodes()[i] != nullptr) {
-                recurseTree(*tree.getNodes()[i], grid,
-                            childBoundsX[i][0], childBoundsX[i][1],
-                            childBoundsY[i][0], childBoundsY[i][1]);
-            }
-        }
-    }
-}
-
-
-void Logger::debugQuad(const vector<string> &option, PRQuadTree &tree) {
-    vector<string> lines;
-
-    printDebugQuad(lines, tree, 0);
-    lines.push_back(separator);
-
-    SystemManager::writeLinesToFile(logFile, lines);
-    cmdCount++;
-
-}
-
-
-void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth = 0) {
+void printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth = 0) {
     string padding(depth * 3, ' '); // three spaces for each level of depth
 
     if (tree.isLeaf()) {
@@ -235,8 +222,19 @@ void Logger::printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth =
     }
 }
 
+void Logger::debugQuad(const vector<string> &option, PRQuadTree &tree) {
+    vector<string> lines;
 
-vector<Record> filterRecords(const vector<Record>& records, const string& filterOption) {
+    printDebugQuad(lines, tree, 0);
+    lines.push_back(separator);
+
+    SystemManager::writeLinesToFile(logFile, lines);
+    cmdCount++;
+
+}
+
+
+vector<Record> filterRecords(const vector<Record> &records, const string &filterOption) {
     map<string, string> classMap = {
             {"Airport",         "structure"},
             {"Arroyo",          "water"},
@@ -272,7 +270,7 @@ vector<Record> filterRecords(const vector<Record>& records, const string& filter
     };
     vector<Record> result;
     for (const auto &record: records) {
-        auto row  = record.getRow();
+        auto row = record.getRow();
         if (row.empty()) {
             continue;
         }
@@ -476,7 +474,7 @@ void Logger::debugHash(const string &hashTableStr) {
     cmdCount++;
 }
 
-void Logger::quitCmd(vector<string> arguments) {
+void Logger::quitLog(std::vector<std::string> arguments) {
     string quitStr;
     quitStr += "Command " + to_string(cmdCount) + ": quit\n\n";
     quitStr += "Terminating execution of commands. \n\n";
