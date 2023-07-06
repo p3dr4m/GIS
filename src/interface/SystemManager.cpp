@@ -4,9 +4,15 @@
 #include <sstream>
 #include <iterator>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
+string replaceBackslashes(const string &path) {
+    string pathCopy = path;
+    replace(pathCopy.begin(), pathCopy.end(), '\\', '/');
+    return pathCopy;
+}
 
 void SystemManager::run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath) {
 
@@ -22,7 +28,8 @@ void SystemManager::run(const char *databaseFilePath, const char *cmdScriptFileP
 }
 
 void SystemManager::readLines(const string &filename, const function<void(vector<string> &)> &runCommand) {
-    ifstream input(filename);
+    string normalizedPath = replaceBackslashes(filename);
+    ifstream input(normalizedPath, ios::binary);  // open in binary mode
 
     if (!input.is_open()) {
         throw runtime_error("Unable to open file: " + filename);
@@ -50,7 +57,8 @@ void SystemManager::readLines(const string &filename, const function<void(vector
 }
 
 void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &, string line, int fileOffset)> &processLine) {
-    ifstream file(filename);
+    string normalizedPath = replaceBackslashes(filename);
+    ifstream file(normalizedPath, ios::binary);  // open in binary mode
     string line;
     streampos offset = 0;
 
@@ -95,19 +103,18 @@ fpos<mbstate_t> SystemManager::writeLineToFile(ofstream &file, const string &lin
 }
 
 void SystemManager::createOrTruncateFile(ofstream &file, const string &filename) {
-    file.open(filename, ios::out);  // open in output mode (create or truncate)
+    file.open(filename, ios::out | ios::binary);  // open in output mode (create or truncate) and binary mode
     if (!file.is_open()) {
         cerr << "Failed to open file: " << filename << endl;
     }
 }
 
 void SystemManager::createOrAppendFile(ofstream &file, const string &filename) {
-    file.open(filename, ios::app);  // open in append mode (create or append)
+    file.open(filename, ios::app | ios::binary);  // open in append mode (create or append) and binary mode
     if (!file.is_open()) {
         cerr << "Failed to open file: " << filename << endl;
     }
 }
-
 void SystemManager::closeFile(ofstream &file) {
     if (file.is_open()) {
         file.close();
@@ -116,7 +123,8 @@ void SystemManager::closeFile(ofstream &file) {
 
 Record SystemManager::goToOffset(ifstream &file, const string &filename, int offset) {
     // Open the file in binary mode
-    file.open(filename, ios::binary);
+    string normalizedPath = replaceBackslashes(filename);
+    file.open(normalizedPath, ios::binary | ios::in);  // add the ios::in flag to open for reading
     if (!file.is_open()) {
         cerr << "Failed to open file: " << filename << endl;
         throw std::runtime_error("Failed to open file: " + filename);
