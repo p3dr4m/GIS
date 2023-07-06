@@ -101,29 +101,26 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         throw invalid_argument("Unable to open file: " + arguments[1]);
     }
     string line, word;
-    vector<string> row;
     int countingLines = -1;
     // Use SystemManager to read the file
     Logger &logger = Logger::getInstance();
-
     // reading the file from import command and inserting into the quadtree
     logger.openDbFile();
     string nameLengths;
-    SystemManager::readDatabase(arguments[1], [&](vector<string> &row, const string line, int fileOffset) {
+    SystemManager::readDatabase(arguments[1], [&](const string& line) {
         // skip first line in file
         if (countingLines == -1) {
             countingLines++;
             return;
         }
 
-        row.pop_back();
-
-        int offset;
+        Record record = Record(line);
+        vector<string> row = record.getRow();
         Coordinate coord = Coordinate(stof(row[PRIM_LONG_DEC]), stof(row[PRIM_LAT_DEC]));
         bool inserted = gisRecord.getTree().isCoordInBox(coord);
 
         if (inserted) {
-            offset = logger.logToDatabase(line, fileOffset);
+            int offset = logger.logToDatabase(line);
             gisRecord.insertRecord(row, countingLines, offset);
             nameLengths += row[FEATURE_NAME];
             countingLines++;
@@ -165,7 +162,7 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
         logger.debugHash(hashStr);
     } else if (arguments[1] == "pool") {
         // print out the memory pool
-        BufferPool<Record> &pool = gisRecord.getPool();
+        BufferPool<Record> &pool = gisRecord.getBuffer();
         logger.debugPool(pool);
     } else if (arguments[1] == "world") {
         // print out the world
@@ -187,11 +184,6 @@ void CommandProcessor::whatIsAtCmd(vector<string> arguments) {
     float latDec = DMS(arguments[1]).toFloat();
     float lngDec = DMS(arguments[2]).toFloat();
     vector<int> offsets = gisRecord.findRecords(latDec, lngDec);
-    // check the buffer with the record offsets. if the buffer does not contain the offsets, then read the file,
-    // and put the records in the buffer
-    // if the buffer does contain the offsets, then get the records from the buffer instead of reading the file.
-    // then log the records.
-    ifstream file;
     Logger &logger = Logger::getInstance();
     string logString;
     vector<Record> records = gisRecord.getRecords(offsets);

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-string replaceBackslashes(const string &path) {
+string SystemManager::replaceBackslashes(const string &path) {
     string pathCopy = path;
     replace(pathCopy.begin(), pathCopy.end(), '\\', '/');
     return pathCopy;
@@ -56,30 +56,19 @@ void SystemManager::readLines(const string &filename, const function<void(vector
     }
 }
 
-void SystemManager::readDatabase(const string &filename, const function<void(vector<string> &, string line, int fileOffset)> &processLine) {
+void SystemManager::readDatabase(const string &filename, const function<void(string &line)> &processLine) {
     string normalizedPath = replaceBackslashes(filename);
     ifstream file(normalizedPath, ios::binary);  // open in binary mode
     string line;
-    streampos offset = 0;
 
     while (true) {
-        offset = file.tellg();
         if (!getline(file, line)) {
             break;
         }
 
-        vector<string> row;
-        string word;
         stringstream ss(line);
 
-        while (getline(ss, word, '|')) {
-            row.push_back(word);
-        }
-
-        // Add file offset as the last element
-        row.push_back(to_string(static_cast<long long>(offset)));
-
-        processLine(row, line, offset);
+        processLine(line);
     }
 }
 
@@ -103,18 +92,21 @@ fpos<mbstate_t> SystemManager::writeLineToFile(ofstream &file, const string &lin
 }
 
 void SystemManager::createOrTruncateFile(ofstream &file, const string &filename) {
-    file.open(filename, ios::out | ios::binary);  // open in output mode (create or truncate) and binary mode
+    string normalizedPath = replaceBackslashes(filename);
+    file.open(normalizedPath, ios::out | ios::binary);  // open in output mode (create or truncate) and binary mode
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filename << endl;
+        cerr << "Failed to open file: " << filename << "\n";
     }
 }
 
 void SystemManager::createOrAppendFile(ofstream &file, const string &filename) {
-    file.open(filename, ios::app | ios::binary);  // open in append mode (create or append) and binary mode
+    string normalizedPath = replaceBackslashes(filename);
+    file.open(normalizedPath, ios::app | ios::binary);  // open in append mode (create or append) and binary mode
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filename << endl;
+        cerr << "Failed to open file: " << filename << "\n";
     }
 }
+
 void SystemManager::closeFile(ofstream &file) {
     if (file.is_open()) {
         file.close();
@@ -126,15 +118,26 @@ Record SystemManager::goToOffset(ifstream &file, const string &filename, int off
     string normalizedPath = replaceBackslashes(filename);
     file.open(normalizedPath, ios::binary | ios::in);  // add the ios::in flag to open for reading
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filename << endl;
+        cerr << "Failed to open file: " << filename << "\n";
         throw std::runtime_error("Failed to open file: " + filename);
     }
 
     // Seek to the specified offset
     file.seekg(offset, ios::beg);
-    if(!file.good()) {
-        cerr << "Failed to seek to offset: " << offset << endl;
+    if (!file.good()) {
+        cerr << "Failed to seek to offset: " << offset << "\n";
         throw std::runtime_error("Failed to seek to offset: " + std::to_string(offset));
+    }
+
+    // Move the cursor to the beginning of the line.
+    // This corrects the position if the offset was in the middle of a line.
+    file.seekg(-1, ios::cur);  // move one character back
+    char c;
+    while (file.get(c)) {
+        if (c == '\n') {  // we've hit the previous line ending
+            break;  // stop moving back
+        }
+        file.seekg(-2, ios::cur);  // move another character back
     }
 
     // Read the line
@@ -143,6 +146,5 @@ Record SystemManager::goToOffset(ifstream &file, const string &filename, int off
 
     // Close the file
     file.close();
-
     return {offset, row};
 }

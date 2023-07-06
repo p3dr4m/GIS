@@ -41,14 +41,14 @@ public:
 
     void quitCmd(std::vector<std::string> arguments);
 
-    int logToDatabase(const std::string &line, int offset);
+    int logToDatabase(const std::string &line);
 
     void openDbFile() {
         if (!databaseFile.is_open()) {
             try {
                 databaseFile.open(databaseFilePath, std::ios::app);
             } catch (std::exception &e) {
-                std::cout << e.what() << std::endl;
+                std::cout << e.what() << "\n";
                 exit(1);
             }
         }
@@ -73,7 +73,7 @@ public:
     };
 
     void log(const std::string &line) {
-        databaseFile << line << std::endl;
+        databaseFile << line << "\n";
     }
 
     std::string getLogFilePath() const {

@@ -29,7 +29,7 @@ public:
     static void
     readLines(const std::string &filename, const std::function<void(std::vector<std::string> &)> &runCommand);
 
-    static void readDatabase(const std::string &filename, const std::function<void(std::vector<std::string> &row, std::string line, int fileOffset)> &processLine);
+    static void readDatabase(const std::string &filename, const std::function<void(std::string &line)> &processLine);
 
     void run(const char *databaseFilePath, const char *cmdScriptFilePath, const char *logFilePath);
 
@@ -48,6 +48,7 @@ public:
 
     static Record goToOffset(std::ifstream &file, const std::string &filename, int offset);
 
+    static std::string replaceBackslashes(const std::string &path);
 };
 
 

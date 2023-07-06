@@ -147,7 +147,7 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
 
     for (const auto &row: grid) {
         string rowStr;
-        // add | to the beginning of the row and | to the end of the row
+        // add | to the beginning of the line and | to the end of the line
         rowStr += "|";
         for (int node: row) {
             if (node == 0)
@@ -272,7 +272,10 @@ vector<Record> filterRecords(const vector<Record>& records, const string& filter
     };
     vector<Record> result;
     for (const auto &record: records) {
-        auto row  = record.getRowVector();
+        auto row  = record.getRow();
+        if (row.empty()) {
+            continue;
+        }
         string featureClass = row[FEATURE_CLASS];
         auto it = classMap.find(featureClass);
         if (it != classMap.end() && it->second == filterOption) {
@@ -311,7 +314,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: filtered) {
-                vector<string> row = record.getRowVector();
+                vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
@@ -338,7 +341,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: records) {
-                vector<string> row = record.getRowVector();
+                vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string featureID = row[FEATURE_ID];
@@ -387,7 +390,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: records) {
-                vector<string> row = record.getRowVector();
+                vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
@@ -432,9 +435,9 @@ void Logger::debugPool(BufferPool<Record> bufferPool) {
     cmdCount++;
 }
 
-int Logger::logToDatabase(const string &line, int offset) {
-    // concat all the strings in the row vector
-    offset = (int) SystemManager::writeLineToFile(databaseFile, line);
+int Logger::logToDatabase(const string &line) {
+    // concat all the strings in the line vector
+    int offset = (int) SystemManager::writeLineToFile(databaseFile, line);
     return offset;
 }
 
@@ -449,7 +452,7 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
         SystemManager::writeLineToFile(logFile, logStr);
     } else {
         for (int i = 0; i < records.size(); i++) {
-            vector<string> row = records[i].getRowVector();
+            vector<string> row = records[i].getRow();
             DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
             DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
             logStr = "  " + to_string(offsets[i]) + ": " + row[COUNTY_NAME] + " " + "(" + latDMS.toLogString() + ", " +
