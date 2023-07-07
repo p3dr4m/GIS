@@ -82,6 +82,16 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
 
 }
 
+#include <algorithm>
+#include <cctype>
+#include <string>
+
+std::string removeWhitespace(const std::string &input) {
+    std::string output = input;
+    output.erase(std::remove_if(output.begin(), output.end(), ::isspace), output.end());
+    return output;
+}
+
 /**
  * import<tab><relative path>
  * import<tab><GIS record file>
@@ -96,7 +106,6 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     }
 
     // open the file
-    gisRecord.clearIndices();
     ifstream input(arguments[1]);
     if (!input.is_open()) {
         throw invalid_argument("Unable to open file: " + arguments[1]);

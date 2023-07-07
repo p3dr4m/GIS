@@ -4,6 +4,7 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <string>
 
 using namespace std;
 
@@ -224,6 +225,8 @@ void printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth = 0) {
 
 void Logger::debugQuad(const vector<string> &option, PRQuadTree &tree) {
     vector<string> lines;
+    string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
+    lines.push_back(cmd);
 
     printDebugQuad(lines, tree, 0);
     lines.push_back(separator);
@@ -307,7 +310,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
         } else {
             // print the first line in the comment above
             string firstLine = "The following " + to_string(filtered.size()) + " feature(s) were found in " +
-                               "(" + lat.toLogString() + "+/- " + arguments[5] + ", " + lng.toLogString() + "+/- " +
+                               "(" + lat.toLogString() + " +/- " + arguments[5] + ", " + lng.toLogString() + " +/- " +
                                arguments[6] +
                                "\n";
             lines.push_back(firstLine);
@@ -332,7 +335,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
     } else if (arguments[1] == "-long") {
         string cmdStr =
                 "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
-                arguments[3] + "\t" + "\n";
+                arguments[3] + "\t" + arguments[4] + "\t" + arguments[5] + "\n";
         lines.push_back(cmdStr);
         lng = DMS(arguments[2]);
         lat = DMS(arguments[3]);
@@ -343,7 +346,8 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
             lines.push_back(firstLine);
         } else {
             string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in (" +
-                               lat.toLogString() + ", " + lng.toLogString() + ")" + "\n";
+                               lat.toLogString() + " +/- " + arguments[4] + ", " + lng.toLogString() + " +/- " +
+                               arguments[5] + ")" + "\n";
 
             lines.push_back(firstLine);
             // sort records by record.offset
@@ -361,7 +365,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 string countyName = row[COUNTY_NAME];
                 string latStr = latDMS.toLogString();
                 string lngStr = lngDMS.toLogString();
-                string elevation = row[ELEV_IN_M];
+                string elevation = row[ELEV_IN_FT];
                 string USGSQuad = row[MAP_NAME];
                 string dateCreated = row[DATE_CREATED];
 
@@ -392,14 +396,17 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
         // REGULAR WHAT IS IN
         if (records.empty()) {
             //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
-            string firstLine = "\tNothing was found in (" + lat.toLogString() + ", " + lng.toLogString() + ")\n";
+            string firstLine = "\tNothing was found in (" + lat.toLogString() + " +/- " + arguments[3] + " , " +
+                               lng.toLogString() + " +/- " + arguments[4] + ")\n";
             lines.push_back(firstLine);
         } else {
             lat = DMS(arguments[1]);
             lng = DMS(arguments[2]);
             // print the first line in the comment above
-            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in (" +
-                               lat.toLogString() + ", " + lng.toLogString() + ")\n";
+            string firstLine =
+                    "The following " + to_string(records.size()) + " feature(s) were found in (" + lat.toLogString() +
+                    " +/- " + arguments[3] + " , " +
+                    lng.toLogString() + " +/- " + arguments[4] + ")\n";
             lines.push_back(firstLine);
 
             // sort records by record.offset
