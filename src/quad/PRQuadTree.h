@@ -170,6 +170,7 @@ public:
     std::vector<Location> retrieve(std::vector<Location> returnNodes, const Location &location);
 
     bool isCoordInBox(Coordinate coord, BoundingBox box);
+
     bool isCoordInBox(Coordinate coord);
 
     int getTotalLocations();
@@ -188,7 +189,34 @@ public:
 
     void getNodeByCoordinate(std::vector<Location> &returnLocations, Coordinate coord);
 
+    Location &find(Coordinate coord) {
+        static Location emptyLocation;
+        // If the coordinate is not in this quad tree's bounding box, return an empty Location.
+        if (!isCoordInBox(coord)) {
+            return emptyLocation;
+        }
 
+        // If this is a leaf node, iterate over the locations to find the matching one.
+        if (isLeaf()) {
+            for (auto &location: locations) {
+                if (location.getCoordinate().latitude == coord.latitude &&
+                    location.getCoordinate().longitude == coord.longitude) {
+                    return location;
+                }
+            }
+        } else {
+            // If this is an internal node, recursively call find on the correct child node.
+            Location temp;
+            temp.coordinate = coord;
+            int index = getIndex(temp);
+            if (nodes[index] != nullptr) {
+                return nodes[index]->find(coord);
+            }
+        }
+
+        // If we reach here, the location was not found, return an empty Location.
+        return emptyLocation;
+    }
 };
 
 

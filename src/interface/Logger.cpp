@@ -45,15 +45,6 @@ void Logger::worldLog(const vector<string> &arguments) {
     DMS southLat = DMS(arguments[3]);
     DMS northLat = DMS(arguments[4]);
     vector<string> lines;
-    if (cmdCount == 0) {
-        string comment = "; Script 1\n"
-                         ";\n"
-                         "; Testing using a small dataset\n"
-                         ";\n"
-                         "; Specify boundaries of coordinate space:\n"
-                         ";";
-        lines.push_back(comment);
-    }
     string cmd = "world\t" + arguments[1] + "\t" + arguments[2] + "\t" + arguments[3] + "\t" + arguments[4] + "\n";
     lines.push_back(cmd);
     lines.push_back(separator);
@@ -78,12 +69,6 @@ void Logger::worldLog(const vector<string> &arguments) {
 
 void Logger::importLog(const vector<string> &arguments, vector<int> data) {
     vector<string> lines;
-
-    if (cmdCount == 1) {
-        string comment = ";\n"
-                         "; Import the dataset [the address here is a relative address]";
-        lines.push_back(comment);
-    }
     string cmd = "Command " + to_string(cmdCount) + ": " + "import\t" + arguments[1] + "\n";
     lines.push_back(cmd);
 
@@ -109,11 +94,6 @@ void Logger::importLog(const vector<string> &arguments, vector<int> data) {
  */
 void Logger::debugWorld(const vector<string> &option, PRQuadTree &tree) {
     vector<string> lines;
-    if (cmdCount == 2) {
-        string comment = ";\n"
-                         "; Lets visualize our already imported geographical data";
-        lines.push_back(comment);
-    }
     string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
     lines.push_back(cmd);
 

@@ -89,6 +89,11 @@ public:
 
     static std::vector<Record> filterRecords(const std::vector<Record> &records, const std::string &filterOption);
 
+    // log line
+    void logLine(const std::string &line) {
+        logFile << line << "\n";
+    }
+
 private:
     int cmdCount = 0;
     std::string separator = "------------------------------------------------------------------------------------------";

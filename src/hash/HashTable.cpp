@@ -73,15 +73,26 @@ void HashTable::resize() {
 
 vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
-    //(data[index].featureName.find(featureName) != string::npos)
-    for (int i = 0; i < capacity; i++) {
-        if (data[index].featureName == featureName && data[index].stateAbbreviation == stateAbbreviation) {
-            return data[index].offsets;
-        } else {
-            index = (index + i * i) % capacity;
+    int originalIndex = index;
+    int i = 0;
+
+    while (data[index].exists &&
+           (data[index].featureName != featureName || data[index].stateAbbreviation != stateAbbreviation)) {
+        i++;
+        index = (originalIndex + i * i) % capacity;
+
+        // If we have checked all entries, break
+        if (i == capacity) {
+            return {};
         }
     }
 
+    // If the existing entry matches the key
+    if (data[index].exists) {
+        return data[index].offsets;
+    }
+
+    // If the key is not found
     return {};
 }
 

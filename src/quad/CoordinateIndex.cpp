@@ -26,16 +26,28 @@ vector<int> CoordinateIndex::searchRecordsInBounds(Coordinate coord, float halfW
 }
 
 bool CoordinateIndex::insert(float latitude, float longitude, int fileOffset, int dbLine) {
+    // Create the coordinate
+    Coordinate coord = Coordinate(longitude, latitude);
 
-    // create the Quad Tree Location
-    Location node;
-    node.coordinate.latitude = latitude;
-    node.coordinate.longitude = longitude;
-    node.fileOffset.push_back(fileOffset);
-    node.databaseLine.push_back(dbLine);
+    // Try to find the Location in the QuadTree
+    Location &existingLocation = quadTree.find(coord);
 
-    // insert the node into the Quad Tree in the coordinate index
-    return quadTree.insert(node);
+    // Check if the Location already exists in the QuadTree
+    if (existingLocation.coordinate.latitude == latitude && existingLocation.coordinate.longitude == longitude) {
+        // If it exists, just update the fileOffset and databaseLine
+        existingLocation.fileOffset.push_back(fileOffset);
+        existingLocation.databaseLine.push_back(dbLine);
+    } else {
+        // If it doesn't exist, create a new Location and insert it into the QuadTree
+        Location newNode;
+        newNode.coordinate = coord;
+        newNode.fileOffset.push_back(fileOffset);
+        newNode.databaseLine.push_back(dbLine);
+
+        return quadTree.insert(newNode);
+    }
+
+    return true;
 }
 
 vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
@@ -44,7 +56,6 @@ vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
     for (auto &node: nodes) {
         for (int index = 0; index < node.fileOffset.size(); index++) {
             fileOffsets.push_back(node.fileOffset[index]);
-//            fileOffsets.push_back(node.databaseLine[index]);
         }
     }
 

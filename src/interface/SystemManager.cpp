@@ -32,7 +32,10 @@ void SystemManager::readLines(const string &filename, const function<void(vector
     ifstream input(normalizedPath, ios::binary);  // open in binary mode
 
     if (!input.is_open()) {
-        throw runtime_error("Unable to open file: " + filename);
+        // exit if file cannot be opened don't throw exception
+        // because it will be caught by the caller
+        cerr << "Unable to open file: " << normalizedPath << endl;
+//        exit(1);
     }
 
     string line;
@@ -48,6 +51,8 @@ void SystemManager::readLines(const string &filename, const function<void(vector
         }
 
         if (arguments.empty() || arguments[0].empty() || arguments[0][0] == ';') {
+            // log the line to the log file
+            Logger::getInstance().logLine(line);
             // empty or comment line, skip
             continue;
         }
