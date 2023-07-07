@@ -103,13 +103,17 @@ void PRQuadTree::split() {
     float centerY = boundingBox.centerPoint.latitude;
 
     nodes[0] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX - quarterWidth, centerY + quarterHeight), quarterWidth, quarterHeight), "tl");
+                              BoundingBox(Coordinate(centerX - quarterWidth, centerY + quarterHeight), quarterWidth,
+                                          quarterHeight), "tl");
     nodes[1] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX + quarterWidth, centerY + quarterHeight), quarterWidth, quarterHeight), "tr");
+                              BoundingBox(Coordinate(centerX + quarterWidth, centerY + quarterHeight), quarterWidth,
+                                          quarterHeight), "tr");
     nodes[2] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX - quarterWidth, centerY - quarterHeight), quarterWidth, quarterHeight), "bl");
+                              BoundingBox(Coordinate(centerX - quarterWidth, centerY - quarterHeight), quarterWidth,
+                                          quarterHeight), "bl");
     nodes[3] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX + quarterWidth, centerY - quarterHeight), quarterWidth, quarterHeight), "br");
+                              BoundingBox(Coordinate(centerX + quarterWidth, centerY - quarterHeight), quarterWidth,
+                                          quarterHeight), "br");
 }
 
 void PRQuadTree::clear() {
@@ -227,7 +231,8 @@ bool PRQuadTree::isCoordInBox(Coordinate coord) {
     }
 
     // Check if the coordinate is not within the longitude boundaries of the box
-    if (coord.longitude < boundingBox.getTopLeft().longitude || coord.longitude > boundingBox.getBottomRight().longitude) {
+    if (coord.longitude < boundingBox.getTopLeft().longitude ||
+        coord.longitude > boundingBox.getBottomRight().longitude) {
         return false;
     }
 

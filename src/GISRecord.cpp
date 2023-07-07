@@ -16,6 +16,7 @@ using namespace std;
  */
 void GISRecord::setBounds(float minLat, float maxLat, float minLong, float maxLong) {
     BoundingBox boundingBox = BoundingBox(minLat, maxLat, minLong, maxLong);
+    clearIndices();
     coordinateIndex->updateBoundsOfTree(boundingBox);
 }
 
@@ -67,7 +68,6 @@ vector<int> GISRecord::findRecords(float longitude, float latitude, float halfWi
 
 vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
     vector<Record> records;
-    ifstream file;
     Logger &logger = Logger::getInstance();
 
     for (auto offset: offsets) {
@@ -76,7 +76,7 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
             records.push_back(record);
             buffer.put(record);
         } else {
-            Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
+            Record record = SystemManager::goToOffset(logger.getDatabaseFilePath(), offset);
             buffer.put(record);
             records.push_back(record);
         }
@@ -86,14 +86,13 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
 
 vector<Record> GISRecord::getRecords(const vector<int> &offsets, const string &filterOption) {
     vector<Record> records;
-    ifstream file;
     Logger &logger = Logger::getInstance();
 
     for (auto offset: offsets) {
         if (buffer.exists(offset)) {
             records.push_back(buffer.get(offset));
         } else {
-            Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
+            Record record = SystemManager::goToOffset(logger.getDatabaseFilePath(), offset);
             records.push_back(record);
         }
     }
@@ -103,6 +102,6 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets, const string &f
         buffer.put(record);
     }
 
-    return records;
+    return filteredRecords;
 }
 

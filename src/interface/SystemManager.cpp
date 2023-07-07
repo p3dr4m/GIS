@@ -113,7 +113,9 @@ void SystemManager::closeFile(ofstream &file) {
     }
 }
 
-Record SystemManager::goToOffset(ifstream &file, const string &filename, int offset) {
+Record SystemManager::goToOffset(const string &filename, int offset) {
+    ifstream file;
+
     // Open the file in binary mode
     string normalizedPath = replaceBackslashes(filename);
     file.open(normalizedPath, ios::binary | ios::in);  // add the ios::in flag to open for reading
@@ -131,13 +133,16 @@ Record SystemManager::goToOffset(ifstream &file, const string &filename, int off
 
     // Move the cursor to the beginning of the line.
     // This corrects the position if the offset was in the middle of a line.
-    file.seekg(-1, ios::cur);  // move one character back
-    char c;
-    while (file.get(c)) {
-        if (c == '\n') {  // we've hit the previous line ending
-            break;  // stop moving back
+
+    if (offset != 0) {
+        file.seekg(-1, ios::cur);  // move one character back
+        char c;
+        while (file.get(c)) {
+            if (c == '\n') {  // we've hit the previous line ending
+                break;  // stop moving back
+            }
+            file.seekg(-2, ios::cur);  // move another character back
         }
-        file.seekg(-2, ios::cur);  // move another character back
     }
 
     // Read the line

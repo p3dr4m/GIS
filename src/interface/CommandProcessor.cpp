@@ -137,8 +137,8 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         }
     });
     logger.closeDbFile();
-    int nodeCount = gisRecord.getNodeCount();
-    int importedNames = gisRecord.getImportedNames();
+    int nodeCount = countingLines;
+    int importedNames = countingLines;
     int longestProbe = gisRecord.getLongestProbe();
     unsigned long avgNameLength = nameLengths.size() / nodeCount;
     vector<int> data = {importedNames, longestProbe, nodeCount, static_cast<int>(avgNameLength)};
