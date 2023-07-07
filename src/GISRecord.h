@@ -209,6 +209,8 @@ public:
 
     std::vector<Record> getRecords(const std::vector<int> &offsets);
 
+    std::vector<Record> getRecords(const std::vector<int> &offsets, const std::string &filterOption);
+
     int getImportedNames() {
         return nameIndex->getSize();
     }
@@ -231,9 +233,10 @@ public:
     }
 
     void clearIndices() {
-//        coordinateIndex->clear();
-//        nameIndex->clear();
+        coordinateIndex->clear();
+        nameIndex->clear();
     }
+
 
     std::string dbFileName;
 private:

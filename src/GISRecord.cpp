@@ -1,4 +1,5 @@
 #include <fstream>
+#include <map>
 #include "GISRecord.h"
 #include "interface/SystemManager.h"
 #include "interface/Logger.h"
@@ -71,7 +72,9 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
 
     for (auto offset: offsets) {
         if (buffer.exists(offset)) {
-            records.push_back(buffer.get(offset));
+            Record record = buffer.get(offset);
+            records.push_back(record);
+            buffer.put(record);
         } else {
             Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
             buffer.put(record);
@@ -80,3 +83,26 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
     }
     return records;
 }
+
+vector<Record> GISRecord::getRecords(const vector<int> &offsets, const string &filterOption) {
+    vector<Record> records;
+    ifstream file;
+    Logger &logger = Logger::getInstance();
+
+    for (auto offset: offsets) {
+        if (buffer.exists(offset)) {
+            records.push_back(buffer.get(offset));
+        } else {
+            Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
+            records.push_back(record);
+        }
+    }
+    vector<Record> filteredRecords = Logger::filterRecords(records, filterOption);
+
+    for (const auto &record: filteredRecords) {
+        buffer.put(record);
+    }
+
+    return records;
+}
+

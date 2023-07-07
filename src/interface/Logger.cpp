@@ -234,7 +234,7 @@ void Logger::debugQuad(const vector<string> &option, PRQuadTree &tree) {
 }
 
 
-vector<Record> filterRecords(const vector<Record> &records, const string &filterOption) {
+vector<Record> Logger::filterRecords(const vector<Record> &records, const string &filterOption) {
     map<string, string> classMap = {
             {"Airport",         "structure"},
             {"Arroyo",          "water"},
@@ -498,7 +498,7 @@ void Logger::debugHash(const string &hashTableStr, const int &hashCapacity, cons
     string debugHashStr;
     debugHashStr += "Command " + to_string(cmdCount) + ": debug\thash\n";
     debugHashStr +=
-            "Format of display is\nSlot number: data record \nCurrent table size is " + to_string(hashCapacity)
+            "\nFormat of display is\nSlot number: data record \nCurrent table size is " + to_string(hashCapacity)
             + "\nNumber of elements in table is " + to_string(hashSize) + "\n\n";
 
     debugHashStr += hashTableStr;

@@ -87,6 +87,8 @@ public:
         return databaseFilePath;
     }
 
+    static std::vector<Record> filterRecords(const std::vector<Record> &records, const std::string &filterOption);
+
 private:
     int cmdCount = 0;
     std::string separator = "------------------------------------------------------------------------------------------";

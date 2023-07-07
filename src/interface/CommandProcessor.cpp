@@ -253,7 +253,7 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
         latDec = DMS(latitude).toFloat();
         lngDec = DMS(longitude).toFloat();
         offsets = gisRecord.findRecords(lngDec, latDec, halfWidth, halfHeight);
-        records = gisRecord.getRecords(offsets);
+        records = gisRecord.getRecords(offsets, filterOption);
         logger.whatIsInLog(arguments, records);
     } else if (arguments[1] == "-long") {
         latitude = arguments[2];
