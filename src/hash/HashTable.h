@@ -34,8 +34,12 @@ public:
 
     std::string str();
 
-    int getSize() {
+    int getSize() const {
         return size;
+    }
+
+    int getCapacity() const {
+        return capacity;
     }
 
 private:

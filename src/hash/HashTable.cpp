@@ -73,9 +73,9 @@ void HashTable::resize() {
 
 vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
-
+    //(data[index].featureName.find(featureName) != string::npos)
     for (int i = 0; i < capacity; i++) {
-        if ((data[index].featureName.find(featureName) != string::npos) && data[index].stateAbbreviation == stateAbbreviation) {
+        if (data[index].featureName == featureName && data[index].stateAbbreviation == stateAbbreviation) {
             return data[index].offsets;
         } else {
             index = (index + i * i) % capacity;
@@ -96,7 +96,7 @@ string HashTable::str() {
         if (data[i].exists) {
             string offsetStr = "";
 
-            for (int offset : data[i].offsets) {
+            for (int offset: data[i].offsets) {
                 offsetStr += to_string(offset);
                 if (data[i].offsets.size() > 1) {
                     offsetStr += ", ";
@@ -105,9 +105,11 @@ string HashTable::str() {
                 }
             }
 
-            result += "\t" + to_string(i) + ": [" + data[i].featureName + " " + data[i].stateAbbreviation + ", [" + offsetStr +
+            result += "\t" + to_string(i) + ": [" + data[i].featureName + " " + data[i].stateAbbreviation + ", [" +
+                      offsetStr +
                       "]]\n";
         }
     }
     return result;
 }
+

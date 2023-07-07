@@ -72,7 +72,6 @@ vector<Record> GISRecord::getRecords(const vector<int> &offsets) {
     for (auto offset: offsets) {
         if (buffer.exists(offset)) {
             records.push_back(buffer.get(offset));
-
         } else {
             Record record = SystemManager::goToOffset(file, logger.getDatabaseFilePath(), offset);
             buffer.put(record);

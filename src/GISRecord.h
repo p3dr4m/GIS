@@ -120,9 +120,11 @@ struct Record {
     std::vector<std::string> row;
 
     Record() = default;
+
     explicit Record(std::string line) : line(std::move(line)) {
         row = split();
     }
+
     Record(int offset, std::string line) : offset(offset), line(std::move(line)) {
         row = split();
     }
@@ -218,6 +220,19 @@ public:
 
     BufferPool<Record> &getBuffer() {
         return buffer;
+    }
+
+    int getHashCapacity() {
+        return nameIndex->getCapacity();
+    }
+
+    int getHashSize() {
+        return nameIndex->getSize();
+    }
+
+    void clearIndices() {
+//        coordinateIndex->clear();
+//        nameIndex->clear();
     }
 
     std::string dbFileName;

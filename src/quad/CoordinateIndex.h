@@ -27,6 +27,10 @@ public:
         return quadTree;
     }
 
+    void clear() {
+        quadTree.clear();
+    }
+
 
 private:
     PRQuadTree quadTree = PRQuadTree(0, BoundingBox(), "root");

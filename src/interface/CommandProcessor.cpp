@@ -96,6 +96,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     }
 
     // open the file
+    gisRecord.clearIndices();
     ifstream input(arguments[1]);
     if (!input.is_open()) {
         throw invalid_argument("Unable to open file: " + arguments[1]);
@@ -107,7 +108,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     // reading the file from import command and inserting into the quadtree
     logger.openDbFile();
     string nameLengths;
-    SystemManager::readDatabase(arguments[1], [&](const string& line) {
+    SystemManager::readDatabase(arguments[1], [&](const string &line) {
         // skip first line in file
         if (countingLines == -1) {
             countingLines++;
@@ -147,24 +148,23 @@ void CommandProcessor::debugCmd(vector<string> arguments) {
         throw invalid_argument("Invalid debug command\n"
                                "Usage: debug <quad|hash|pool|world>");
     }
-    PRQuadTree &quadTree = gisRecord.getTree();
-    string hashStr = gisRecord.getHashTableStr();
-
-
-    int nodeCount = quadTree.getTotalLocations();
-
     Logger &logger = Logger::getInstance();
     if (arguments[1] == "quad") {
+        PRQuadTree &quadTree = gisRecord.getTree();
         // print out the quadtree
         logger.debugQuad(arguments, quadTree);
     } else if (arguments[1] == "hash") {
+        string hashStr = gisRecord.getHashTableStr();
+        int hashCapacity = gisRecord.getHashCapacity();
+        int hashSize = gisRecord.getHashSize();
         // print out the hash table
-        logger.debugHash(hashStr);
+        logger.debugHash(hashStr, hashCapacity, hashSize);
     } else if (arguments[1] == "pool") {
         // print out the memory pool
         BufferPool<Record> &pool = gisRecord.getBuffer();
         logger.debugPool(pool);
     } else if (arguments[1] == "world") {
+        PRQuadTree &quadTree = gisRecord.getTree();
         // print out the world
         logger.debugWorld(arguments, quadTree);
 

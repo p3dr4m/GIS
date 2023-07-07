@@ -285,26 +285,31 @@ vector<Record> filterRecords(const vector<Record> &records, const string &filter
 
 
 void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
-    string cmdStr = "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
-                    arguments[3] + "\t" + arguments[4] + "\n";
-    SystemManager::writeLineToFile(logFile, cmdStr);
-
     vector<string> lines;
     DMS lat{};
     DMS lng{};
     string filterOption;
     if (arguments[1] == "-filter") {
+        string cmdStr =
+                "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
+                arguments[3] + "\t" + arguments[4] + "\t" + arguments[5] + "\t" + arguments[6] + "\n";
+        lines.push_back(cmdStr);
+
         filterOption = arguments[2];
         lat = DMS(arguments[3]);
         lng = DMS(arguments[4]);
         vector<Record> filtered = filterRecords(records, filterOption);
         if (records.empty()) {
             //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
-            string firstLine = "Nothing was found in (" + arguments[2] + ", " + arguments[3] + ")\n";
+            string firstLine = "\tNothing was found in (" + lat.toLogString() + ", " + lng.toLogString() + ")\n";
+            lines.push_back(firstLine);
+
         } else {
             // print the first line in the comment above
             string firstLine = "The following " + to_string(filtered.size()) + " feature(s) were found in " +
-                               arguments[2] + "\n";
+                               "(" + lat.toLogString() + "+/- " + arguments[5] + ", " + lng.toLogString() + "+/- " +
+                               arguments[6] +
+                               "\n";
             lines.push_back(firstLine);
 
             // sort records by record.offset
@@ -315,7 +320,9 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
-                string line = "\t" + to_string(record.offset) + "  " +  record.str() + "\n";
+                string line = "\t" + to_string(record.offset) + ":  " + "\"" + row[FEATURE_NAME] + "\"" + +"  " + "\"" +
+                              row[STATE_ALPHA] + "\"" + " " + "(" + latDMS.toLogString() + ", " +
+                              lngDMS.toLogString() + ")";
                 lines.push_back(line);
             }
 
@@ -323,15 +330,20 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
 
 
     } else if (arguments[1] == "-long") {
+        string cmdStr =
+                "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
+                arguments[3] + "\t" + "\n";
+        lines.push_back(cmdStr);
         lng = DMS(arguments[2]);
         lat = DMS(arguments[3]);
 
         // LONG WHAT IS IN
         if (records.empty()) {
-            string firstLine = "Nothing was found in (" + arguments[2] + ", " + arguments[3] + ")\n";
+            string firstLine = "\tNothing was found in (" + lat.toLogString() + ", " + lng.toLogString() + ")\n";
+            lines.push_back(firstLine);
         } else {
-            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
-                               arguments[2] + " " + arguments[3] + "\n";
+            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in (" +
+                               lat.toLogString() + ", " + lng.toLogString() + ")" + "\n";
 
             lines.push_back(firstLine);
             // sort records by record.offset
@@ -370,17 +382,24 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
         }
 
     } else {
+        string cmdStr =
+                "Command " + to_string(cmdCount) + ": what_is_in\t" + arguments[1] + "\t" + arguments[2] + "\t" +
+                arguments[3] + "\t" + arguments[4] + "\n";
+        lines.push_back(cmdStr);
         lat = DMS(arguments[1]);
         lng = DMS(arguments[2]);
 
         // REGULAR WHAT IS IN
         if (records.empty()) {
             //Nothing was found in ("38d 20m 12s North +/- 60", "79d 23m 30s West +/- 90")
-            string firstLine = "Nothing was found in (" + arguments[1] + ", " + arguments[2] + ")\n";
+            string firstLine = "\tNothing was found in (" + lat.toLogString() + ", " + lng.toLogString() + ")\n";
+            lines.push_back(firstLine);
         } else {
+            lat = DMS(arguments[1]);
+            lng = DMS(arguments[2]);
             // print the first line in the comment above
-            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in " +
-                               arguments[1] + "\n";
+            string firstLine = "The following " + to_string(records.size()) + " feature(s) were found in (" +
+                               lat.toLogString() + ", " + lng.toLogString() + ")\n";
             lines.push_back(firstLine);
 
             // sort records by record.offset
@@ -391,14 +410,16 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 vector<string> row = record.getRow();
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
-                string line = "\t" + to_string(record.offset) + "  " + record.str() + "\n";
+                string line = "\t" + to_string(record.offset) + ":  " + "\"" + row[FEATURE_NAME] + "\"" + "  " + "\"" +
+                              row[STATE_ALPHA] + "\"" + " " + "(" + latDMS.toLogString() + ", " +
+                              lngDMS.toLogString() + ")";
                 lines.push_back(line);
             }
 
         }
     }
 
-
+    lines.push_back(separator);
     SystemManager::writeLinesToFile(logFile, lines);
     cmdCount++;
 }
@@ -407,22 +428,25 @@ void Logger::whatIsAtLog(vector<string> arguments, vector<Record> records, vecto
     stringstream whatIsAtLogStr;
 
     whatIsAtLogStr << "Command " << cmdCount << ": what_is_at\t" << arguments[1] << "\t" << arguments[2] << "\n\n";
-
+    DMS lat = DMS(arguments[1]);
+    DMS lng = DMS(arguments[2]);
     //check for empty records
     if (records.empty()) {
-        whatIsAtLogStr << "Nothing was found at (" << arguments[1] << ", " << arguments[2] << ")\n";
+        whatIsAtLogStr << "\tNothing was found at (" << lat.toLogString() << ", " << lng.toLogString() << ")\n";
     } else {
+        whatIsAtLogStr << "\tThe following " << "feature(s) were found in (" <<
+                       lat.toLogString() << ", " << lng.toLogString() << ")" "\n";
         for (size_t i = 0; i < records.size(); ++i) {
             string temp;
             vector<string> row = records[i].getRow();
-            temp +=  "\"" + row[FEATURE_NAME] +"\"" + "  " + "\""+ row[COUNTY_NAME]+"\"" + "  " +
-                    "\""+row[STATE_ALPHA] + "\"";
+            temp += "\"" + row[FEATURE_NAME] + "\"" + "  " + "\"" + row[COUNTY_NAME] + "\"" + "  " +
+                    "\"" + row[STATE_ALPHA] + "\"";
 
             whatIsAtLogStr << "\t" << offsets[i] << ":  " << temp << "\n";
         }
     }
 
-
+    whatIsAtLogStr << separator;
     SystemManager::writeLineToFile(logFile, whatIsAtLogStr.str());
     cmdCount++;
 
@@ -433,7 +457,7 @@ void Logger::debugPool(BufferPool<Record> bufferPool) {
     // add "BufferPool: " to the beginning of the string
     bufferPoolStr += "Command " + to_string(cmdCount) + ": debug\tpool\n";
     bufferPoolStr += bufferPool.str();
-
+    bufferPoolStr += separator;
     SystemManager::writeLineToFile(logFile, bufferPoolStr);
     cmdCount++;
 }
@@ -451,7 +475,7 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
 
     SystemManager::writeLineToFile(logFile, cmdStr);
     if (records.empty()) {
-        logStr = "No records match " + arguments[1] + ", " + arguments[2];
+        logStr = "\tNo records match \"" + arguments[1] + "\"" + " and \"" + arguments[2] + "\"";
         SystemManager::writeLineToFile(logFile, logStr);
     } else {
         for (int i = 0; i < records.size(); i++) {
@@ -470,10 +494,16 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
     cmdCount++;
 }
 
-void Logger::debugHash(const string &hashTableStr) {
+void Logger::debugHash(const string &hashTableStr, const int &hashCapacity, const int &hashSize) {
     string debugHashStr;
     debugHashStr += "Command " + to_string(cmdCount) + ": debug\thash\n";
+    debugHashStr +=
+            "Format of display is\nSlot number: data record \nCurrent table size is " + to_string(hashCapacity)
+            + "\nNumber of elements in table is " + to_string(hashSize) + "\n\n";
+
     debugHashStr += hashTableStr;
+    debugHashStr += separator;
+
 
     SystemManager::writeLineToFile(logFile, debugHashStr);
     cmdCount++;

@@ -33,6 +33,13 @@ public:
         return hashTable.getSize();
     }
 
+    int getCapacity() {
+        return hashTable.getCapacity();
+    }
+
+    void clear() {
+        hashTable = HashTable(1024);
+    }
 
 
 private:

@@ -43,12 +43,17 @@ public:
     void worldLog(const std::vector<std::string> &arguments);
 
     void debugWorld(const std::vector<std::string> &option, PRQuadTree &tree);
+
     void debugQuad(const std::vector<std::string> &option, PRQuadTree &tree);
+
     void debugPool(BufferPool<Record> bufferPool);
-    void debugHash(const std::string &hashTableStr);
+
+    void debugHash(const std::string &hashTableStr, const int &hashCapacity, const int &hashSize);
 
     void whatIsInLog(std::vector<std::string> arguments, std::vector<Record> records);
+
     void whatIsAtLog(std::vector<std::string> arguments, std::vector<Record> records, std::vector<int> offsets);
+
     void whatIsLog(std::vector<std::string> arguments, std::vector<Record> records, std::vector<int> offsets);
 
     void quitLog(std::vector<std::string> arguments);
