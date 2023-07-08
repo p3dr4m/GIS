@@ -1,6 +1,8 @@
 #include "GISRecord.h"
 #include "interface/SystemManager.h"
 #include "interface/Logger.h"
+#include "structs/Record.h"
+#include "structs/DMS.h"
 
 using namespace std;
 

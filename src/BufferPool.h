@@ -11,7 +11,7 @@ public:
     explicit BufferPool(size_t size) : maxSize(size) {}
 
     void put(const T &item) {
-        auto key = item.getKey();
+        auto key = item.offset;
 
         // If item already in buffer, remove it first
         if (cacheMap.find(key) != cacheMap.end()) {
@@ -23,7 +23,7 @@ public:
         if (cacheList.size() == maxSize) {
             T lastItem = cacheList.back();
             cacheList.pop_back();
-            cacheMap.erase(lastItem.getKey());
+            cacheMap.erase(lastItem.offset);
         }
 
         // Insert the item at the front of the cache
@@ -54,15 +54,11 @@ public:
         return cacheMap.find(key) != cacheMap.end();
     }
 
-    size_t size() const {
-        return cacheMap.size();
-    }
-
     std::string str() const {
         std::stringstream ss;
         ss << "MRU\n";
         for (const auto &item: cacheList) {
-            ss << "  " << item.getKey() << ": " << item.str() << "\n";
+            ss << "  " << item.offset << ": " << item.str() << "\n";
         }
         ss << "LRU\n";
         return ss.str();

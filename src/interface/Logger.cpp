@@ -2,6 +2,7 @@
 #include "SystemManager.h"
 #include <algorithm>
 #include <map>
+#include "../structs/DMS.h"
 
 using namespace std;
 
@@ -235,7 +236,7 @@ vector<Record> Logger::filterRecords(const vector<Record> &records, const string
     };
     vector<Record> result;
     for (const auto &record: records) {
-        auto row = record.getRow();
+        auto row = record.row;
         if (row.empty()) {
             continue;
         }
@@ -282,7 +283,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: filtered) {
-                vector<string> row = record.getRow();
+                vector<string> row = record.row;
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string line = "\t" + to_string(record.offset) + ":  " + "\"" + row[FEATURE_NAME] + "\"" + +"  " + "\"" +
@@ -317,7 +318,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: records) {
-                vector<string> row = record.getRow();
+                vector<string> row = record.row;
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string featureID = row[FEATURE_ID];
@@ -376,7 +377,7 @@ void Logger::whatIsInLog(vector<string> arguments, vector<Record> records) {
                 return a.offset < b.offset;
             });
             for (const Record &record: records) {
-                vector<string> row = record.getRow();
+                vector<string> row = record.row;
                 DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
                 DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
                 string line = "\t" + to_string(record.offset) + ":  " + "\"" + row[FEATURE_NAME] + "\"" + "  " + "\"" +
@@ -407,7 +408,7 @@ void Logger::whatIsAtLog(vector<string> arguments, vector<Record> records, vecto
                        lat.toLogString() << ", " << lng.toLogString() << ")" "\n";
         for (size_t i = 0; i < records.size(); ++i) {
             string temp;
-            vector<string> row = records[i].getRow();
+            vector<string> row = records[i].row;
             temp += "\"" + row[FEATURE_NAME] + "\"" + "  " + "\"" + row[COUNTY_NAME] + "\"" + "  " +
                     "\"" + row[STATE_ALPHA] + "\"";
 
@@ -447,7 +448,7 @@ void Logger::whatIsLog(vector<string> arguments, vector<Record> records, vector<
         SystemManager::writeLineToFile(logFile, logStr);
     } else {
         for (int i = 0; i < records.size(); i++) {
-            vector<string> row = records[i].getRow();
+            vector<string> row = records[i].row;
             DMS latDMS = DMS(row[PRIMARY_LAT_DMS]);
             DMS lngDMS = DMS(row[PRIM_LONG_DMS]);
             logStr = "  " + to_string(offsets[i]) + ": " + row[COUNTY_NAME] + " " + "(" + latDMS.toLogString() + ", " +

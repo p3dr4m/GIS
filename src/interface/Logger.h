@@ -101,7 +101,7 @@ private:
 
     static std::string getTime();
 
-    void printWorld(PRQuadTree &tree, std::vector<std::string> &lines);
+    static void printWorld(PRQuadTree &tree, std::vector<std::string> &lines);
 
 
 };

@@ -92,7 +92,7 @@ string HashTable::str() {
     string result;
     for (int i = 0; i < capacity; i++) {
         if (data[i].exists) {
-            string offsetStr = "";
+            string offsetStr;
 
             for (int offset: data[i].offsets) {
                 offsetStr += to_string(offset);

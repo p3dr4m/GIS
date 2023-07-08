@@ -2,84 +2,12 @@
 #define INC_8042_PROJECT_PRQUADTREE_H
 
 
-#include <cmath>
+#include "../structs/BoundingBox.h"
+#include "../structs/Location.h"
 #include <string>
-#include <utility>
-#include <vector>
 #include <limits>
 #include <memory>
-
-
-struct Coordinate {
-    float longitude;
-    float latitude;
-
-    float getX() const {
-        return longitude;
-    }
-
-    float getY() const {
-        return latitude;
-    }
-
-    Coordinate(float x, float y) {
-        longitude = x;
-        latitude = y;
-    }
-
-    Coordinate() {
-        longitude = 0;
-        latitude = 0;
-    }
-};
-
-struct Location {
-    Coordinate coordinate;
-    std::vector<int> fileOffset;
-    std::vector<int> databaseLine;
-
-    Coordinate getCoordinate() const {
-        return coordinate;
-    }
-    
-    int getXInSec() const {
-        return static_cast<int>(std::round(coordinate.longitude * 3600));
-    }
-
-    int getYInSec() const {
-        return static_cast<int>(std::round(coordinate.latitude * 3600));
-    }
-
-};
-
-struct BoundingBox {
-    Coordinate centerPoint;
-    float halfWidth;
-    float halfHeight;
-
-    BoundingBox() {
-        centerPoint = Coordinate(0, 0);
-        halfWidth = 0;
-        halfHeight = 0;
-    }
-
-    // Constructor to create bounding box search area
-    BoundingBox(Coordinate center, float halfWidth, float halfHeight)
-            : centerPoint(center), halfWidth(halfWidth), halfHeight(halfHeight) {}
-
-    BoundingBox(float minLat, float maxLat, float minLong, float maxLong)
-            : centerPoint((minLong + maxLong) / 2, (minLat + maxLat) / 2),
-              halfWidth((maxLong - minLong) / 2),
-              halfHeight((maxLat - minLat) / 2) {}
-
-    Coordinate getTopLeft() const {
-        return {centerPoint.longitude - halfWidth, centerPoint.latitude + halfHeight};
-    }
-
-    Coordinate getBottomRight() const {
-        return {centerPoint.longitude + halfWidth, centerPoint.latitude - halfHeight};
-    }
-};
+#include <vector>
 
 
 /**

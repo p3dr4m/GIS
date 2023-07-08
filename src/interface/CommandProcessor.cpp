@@ -1,5 +1,6 @@
 #include "CommandProcessor.h"
 #include "Logger.h"
+#include "../structs/DMS.h"
 
 
 using namespace std;
@@ -114,7 +115,7 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         }
 
         Record record = Record(line);
-        vector<string> row = record.getRow();
+        vector<string> row = record.row;
         Coordinate coord = Coordinate(stof(row[PRIM_LONG_DEC]), stof(row[PRIM_LAT_DEC]));
         bool inserted = gisRecord.getTree().isCoordInBox(coord);
 

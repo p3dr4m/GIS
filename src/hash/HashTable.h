@@ -4,13 +4,7 @@
 
 #include <string>
 #include <vector>
-
-struct HashEntry {
-    std::string featureName;
-    std::string stateAbbreviation;
-    std::vector<int> offsets;
-    bool exists = false;
-};
+#include "../structs/HashEntry.h"
 
 class HashTable {
 public:

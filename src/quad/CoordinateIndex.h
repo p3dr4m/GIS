@@ -2,6 +2,7 @@
 #define INC_8042_PROJECT_COORDINATEINDEX_H
 
 #include "PRQuadTree.h"
+#include "../structs/BoundingBox.h"
 
 class CoordinateIndex {
 public:
