@@ -1,6 +1,10 @@
 //HashTable.cpp
 #include "HashTable.h"
 
+
+// https://www.geeksforgeeks.org/quadratic-probing-in-hashing/
+// https://www.geeksforgeeks.org/what-are-hash-functions-and-how-to-choose-a-good-hash-function/
+
 using namespace std;
 
 void HashTable::insert(const string &featureName, const string &stateAbbreviation, int offset) {
@@ -50,7 +54,7 @@ unsigned int HashTable::hash(const string &featureName, const string &stateAbbre
 
 void HashTable::resize() {
     capacity *= 2;
-    vector<HashEntry> temp = data;
+    vector <HashEntry> temp = data;
     data.clear();
     data.resize(capacity);
     size = 0;

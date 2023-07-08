@@ -1,5 +1,7 @@
 #include "PRQuadTree.h"
 
+/// https://www.geeksforgeeks.org/quad-tree/ used this for help
+
 using namespace std;
 
 bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
@@ -60,7 +62,7 @@ bool PRQuadTree::insert(const Location &location) {
 
     locations.push_back(location);
 
-    if (locations.size() > MAX_NODES && level < MAX_LEVELS) {
+    if (locations.size() > K_VALUE && level < MAX_LEVELS) {
         if (nodes[0] == nullptr) {
             split();
         }
@@ -117,22 +119,22 @@ void PRQuadTree::split() {
     float centerY = boundingBox.centerPoint.latitude;
 
     nodes[0] = std::unique_ptr<PRQuadTree>(
-            new PRQuadTree(level + 1,
+            new PRQuadTree(K_VALUE, level + 1,
                            BoundingBox(Coordinate(centerX - quarterWidth,
                                                   centerY + quarterHeight), quarterWidth,
                                        quarterHeight), "tl"));
     nodes[1] = std::unique_ptr<PRQuadTree>(
-            new PRQuadTree(level + 1,
+            new PRQuadTree(K_VALUE, level + 1,
                            BoundingBox(Coordinate(centerX + quarterWidth,
                                                   centerY + quarterHeight), quarterWidth,
                                        quarterHeight), "tr"));
     nodes[2] = std::unique_ptr<PRQuadTree>(
-            new PRQuadTree(level + 1,
+            new PRQuadTree(K_VALUE, level + 1,
                            BoundingBox(Coordinate(centerX - quarterWidth,
                                                   centerY - quarterHeight), quarterWidth,
                                        quarterHeight), "bl"));
     nodes[3] = std::unique_ptr<PRQuadTree>(
-            new PRQuadTree(level + 1,
+            new PRQuadTree(K_VALUE, level + 1,
                            BoundingBox(Coordinate(centerX + quarterWidth,
                                                   centerY - quarterHeight), quarterWidth,
                                        quarterHeight), "br"));

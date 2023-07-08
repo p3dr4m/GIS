@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <sstream>
 
+
+// https://www.geeksforgeeks.org/lru-cache-implementation/ used for help
+
 template<typename T>
 class BufferPool {
 public:
@@ -13,13 +16,13 @@ public:
     void put(const T &item) {
         auto key = item.offset;
 
-        // If item already in buffer, remove it first
+        // if item exists, remove from buffer
         if (cacheMap.find(key) != cacheMap.end()) {
             cacheList.erase(cacheMap[key]);
             cacheMap.erase(key);
         }
 
-        // If the buffer is full, remove the least recently used item
+        // If buffer full, remove LRU item
         if (cacheList.size() == maxSize) {
             T lastItem = cacheList.back();
             cacheList.pop_back();
@@ -33,7 +36,7 @@ public:
 
     T get(const int key) {
         if (cacheMap.find(key) == cacheMap.end()) {
-            throw std::out_of_range("Key not found in LRUBufferPool");
+            throw std::out_of_range("Key not found in BufferPool");
         }
 
         // Copy the accessed item

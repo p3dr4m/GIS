@@ -15,7 +15,7 @@
  */
 class PRQuadTree {
 private:
-    int MAX_NODES = 4; // max number of nodes in a leaf node
+    int K_VALUE = 4; // max number of nodes in a leaf node
     int MAX_LEVELS = 999999999; // max number of levels in the tree
     int level = 0; // the current level of the tree
     std::vector<Location> locations; // the locations in the tree
@@ -54,7 +54,14 @@ private:
     }
 
 public:
-    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id) : level(pLevel), boundingBox(pBox), id(std::move(_id)) {
+
+    PRQuadTree() : K_VALUE(4), level(99999), boundingBox() {
+        nodes.resize(4);
+    }
+
+    PRQuadTree(int kVal, int pLevel, BoundingBox pBox, std::string _id) : K_VALUE(kVal), level(pLevel),
+                                                                          boundingBox(pBox),
+                                                                          id(std::move(_id)) {
         nodes.resize(4);
     };
 
