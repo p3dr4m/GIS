@@ -32,10 +32,8 @@ void SystemManager::readLines(const string &filename, const function<void(vector
     ifstream input(normalizedPath, ios::binary);  // open in binary mode
 
     if (!input.is_open()) {
-        // exit if file cannot be opened don't throw exception
-        // because it will be caught by the caller
         cerr << "Unable to open file: " << normalizedPath << endl;
-//        exit(1);
+        return;
     }
 
     string line;
@@ -135,10 +133,7 @@ Record SystemManager::goToOffset(const string &filename, int offset) {
         cerr << "Failed to seek to offset: " << offset << "\n";
         throw runtime_error("Failed to seek to offset: " + to_string(offset));
     }
-
-    // Move the cursor to the beginning of the line.
-    // This corrects the position if the offset was in the middle of a line.
-
+    
     if (offset != 0) {
         file.seekg(-1, ios::cur);  // move one character back
         char c;

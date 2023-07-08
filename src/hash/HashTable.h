@@ -5,11 +5,6 @@
 #include <string>
 #include <vector>
 
-// create a hash table with fixed size 1024
-// the hash table must use quadratic probing to resolve collisions
-// the table will double in size when the load factor is 0.7
-// the hash table will store a vector
-
 struct HashEntry {
     std::string featureName;
     std::string stateAbbreviation;
@@ -30,7 +25,9 @@ public:
 
     std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation);
 
-    int getLongestProbe();
+    int getLongestProbe() const {
+        return longestProbe;
+    }
 
     std::string str();
 

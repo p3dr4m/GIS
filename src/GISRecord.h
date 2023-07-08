@@ -1,12 +1,9 @@
 #ifndef INC_8042_PROJECT_GISRECORD_H
 #define INC_8042_PROJECT_GISRECORD_H
 
-#include <string>
 #include "quad/CoordinateIndex.h"
 #include "hash/NameIndex.h"
 #include "BufferPool.h"
-#include <stdexcept>
-#include <utility>
 
 /**
  * The constructor takes a DMS (Degrees, Minutes, Seconds) string as an argument.
@@ -143,10 +140,6 @@ struct Record {
         return row;
     }
 
-    void setOffset(int newOffset) {
-        this->offset = newOffset;
-    }
-
     int getKey() const {
         return offset;
     }
@@ -195,10 +188,6 @@ public:
 
     std::vector<int> findRecords(const std::string &name, const std::string &state);
 
-    int getNodeCount() {
-        return coordinateIndex->getTotalLocations();
-    };
-
     PRQuadTree &getTree() {
         return coordinateIndex->getTree();
     }
@@ -210,10 +199,6 @@ public:
     std::vector<Record> getRecords(const std::vector<int> &offsets);
 
     std::vector<Record> getRecords(const std::vector<int> &offsets, const std::string &filterOption);
-
-    int getImportedNames() {
-        return nameIndex->getSize();
-    }
 
     int getLongestProbe() {
         return nameIndex->getLongestProbe();

@@ -1,9 +1,7 @@
 #ifndef INC_8042_PROJECT_LOGGER_H
 #define INC_8042_PROJECT_LOGGER_H
 
-#include <string>
-#include <vector>
-#include <fstream>
+#include <iostream>
 #include "SystemManager.h"
 
 class Logger {
@@ -17,7 +15,6 @@ public:
            const std::string &databaseFilePath) :
             logFilePath(logFilePath),
             databaseFilePath(databaseFilePath) {
-        // create or truncate log file and database file
         SystemManager::createOrTruncateFile(logFile, logFilePath);
         SystemManager::createOrTruncateFile(databaseFile, databaseFilePath);
         SystemManager::closeFile(logFile);
@@ -35,8 +32,8 @@ public:
 
     Logger &operator=(const Logger &) = delete;
 
-    void headerLog(const std::string &databaseFilePath, const std::string &cmdScriptFilePath,
-                   const std::string &logFilePath);
+    void headerLog(const std::string &dbFilePath, const std::string &cmdScriptFilePath,
+                   const std::string &logPath);
 
     void importLog(const std::vector<std::string> &arguments, std::vector<int> data);
 
@@ -46,7 +43,7 @@ public:
 
     void debugQuad(const std::vector<std::string> &option, PRQuadTree &tree);
 
-    void debugPool(BufferPool<Record> bufferPool);
+    void debugPool(const BufferPool<Record> &bufferPool);
 
     void debugHash(const std::string &hashTableStr, const int &hashCapacity, const int &hashSize);
 
@@ -56,7 +53,7 @@ public:
 
     void whatIsLog(std::vector<std::string> arguments, std::vector<Record> records, std::vector<int> offsets);
 
-    void quitLog(std::vector<std::string> arguments);
+    void quitLog();
 
     int logToDatabase(const std::string &line);
 

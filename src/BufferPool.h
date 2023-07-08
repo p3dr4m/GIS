@@ -3,15 +3,14 @@
 
 #include <list>
 #include <unordered_map>
-#include <stdexcept>
 #include <sstream>
 
-template <typename T>
+template<typename T>
 class BufferPool {
 public:
-    explicit BufferPool(size_t size): maxSize(size) {}
+    explicit BufferPool(size_t size) : maxSize(size) {}
 
-    void put(const T& item) {
+    void put(const T &item) {
         auto key = item.getKey();
 
         // If item already in buffer, remove it first
@@ -62,8 +61,8 @@ public:
     std::string str() const {
         std::stringstream ss;
         ss << "MRU\n";
-        for(const auto& item : cacheList) {
-            ss << "  " <<item.getKey() << ": " << item.str() << "\n";
+        for (const auto &item: cacheList) {
+            ss << "  " << item.getKey() << ": " << item.str() << "\n";
         }
         ss << "LRU\n";
         return ss.str();
@@ -74,7 +73,6 @@ private:
     std::unordered_map<int, typename std::list<T>::iterator> cacheMap;
     size_t maxSize;
 };
-
 
 
 #endif //INC_8042_PROJECT_BUFFERPOOL_H

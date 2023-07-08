@@ -2,8 +2,6 @@
 #define INC_8042_PROJECT_COORDINATEINDEX_H
 
 #include "PRQuadTree.h"
-#include <vector>
-#include <iostream>
 
 class CoordinateIndex {
 public:
@@ -15,15 +13,10 @@ public:
     std::vector<int> searchRecordsInBounds(Coordinate coord, float halfWidth, float halfHeight);
 
     void updateBoundsOfTree(BoundingBox boundingBox) {
-        quadTree = PRQuadTree(0, boundingBox, "root", true);
-    }
-
-    int getTotalLocations() {
-        return quadTree.getTotalLocations();
+        quadTree = PRQuadTree(0, boundingBox, "root");
     }
 
     PRQuadTree &getTree() {
-        // return reference to quadTree
         return quadTree;
     }
 
@@ -33,7 +26,7 @@ public:
 
 
 private:
-    PRQuadTree quadTree = PRQuadTree(0, BoundingBox(), "root", true);
+    PRQuadTree quadTree = PRQuadTree(0, BoundingBox(), "root");
 
     static std::vector<int> getOffsetsFromNodes(std::vector<Location> nodes);
 };

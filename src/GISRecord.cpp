@@ -1,5 +1,3 @@
-#include <fstream>
-#include <map>
 #include "GISRecord.h"
 #include "interface/SystemManager.h"
 #include "interface/Logger.h"

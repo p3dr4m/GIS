@@ -2,10 +2,7 @@
 #ifndef INC_8042_PROJECT_NAMEINDEX_H
 #define INC_8042_PROJECT_NAMEINDEX_H
 
-#include <utility>
-
 #include "HashTable.h"
-//#include "../GISRecord.h"
 
 class NameIndex {
 public:

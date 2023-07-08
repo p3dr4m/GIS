@@ -34,24 +34,6 @@ void HashTable::insert(const string &featureName, const string &stateAbbreviatio
     }
 }
 
-//unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
-//    string key = featureName + stateAbbreviation;
-//    unsigned int hash = 0;
-//    unsigned int x = 0;
-//    unsigned int i = 0;
-//    unsigned int len = key.length();
-//
-//    for (i = 0; i < len; i++) {
-//        hash = (hash << 4) + (key[i]);
-//        if ((x = hash & 0xF0000000) != 0) {
-//            hash ^= (x >> 24);
-//        }
-//        hash &= ~x;
-//    }
-//
-//    return hash % capacity;
-//}
-
 unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
     // djb2 hash http://www.cse.yorku.ca/~oz/hash.html
     string key = featureName + stateAbbreviation;
@@ -104,9 +86,6 @@ vector<int> HashTable::find(const string &featureName, const string &stateAbbrev
     return {};
 }
 
-int HashTable::getLongestProbe() {
-    return longestProbe;
-}
 
 string HashTable::str() {
     // show the hash table in a string

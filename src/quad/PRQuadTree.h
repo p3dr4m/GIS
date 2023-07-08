@@ -2,11 +2,12 @@
 #define INC_8042_PROJECT_PRQUADTREE_H
 
 
+#include <cmath>
 #include <string>
-#include <memory>
 #include <utility>
 #include <vector>
-#include <cmath>
+#include <limits>
+#include <memory>
 
 
 struct Coordinate {
@@ -97,7 +98,9 @@ struct BoundingBox {
 };
 
 
-// A QuadTree, containing 4 subtrees
+/**
+ * https://pvigier.github.io/2019/08/04/quadtree-collision-detection.html
+ */
 class PRQuadTree {
 private:
     int MAX_NODES = 4; // max number of nodes in a leaf node
@@ -105,88 +108,76 @@ private:
     int level = 0; // the current level of the tree
     std::vector<Location> locations; // the locations in the tree
     BoundingBox boundingBox; // the bounding box of the tree
-    std::vector<PRQuadTree *> nodes; // the subtrees of the tree
+    std::vector<std::unique_ptr<PRQuadTree>> nodes; // the subtrees of the tree
     std::string id; // the id of the tree
-    bool isInitialized;
+
+    static bool nearlyEqual(float a, float b, float epsilon) {
+        float absA = std::fabs(a);
+        float absB = std::fabs(b);
+        float diff = std::fabs(a - b);
+
+        if (a == b) {
+            return true;
+        } else if (a == 0 || b == 0 || diff < std::numeric_limits<float>::min()) {
+            return diff < epsilon;
+        } else {
+            return diff / (absA + absB) < epsilon;
+        }
+    }
+
+    static bool isBoxIntersect(BoundingBox box1, BoundingBox box2) {
+        // Check for intersection of two bounding boxes
+        if (box1.getTopLeft().latitude < box2.getBottomRight().latitude ||
+            box2.getTopLeft().latitude < box1.getBottomRight().latitude) {
+            return false;
+        }
+
+        if (box1.getBottomRight().longitude < box2.getTopLeft().longitude ||
+            box2.getBottomRight().longitude < box1.getTopLeft().longitude) {
+            return false;
+        }
+
+        // If none of the above conditions are met, the boxes intersect
+        return true;
+    }
 
 public:
-    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id, bool init) : level(pLevel), boundingBox(pBox),
-                                                                           id(std::move(_id)), isInitialized(init) {
-        nodes.reserve(4);
-        level = pLevel;
-        // initialize the nodes to nullptr
-        for (int i = 0; i < 4; i++) {
-            nodes.push_back(nullptr);
-        }
+    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id) : level(pLevel), boundingBox(pBox), id(std::move(_id)) {
+        nodes.resize(4);
     };
 
-    ~PRQuadTree() {
-        for (int i = 0; i < 4; i++) {
-            delete nodes[i];
-        }
-    }
 
-    // copy constructor
-    PRQuadTree(const PRQuadTree &other) {
-        level = other.level;
-        boundingBox = other.boundingBox;
-        nodes = other.nodes;
-        id = other.id;
-        isInitialized = other.isInitialized;
+    bool isLeaf() {
+        return nodes[0] == nullptr;
     }
-
-    // copy assignment operator
-    PRQuadTree &operator=(const PRQuadTree &other) {
-        level = other.level;
-        boundingBox = other.boundingBox;
-        nodes = other.nodes;
-        id = other.id;
-        isInitialized = other.isInitialized;
-        return *this;
-    }
-
-    // move constructor
-    PRQuadTree(PRQuadTree &&other) noexcept {
-        level = other.level;
-        boundingBox = other.boundingBox;
-        nodes = other.nodes;
-        id = other.id;
-        isInitialized = other.isInitialized;
-    }
-
-    // move assignment operator
-    PRQuadTree &operator=(PRQuadTree &&other) noexcept {
-        level = other.level;
-        boundingBox = other.boundingBox;
-        nodes = other.nodes;
-        id = other.id;
-        isInitialized = other.isInitialized;
-        return *this;
-    }
-
-    bool isLeaf();
 
     void clear();
 
     void split();
 
-    int getIndex(Location location);;
+    int getIndex(const Location &location) const;;
 
-    bool insert(Location location);
+    bool insert(const Location &location);
 
     std::vector<Location> retrieve(std::vector<Location> returnNodes, const Location &location);
 
-    bool isCoordInBox(Coordinate coord, BoundingBox box);
+    static bool isCoordInBox(Coordinate coord, BoundingBox box);
 
     bool isCoordInBox(Coordinate coord);
 
     int getTotalLocations();
 
-    int getLocationsSize();
+    int getLocationsSize() {
+        return (int) locations.size();
+    }
 
-    std::vector<Location> getLocations();
+    std::vector<std::unique_ptr<PRQuadTree>> &getNodes() {
+        return nodes;
+    }
 
-    std::vector<PRQuadTree *> getNodes();
+    std::vector<Location> getLocations() {
+        return locations;
+    }
 
     std::string getId() {
         return id;
@@ -196,39 +187,7 @@ public:
 
     void getNodeByCoordinate(std::vector<Location> &returnLocations, Coordinate coord);
 
-    Location &find(Coordinate coord) {
-        static Location emptyLocation;
-        // If the coordinate is not in this quad tree's bounding box, return an empty Location.
-        if (!isCoordInBox(coord)) {
-            return emptyLocation;
-        }
-
-        // If this is a leaf node, iterate over the locations to find the matching one.
-        if (isLeaf()) {
-            for (auto &location: locations) {
-                if (location.getCoordinate().latitude == coord.latitude &&
-                    location.getCoordinate().longitude == coord.longitude) {
-                    return location;
-                }
-            }
-        } else {
-            // If this is an internal node, recursively call find on the correct child node.
-            Location temp;
-            temp.coordinate = coord;
-            int index = getIndex(temp);
-            if (index == -1) {
-                return emptyLocation;
-            }
-            if (nodes[index] != nullptr) {
-                return nodes[index]->find(coord);
-            } else {
-                return emptyLocation;
-            }
-        }
-
-        // If we reach here, the location was not found, return an empty Location.
-        return emptyLocation;
-    }
+    Location &find(Coordinate coord);
 };
 
 

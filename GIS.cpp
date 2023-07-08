@@ -1,5 +1,5 @@
-#include <iostream>
 #include "src/interface/SystemManager.h"
+
 using namespace std;
 
 /**

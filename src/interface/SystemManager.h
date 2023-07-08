@@ -1,12 +1,9 @@
 #ifndef INC_8042_PROJECT_SYSTEMMANAGER_H
 #define INC_8042_PROJECT_SYSTEMMANAGER_H
 
-#include <string>
-#include <vector>
+#include "CommandProcessor.h"
 #include <functional>
 #include <fstream>
-#include <sstream>
-#include "CommandProcessor.h"
 
 class SystemManager {
 public:
@@ -38,13 +35,10 @@ public:
 
     static void writeLinesToFile(std::ofstream &file, const std::vector<std::string> &lines);
 
-    // Method to create a file or truncate it if it exists.
     static void createOrTruncateFile(std::ofstream &file, const std::string &filename);
 
-    // Method to create a file or open it for appending if it exists.
     static void createOrAppendFile(std::ofstream &file, const std::string &filename);
 
-    // Don't forget to close the file when you're done with it.
     static void closeFile(std::ofstream &file);
 
     static Record goToOffset(const std::string &filename, int offset);

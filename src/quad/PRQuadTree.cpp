@@ -1,13 +1,8 @@
-#include <limits>
 #include "PRQuadTree.h"
 
 using namespace std;
 
 bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
-    // Check if boundingBox is initialized
-    if (!isInitialized) {
-        return false;
-    }
     // Check if the coordinate is not within the latitude boundaries of the box
     if (coord.latitude < box.getBottomRight().latitude || coord.latitude > box.getTopLeft().latitude) {
         return false;
@@ -15,6 +10,22 @@ bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
 
     // Check if the coordinate is not within the longitude boundaries of the box
     if (coord.longitude < box.getTopLeft().longitude || coord.longitude > box.getBottomRight().longitude) {
+        return false;
+    }
+
+    // If none of the above conditions are met, the coordinate is within the box
+    return true;
+}
+
+bool PRQuadTree::isCoordInBox(Coordinate coord) {
+    // Check if the coordinate is not within the latitude boundaries of the box
+    if (coord.latitude < boundingBox.getBottomRight().latitude || coord.latitude > boundingBox.getTopLeft().latitude) {
+        return false;
+    }
+
+    // Check if the coordinate is not within the longitude boundaries of the box
+    if (coord.longitude < boundingBox.getTopLeft().longitude ||
+        coord.longitude > boundingBox.getBottomRight().longitude) {
         return false;
     }
 
@@ -31,12 +42,11 @@ vector<Location> PRQuadTree::retrieve(vector<Location> returnNodes, const Locati
     return returnNodes;
 }
 
-bool PRQuadTree::insert(Location location) {
+bool PRQuadTree::insert(const Location &location) {
     // Check if the location is inside the bounding box of the quadtree
     if (!isCoordInBox(location.getCoordinate(), boundingBox)) {
         return false;  // Location is outside the bounding box, do nothing
     }
-
 
     // is it a leaf node?
     if (nodes[0] != nullptr) {
@@ -68,7 +78,7 @@ bool PRQuadTree::insert(Location location) {
     return true;
 }
 
-int PRQuadTree::getIndex(Location location) {
+int PRQuadTree::getIndex(const Location &location) const {
     int index = -1;
     float centerX = boundingBox.centerPoint.getX();
     float centerY = boundingBox.centerPoint.getY();
@@ -106,18 +116,26 @@ void PRQuadTree::split() {
     float centerX = boundingBox.centerPoint.longitude;
     float centerY = boundingBox.centerPoint.latitude;
 
-    nodes[0] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX - quarterWidth, centerY + quarterHeight), quarterWidth,
-                                          quarterHeight), "tl", true);
-    nodes[1] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX + quarterWidth, centerY + quarterHeight), quarterWidth,
-                                          quarterHeight), "tr", true);
-    nodes[2] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX - quarterWidth, centerY - quarterHeight), quarterWidth,
-                                          quarterHeight), "bl", true);
-    nodes[3] = new PRQuadTree(level + 1,
-                              BoundingBox(Coordinate(centerX + quarterWidth, centerY - quarterHeight), quarterWidth,
-                                          quarterHeight), "br", true);
+    nodes[0] = std::unique_ptr<PRQuadTree>(
+            new PRQuadTree(level + 1,
+                           BoundingBox(Coordinate(centerX - quarterWidth,
+                                                  centerY + quarterHeight), quarterWidth,
+                                       quarterHeight), "tl"));
+    nodes[1] = std::unique_ptr<PRQuadTree>(
+            new PRQuadTree(level + 1,
+                           BoundingBox(Coordinate(centerX + quarterWidth,
+                                                  centerY + quarterHeight), quarterWidth,
+                                       quarterHeight), "tr"));
+    nodes[2] = std::unique_ptr<PRQuadTree>(
+            new PRQuadTree(level + 1,
+                           BoundingBox(Coordinate(centerX - quarterWidth,
+                                                  centerY - quarterHeight), quarterWidth,
+                                       quarterHeight), "bl"));
+    nodes[3] = std::unique_ptr<PRQuadTree>(
+            new PRQuadTree(level + 1,
+                           BoundingBox(Coordinate(centerX + quarterWidth,
+                                                  centerY - quarterHeight), quarterWidth,
+                                       quarterHeight), "br"));
 }
 
 void PRQuadTree::clear() {
@@ -140,19 +158,6 @@ int PRQuadTree::getTotalLocations() {
     return totalLocations;
 }
 
-bool nearlyEqual(float a, float b, float epsilon) {
-    float absA = fabs(a);
-    float absB = fabs(b);
-    float diff = fabs(a - b);
-
-    if (a == b) {
-        return true;
-    } else if (a == 0 || b == 0 || diff < numeric_limits<float>::min()) {
-        return diff < epsilon;
-    } else {
-        return diff / (absA + absB) < epsilon;
-    }
-}
 
 void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate coord) {
     if (isCoordInBox(coord, boundingBox)) {
@@ -176,21 +181,6 @@ void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate c
     }
 }
 
-bool isBoxIntersect(BoundingBox box1, BoundingBox box2) {
-    // Check for intersection of two bounding boxes
-    if (box1.getTopLeft().latitude < box2.getBottomRight().latitude ||
-        box2.getTopLeft().latitude < box1.getBottomRight().latitude) {
-        return false;
-    }
-
-    if (box1.getBottomRight().longitude < box2.getTopLeft().longitude ||
-        box2.getBottomRight().longitude < box1.getTopLeft().longitude) {
-        return false;
-    }
-
-    // If none of the above conditions are met, the boxes intersect
-    return true;
-}
 
 void PRQuadTree::getLocationsInBounds(vector<Location> &returnNodes, BoundingBox box) {
     // Check if the bounding box of the current node intersects with the given box
@@ -211,40 +201,37 @@ void PRQuadTree::getLocationsInBounds(vector<Location> &returnNodes, BoundingBox
 }
 
 
-bool PRQuadTree::isLeaf() {
-    return nodes[0] == nullptr;
-}
-
-int PRQuadTree::getLocationsSize() {
-    return (int) locations.size();
-}
-
-
-vector<PRQuadTree *> PRQuadTree::getNodes() {
-    return nodes;
-}
-
-vector<Location> PRQuadTree::getLocations() {
-    return locations;
-}
-
-bool PRQuadTree::isCoordInBox(Coordinate coord) {
-    // Check if boundingBox is initialized
-    if (!isInitialized) {
-        return false;
-    }
-    // Check if the coordinate is not within the latitude boundaries of the box
-    if (coord.latitude < boundingBox.getBottomRight().latitude || coord.latitude > boundingBox.getTopLeft().latitude) {
-        return false;
+Location &PRQuadTree::find(Coordinate coord) {
+    static Location emptyLocation;
+    // If the coordinate is not in this quad tree's bounding box, return an empty Location.
+    if (!isCoordInBox(coord)) {
+        return emptyLocation;
     }
 
-    // Check if the coordinate is not within the longitude boundaries of the box
-    if (coord.longitude < boundingBox.getTopLeft().longitude ||
-        coord.longitude > boundingBox.getBottomRight().longitude) {
-        return false;
+    // If this is a leaf node, iterate over the locations to find the matching one.
+    if (isLeaf()) {
+        for (auto &location: locations) {
+            if (location.getCoordinate().latitude == coord.latitude &&
+                location.getCoordinate().longitude == coord.longitude) {
+                return location;
+            }
+        }
+    } else {
+        // If this is an internal node, recursively call find on the correct child node.
+        Location temp;
+        temp.coordinate = coord;
+        int index = getIndex(temp);
+        if (index == -1) {
+            return emptyLocation;
+        }
+        if (nodes[index] != nullptr) {
+            return nodes[index]->find(coord);
+        } else {
+            return emptyLocation;
+        }
     }
 
-    // If none of the above conditions are met, the coordinate is within the box
-    return true;
+    // If we reach here, the location was not found, return an empty Location.
+    return emptyLocation;
 }
 

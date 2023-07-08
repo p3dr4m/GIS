@@ -1,10 +1,5 @@
-#include <fstream>
-#include <stdexcept>
-#include <utility>
 #include "CommandProcessor.h"
 #include "Logger.h"
-#include <algorithm>
-#include <string>
 
 
 using namespace std;
@@ -50,7 +45,7 @@ void CommandProcessor::runCommand(const vector<string> &arguments) {
             whatIsInCmd(arguments);
             break;
         case quit:
-            quitCmd(arguments);
+            quitCmd();
             break;
     }
 }
@@ -286,10 +281,10 @@ void CommandProcessor::whatIsInCmd(vector<string> arguments) {
 /**
  * quit<tab>
  */
-void CommandProcessor::quitCmd(vector<string> arguments) {
+void CommandProcessor::quitCmd() {
     // logger close files
     Logger &logger = Logger::getInstance();
-    logger.quitLog(move(arguments));
+    logger.quitLog();
     exit(0);
 }
 

@@ -1,10 +1,7 @@
 #include "Logger.h"
 #include "SystemManager.h"
 #include <algorithm>
-#include <sstream>
-#include <fstream>
 #include <map>
-#include <string>
 
 using namespace std;
 
@@ -18,9 +15,8 @@ string Logger::getTime() {
     return s;
 }
 
-void Logger::headerLog(const string &databaseFilePath, const string &cmdScriptFilePath,
-                       const string &logFilePath) {
-    // write to the logFile ofstream from SystemManager
+void Logger::headerLog(const string &dbFilePath, const string &cmdScriptFilePath,
+                       const string &logPath) {
     vector<string> lines;
 
 
@@ -28,15 +24,13 @@ void Logger::headerLog(const string &databaseFilePath, const string &cmdScriptFi
     lines.emplace_back("Student Name: Raziq Khan, Student Id: A00990021");
     lines.emplace_back("Student Name: Pedram Nazari, Student Id: A00931203");
     lines.emplace_back("Begin of GIS Program log:");
-    lines.push_back("dbFile:\t" + databaseFilePath);
+    lines.push_back("dbFile:\t" + dbFilePath);
     lines.push_back("script:\t" + cmdScriptFilePath);
-    lines.push_back("log:\t" + logFilePath);
+    lines.push_back("log:\t" + logPath);
     lines.push_back("Start Time: " + getTime());
 
-    // write to the logFile ofstream from SystemManager
 
     SystemManager::writeLinesToFile(logFile, lines);
-//    SystemManager::closeFile(logFile);
 }
 
 void Logger::worldLog(const vector<string> &arguments) {
@@ -82,16 +76,6 @@ void Logger::importLog(const vector<string> &arguments, vector<int> data) {
     cmdCount++;
 }
 
-/**
- * Log the contents of the specified index structure in a fashion that makes the
- * internal structure and contents of the index clear. It is not necessary to be overly
- * verbose here, but you should include information like key values and file offsets
- * where a p p r o p r i a t e .
- * Hint: for d e b u g < t a b > w o r l d t hi n k of a recursive m e t h o d that c a n divide the 2-D
- * world space in 4 parts each time and continue the recursion for a number of times.
- * @param option
- * @param tree
- */
 void Logger::debugWorld(const vector<string> &option, PRQuadTree &tree) {
     vector<string> lines;
     string cmd = "Command " + to_string(cmdCount) + ": " + "debug\t" + option[1] + "\n";
@@ -136,7 +120,6 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     vector<Location> nodes;
 
     // print the grid
-    // add a line of dashes to the beginning and end of the grid. the dash lines also have + at the beginning and end
     string dashLine = "+";
     for (int i = 0; i < 150; i++) {
         dashLine += "-";
@@ -150,7 +133,6 @@ void Logger::printWorld(PRQuadTree &tree, vector<string> &lines) {
     // reverse the grid and the nested vectors
     reverse(grid.begin(), grid.end());
 
-    // reve
 
     for (const auto &row: grid) {
         string rowStr;
@@ -439,9 +421,8 @@ void Logger::whatIsAtLog(vector<string> arguments, vector<Record> records, vecto
 
 }
 
-void Logger::debugPool(BufferPool<Record> bufferPool) {
+void Logger::debugPool(const BufferPool<Record> &bufferPool) {
     string bufferPoolStr;
-    // add "BufferPool: " to the beginning of the string
     bufferPoolStr += "Command " + to_string(cmdCount) + ": debug\tpool\n";
     bufferPoolStr += bufferPool.str();
     bufferPoolStr += separator;
@@ -496,7 +477,7 @@ void Logger::debugHash(const string &hashTableStr, const int &hashCapacity, cons
     cmdCount++;
 }
 
-void Logger::quitLog(std::vector<std::string> arguments) {
+void Logger::quitLog() {
     string quitStr;
     quitStr += "Command " + to_string(cmdCount) + ": quit\n\n";
     quitStr += "Terminating execution of commands. \n\n";
