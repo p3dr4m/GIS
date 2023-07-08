@@ -15,13 +15,12 @@ public:
 
     ~HashTable() = default;
 
-    void insert(const std::string &featureName, const std::string &stateAbbreviation, int offset);
+    bool insert(const std::string &featureName, const std::string &stateAbbreviation, int offset);
 
     std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation);
 
-    int getLongestProbe() const {
-        return longestProbe;
-    }
+    int getLongestProbe();
+
 
     std::string str();
 

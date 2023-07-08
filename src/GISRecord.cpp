@@ -20,7 +20,8 @@ void GISRecord::setBounds(float minLat, float maxLat, float minLong, float maxLo
     coordinateIndex->updateBoundsOfTree(boundingBox);
 }
 
-void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {
+void
+GISRecord::insertRecord(int offset, vector<string> row, int lineNum, int &importedRecords, int &importedLocations) {
     float latDec, lngDec;
 
     string latDecStr = row[PRIM_LAT_DEC];
@@ -44,8 +45,14 @@ void GISRecord::insertRecord(vector<string> row, int lineNum, int offset) {
     }
 
     // Insert lat/long into the coordinate index
-    coordinateIndex->insert(latDec, lngDec, offset, lineNum);
-    nameIndex->insert(row[FEATURE_NAME], row[STATE_ALPHA], offset);
+    bool insertedLocation = coordinateIndex->insert(latDec, lngDec, offset, lineNum);
+    if (insertedLocation) {
+        importedLocations++;
+    }
+    bool insertedRecord = nameIndex->insert(row[FEATURE_NAME], row[STATE_ALPHA], offset);
+    if (insertedRecord) {
+        importedRecords++;
+    }
 }
 
 

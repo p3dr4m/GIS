@@ -46,7 +46,8 @@ public:
 
     void setBounds(float minLat, float maxLat, float minLong, float maxLong);
 
-    void insertRecord(std::vector<std::string> row, int lineNum, int offset);
+    void
+    insertRecord(int offset, std::vector<std::string> row, int lineNum, int &importedRecords, int &importedLocations);
 
     std::vector<int> findRecords(float lat, float lng);
 

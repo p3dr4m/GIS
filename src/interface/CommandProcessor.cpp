@@ -102,6 +102,8 @@ void CommandProcessor::importCmd(vector<string> arguments) {
     }
     string line, word;
     int countingLines = -1;
+    int importedRecords = 0;
+    int importedLocations = 0;
     // Use SystemManager to read the file
     Logger &logger = Logger::getInstance();
     // reading the file from import command and inserting into the quadtree
@@ -119,16 +121,16 @@ void CommandProcessor::importCmd(vector<string> arguments) {
         Coordinate coord = Coordinate(stof(row[PRIM_LONG_DEC]), stof(row[PRIM_LAT_DEC]));
         bool inserted = gisRecord.getTree().isCoordInBox(coord);
 
+        countingLines++;
         if (inserted) {
             int offset = logger.logToDatabase(line);
-            gisRecord.insertRecord(row, countingLines, offset);
+            gisRecord.insertRecord(offset, row, countingLines, importedRecords, importedLocations);
             nameLengths += row[FEATURE_NAME];
-            countingLines++;
         }
     });
     logger.closeDbFile();
-    int nodeCount = countingLines;
-    int importedNames = countingLines;
+    int nodeCount = importedLocations;
+    int importedNames = importedRecords;
     int longestProbe = gisRecord.getLongestProbe();
     unsigned long avgNameLength = nameLengths.size() / nodeCount;
     vector<int> data = {importedNames, longestProbe, nodeCount, static_cast<int>(avgNameLength)};

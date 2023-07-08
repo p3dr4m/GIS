@@ -7,35 +7,34 @@
 
 using namespace std;
 
-void HashTable::insert(const string &featureName, const string &stateAbbreviation, int offset) {
+bool HashTable::insert(const string &featureName, const string &stateAbbreviation, int offset) {
     unsigned int index = hash(featureName, stateAbbreviation);
     HashEntry entry;
     entry.featureName = featureName;
     entry.stateAbbreviation = stateAbbreviation;
     entry.offsets.push_back(offset);
     entry.exists = true;
-    int tempProbe = 1;
+    bool inserted = false;
 
     for (int i = 0; i < capacity; i++) {
         if (!data[index].exists) {
             data[index] = entry;
             size++;
+            inserted = true;
             break;
         } else if (data[index].featureName == featureName && data[index].stateAbbreviation == stateAbbreviation) {
             data[index].offsets.push_back(offset);
+            inserted = true;
             break;
         } else {
             index = (index + i * i) % capacity;
-            tempProbe++;
-            if (tempProbe > longestProbe) {
-                longestProbe = tempProbe;
-            }
         }
     }
 
     if (((size * 1.0) / capacity) >= loadFactor) {
         resize();
     }
+    return inserted;
 }
 
 unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
@@ -54,7 +53,7 @@ unsigned int HashTable::hash(const string &featureName, const string &stateAbbre
 
 void HashTable::resize() {
     capacity *= 2;
-    vector <HashEntry> temp = data;
+    vector<HashEntry> temp = data;
     data.clear();
     data.resize(capacity);
     size = 0;
@@ -68,22 +67,17 @@ void HashTable::resize() {
 vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
     unsigned int originalIndex = index;
-    int i = 0;
 
-    while (data[index].exists &&
-           (data[index].featureName != featureName || data[index].stateAbbreviation != stateAbbreviation)) {
-        i++;
+    for (int i = 0; i < capacity; i++) {
         index = (originalIndex + i * i) % capacity;
-
-        // If we have checked all entries, break
-        if (i == capacity) {
-            return {};
+        bool hasFeatureName = data[index].featureName == featureName;
+//        bool hasFeatureName = data[index].featureName.find(featureName) == std::string::npos;
+        // If the existing entry matches the key
+        if (data[index].exists &&
+            hasFeatureName &&
+            data[index].stateAbbreviation == stateAbbreviation) {
+            return data[index].offsets;
         }
-    }
-
-    // If the existing entry matches the key
-    if (data[index].exists) {
-        return data[index].offsets;
     }
 
     // If the key is not found
@@ -115,3 +109,18 @@ string HashTable::str() {
     return result;
 }
 
+int HashTable::getLongestProbe() {
+    int longestSequence = 0;
+    int currentSequence = 0;
+    for (int i = 0; i < capacity; i++) {
+        if (data[i].exists) {
+            currentSequence++;
+        } else {
+            if (currentSequence > longestSequence) {
+                longestSequence = currentSequence;
+            }
+            currentSequence = 0;
+        }
+    }
+    return longestSequence;
+}

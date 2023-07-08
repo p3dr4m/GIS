@@ -10,8 +10,8 @@ public:
 
     ~NameIndex() = default;
 
-    void insert(const std::string &featureName, const std::string &stateAbbreviation, int offset) {
-        hashTable.insert(featureName, stateAbbreviation, offset);
+    bool insert(const std::string &featureName, const std::string &stateAbbreviation, int offset) {
+        return hashTable.insert(featureName, stateAbbreviation, offset);
     }
 
     std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation) {

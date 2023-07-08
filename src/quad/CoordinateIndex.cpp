@@ -37,6 +37,7 @@ bool CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
         // If it exists, just update the fileOffset and databaseLine
         existingLocation.fileOffset.push_back(fileOffset);
         existingLocation.databaseLine.push_back(dbLine);
+        return true;
     } else {
         // If it doesn't exist, create a new Location and insert it into the QuadTree
         Location newNode;
@@ -46,8 +47,6 @@ bool CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
 
         return quadTree.insert(newNode);
     }
-
-    return true;
 }
 
 vector<int> CoordinateIndex::getOffsetsFromNodes(const vector<Location> &nodes) {

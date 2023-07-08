@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # run make
-make
+make -j14
 
 mv ./GIS.exe ./data
 i=2
