@@ -41,15 +41,7 @@ struct Location {
     Coordinate getCoordinate() const {
         return coordinate;
     }
-
-    float getX() const {
-        return coordinate.longitude;
-    }
-
-    float getY() const {
-        return coordinate.latitude;
-    }
-
+    
     int getXInSec() const {
         return static_cast<int>(std::round(coordinate.longitude * 3600));
     }

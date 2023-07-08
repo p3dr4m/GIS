@@ -83,8 +83,8 @@ int PRQuadTree::getIndex(const Location &location) const {
     float centerX = boundingBox.centerPoint.getX();
     float centerY = boundingBox.centerPoint.getY();
 
-    float x = location.getX();
-    float y = location.getY();
+    float x = location.coordinate.getX();
+    float y = location.coordinate.getY();
 
     // Object can completely fit within the top quadrants
     bool topQuadrant = (y > centerY);
@@ -168,8 +168,8 @@ void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate c
         } else {
             // check each location in the node if it has the same coordinates
             for (const auto &location: locations) {
-                float locationX = location.getX();
-                float locationY = location.getY();
+                float locationX = location.coordinate.getX();
+                float locationY = location.coordinate.getY();
                 float compareX = coord.getX();
                 float compareY = coord.getY();
                 if (nearlyEqual(locationX, compareX, 0.00001) && nearlyEqual(locationY, compareY, 0.00001)) {
