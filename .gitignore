@@ -31,3 +31,7 @@ cmake-build-*/
 build/
 db_test.txt
 log_test.txt
+submit
+db_test*.txt
+log_test*.txt
+*.zip
