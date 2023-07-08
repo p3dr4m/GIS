@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+
 struct Record {
     int offset{};
     std::string line;
@@ -35,16 +36,6 @@ struct Record {
             }
         }
         return row;
-    }
-
-    std::string str() const {
-        // restore the line to original format
-        std::string temp;
-        for (const auto &i: row) {
-            temp += i + "|";
-        }
-        temp.pop_back();
-        return temp;
     }
 
 };

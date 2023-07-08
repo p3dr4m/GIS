@@ -8,6 +8,9 @@
 
 #include "Coordinate.h"
 
+/**
+ * Bounding box is a rectangle that is used to search for a location
+ */
 struct BoundingBox {
     Coordinate centerPoint;
     float halfWidth;

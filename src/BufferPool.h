@@ -61,7 +61,7 @@ public:
         std::stringstream ss;
         ss << "MRU\n";
         for (const auto &item: cacheList) {
-            ss << "  " << item.offset << ": " << item.str() << "\n";
+            ss << "  " << item.offset << ": " << item.line << "\n";
         }
         ss << "LRU\n";
         return ss.str();
