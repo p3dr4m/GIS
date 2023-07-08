@@ -159,7 +159,7 @@ void printDebugQuad(vector<string> &lines, PRQuadTree &tree, int depth = 0) {
             string bufferLine;
             for (auto &location: tree.getLocations()) {
                 string databaseLine;
-                for (const auto &line: location.getDatabaseLine()) {
+                for (const auto &line: location.databaseLine) {
                     databaseLine += to_string(line) + "|";
                 }
                 if (!databaseLine.empty()) {

@@ -50,12 +50,12 @@ bool CoordinateIndex::insert(float latitude, float longitude, int fileOffset, in
     return true;
 }
 
-vector<int> CoordinateIndex::getOffsetsFromNodes(vector<Location> nodes) {
+vector<int> CoordinateIndex::getOffsetsFromNodes(const vector<Location> &nodes) {
     vector<int> fileOffsets;
 
     for (auto &node: nodes) {
-        for (int index = 0; index < node.fileOffset.size(); index++) {
-            fileOffsets.push_back(node.fileOffset[index]);
+        for (int index: node.fileOffset) {
+            fileOffsets.push_back(index);
         }
     }
 

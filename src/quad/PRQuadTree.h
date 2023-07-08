@@ -58,14 +58,6 @@ struct Location {
         return static_cast<int>(std::round(coordinate.latitude * 3600));
     }
 
-    std::vector<int> getFileOffset() const {
-        return fileOffset;
-    }
-
-    std::vector<int> getDatabaseLine() const {
-        return databaseLine;
-    }
-
 };
 
 struct BoundingBox {
