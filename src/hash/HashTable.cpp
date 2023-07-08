@@ -3,8 +3,8 @@
 
 using namespace std;
 
-void HashTable::insert(string featureName, string stateAbbreviation, int offset) {
-    int index = hash(featureName, stateAbbreviation);
+void HashTable::insert(const string &featureName, const string &stateAbbreviation, int offset) {
+    unsigned int index = hash(featureName, stateAbbreviation);
     HashEntry entry;
     entry.featureName = featureName;
     entry.stateAbbreviation = stateAbbreviation;
@@ -34,25 +34,33 @@ void HashTable::insert(string featureName, string stateAbbreviation, int offset)
     }
 }
 
-/**
- * @brief we use elf hash function to hash the key
- * @param featureName
- * @param stateAbbreviation
- * @return
- */
+//unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
+//    string key = featureName + stateAbbreviation;
+//    unsigned int hash = 0;
+//    unsigned int x = 0;
+//    unsigned int i = 0;
+//    unsigned int len = key.length();
+//
+//    for (i = 0; i < len; i++) {
+//        hash = (hash << 4) + (key[i]);
+//        if ((x = hash & 0xF0000000) != 0) {
+//            hash ^= (x >> 24);
+//        }
+//        hash &= ~x;
+//    }
+//
+//    return hash % capacity;
+//}
+
 unsigned int HashTable::hash(const string &featureName, const string &stateAbbreviation) const {
+    // djb2 hash http://www.cse.yorku.ca/~oz/hash.html
     string key = featureName + stateAbbreviation;
-    unsigned int hash = 0;
-    unsigned int x = 0;
+    unsigned int hash = 5381;
     unsigned int i = 0;
     unsigned int len = key.length();
 
     for (i = 0; i < len; i++) {
-        hash = (hash << 4) + (key[i]);
-        if ((x = hash & 0xF0000000) != 0) {
-            hash ^= (x >> 24);
-        }
-        hash &= ~x;
+        hash = ((hash << 5) + hash) + key[i];
     }
 
     return hash % capacity;
@@ -73,7 +81,7 @@ void HashTable::resize() {
 
 vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
-    int originalIndex = index;
+    unsigned int originalIndex = index;
     int i = 0;
 
     while (data[index].exists &&

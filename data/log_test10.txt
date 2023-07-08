@@ -1,0 +1,77 @@
+Course Project for COMP 8042
+Student Name: Raziq Khan, Student Id: A00990021
+Student Name: Pedram Nazari, Student Id: A00931203
+Begin of GIS Program log:
+dbFile:	./db_test10.txt
+script:	./Script10.txt
+log:	./log_test10.txt
+Start Time: Fri Jul 07 17:15:32 PDT 2023
+; Script 9
+;
+; Test of search failures with a large database file.
+;
+; Specify boundaries of coordinate space:
+world	0860000W	0750000W	320000N	430000N
+
+------------------------------------------------------------------------------------------
+Latitude/longitude values in index entries are shown as signed integers, in total seconds.
+------------------------------------------------------------------------------------------
+						World boundaries are set to:
+						           154800
+						-309600              -270000
+						           115200
+------------------------------------------------------------------------------------------
+;
+; Import a large DB file:
+Command 1: import	VA_All.txt
+
+Imported Features by name: 59546
+Longest probe sequence:   28
+Imported Locations:        59546
+Average name length:       18
+------------------------------------------------------------------------------------------
+;
+; Check the location and name/state indices if you dare:
+;debug	quad
+;debug	hash
+;
+; Try a few name/state searches for nonexistent features:
+Command 2: what_is	Bleaksburg	VA
+
+	No records match "Bleaksburg" and "VA"
+------------------------------------------------------------------------------------------
+Command 3: what_is	Nova	VA
+
+	No records match "Nova" and "VA"
+------------------------------------------------------------------------------------------
+Command 4: what_is	Wet Run	VA
+
+	No records match "Wet Run" and "VA"
+------------------------------------------------------------------------------------------
+;
+; Try a location search for an empty location:
+Command 5: what_is_at	383340N	0793423W
+
+	The following feature(s) were found in (38d 33m 40s North, 79d 34m 23s West)
+	4860224:  "Hardscrabble"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+;
+; And a few searches for an empty region:
+Command 6: what_is_in	-long	363206N	0804752W	6	6
+
+	Nothing was found in (80d 47m 52s West, 36d 32m 6s North)
+
+------------------------------------------------------------------------------------------
+Command 7: what_is_in	-filter	water	363206N	0804752W	6	6
+
+	Nothing was found in (36d 32m 6s North, 80d 47m 52s West)
+
+------------------------------------------------------------------------------------------
+;
+; Exit
+Command 8: quit
+
+Terminating execution of commands. 
+
+------------------------------------------------------------------------------------------
+End time: Fri Jul 07 17:15:33 PDT 2023

@@ -3,6 +3,9 @@
 #include <utility>
 #include "CommandProcessor.h"
 #include "Logger.h"
+#include <algorithm>
+#include <string>
+
 
 using namespace std;
 
@@ -82,15 +85,6 @@ void CommandProcessor::worldCmd(vector<string> arguments) {
 
 }
 
-#include <algorithm>
-#include <cctype>
-#include <string>
-
-std::string removeWhitespace(const std::string &input) {
-    std::string output = input;
-    output.erase(std::remove_if(output.begin(), output.end(), ::isspace), output.end());
-    return output;
-}
 
 /**
  * import<tab><relative path>

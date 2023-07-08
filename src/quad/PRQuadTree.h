@@ -101,14 +101,17 @@ struct BoundingBox {
 class PRQuadTree {
 private:
     int MAX_NODES = 4; // max number of nodes in a leaf node
-    int MAX_LEVELS = 1000; // max number of levels in the tree
+    int MAX_LEVELS = 999999999; // max number of levels in the tree
     int level = 0; // the current level of the tree
     std::vector<Location> locations; // the locations in the tree
     BoundingBox boundingBox; // the bounding box of the tree
     std::vector<PRQuadTree *> nodes; // the subtrees of the tree
     std::string id; // the id of the tree
+    bool isInitialized;
+
 public:
-    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id) : level(pLevel), boundingBox(pBox), id(std::move(_id)) {
+    PRQuadTree(int pLevel, BoundingBox pBox, std::string _id, bool init) : level(pLevel), boundingBox(pBox),
+                                                                           id(std::move(_id)), isInitialized(init) {
         nodes.reserve(4);
         level = pLevel;
         // initialize the nodes to nullptr
@@ -129,6 +132,7 @@ public:
         boundingBox = other.boundingBox;
         nodes = other.nodes;
         id = other.id;
+        isInitialized = other.isInitialized;
     }
 
     // copy assignment operator
@@ -137,6 +141,7 @@ public:
         boundingBox = other.boundingBox;
         nodes = other.nodes;
         id = other.id;
+        isInitialized = other.isInitialized;
         return *this;
     }
 
@@ -146,6 +151,7 @@ public:
         boundingBox = other.boundingBox;
         nodes = other.nodes;
         id = other.id;
+        isInitialized = other.isInitialized;
     }
 
     // move assignment operator
@@ -154,6 +160,7 @@ public:
         boundingBox = other.boundingBox;
         nodes = other.nodes;
         id = other.id;
+        isInitialized = other.isInitialized;
         return *this;
     }
 
@@ -209,8 +216,13 @@ public:
             Location temp;
             temp.coordinate = coord;
             int index = getIndex(temp);
+            if (index == -1) {
+                return emptyLocation;
+            }
             if (nodes[index] != nullptr) {
                 return nodes[index]->find(coord);
+            } else {
+                return emptyLocation;
             }
         }
 

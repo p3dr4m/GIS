@@ -26,7 +26,7 @@ public:
 
     ~HashTable() = default;
 
-    void insert(std::string featureName, std::string stateAbbreviation, int offset);
+    void insert(const std::string &featureName, const std::string &stateAbbreviation, int offset);
 
     std::vector<int> find(const std::string &featureName, const std::string &stateAbbreviation);
 

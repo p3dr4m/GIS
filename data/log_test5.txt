@@ -1,0 +1,136 @@
+Course Project for COMP 8042
+Student Name: Raziq Khan, Student Id: A00990021
+Student Name: Pedram Nazari, Student Id: A00931203
+Begin of GIS Program log:
+dbFile:	./db_test5.txt
+script:	./Script05.txt
+log:	./log_test5.txt
+Start Time: Fri Jul 07 17:15:28 PDT 2023
+; Script 4
+;
+; General test of searches with a larger database file.
+;
+; Specify boundaries of coordinate space:
+world	0804500W	0800000W	370000N	374500N
+
+------------------------------------------------------------------------------------------
+Latitude/longitude values in index entries are shown as signed integers, in total seconds.
+------------------------------------------------------------------------------------------
+						World boundaries are set to:
+						           135900
+						-290700              -288000
+						           133200
+------------------------------------------------------------------------------------------
+;
+; Import a smallish DB file:
+Command 1: import	VA_Montgomery.txt
+
+Imported Features by name: 752
+Longest probe sequence:   14
+Imported Locations:        752
+Average name length:       18
+------------------------------------------------------------------------------------------
+;
+; Check the location and name/state indices if you dare:
+;debug	quad
+;debug	hash
+;
+; Try a few name/state searches:
+Command 2: what_is	Paul Derring Hall	VA
+
+  91962: Montgomery (37d 13m 44s North, 80d 25m 33s West)
+------------------------------------------------------------------------------------------
+Command 3: what_is	Holden Hall	VA
+
+  60200: Montgomery (37d 13m 47s North, 80d 25m 24s West)
+------------------------------------------------------------------------------------------
+Command 4: what_is	Sugar Bottom Hollow	VA
+
+  32039: Montgomery (37d 20m 10s North, 80d 19m 17s West)
+------------------------------------------------------------------------------------------
+Command 5: what_is	Blacksburg Quarry	VA
+
+  104925: Montgomery (37d 10m 45s North, 80d 23m 32s West)
+------------------------------------------------------------------------------------------
+;
+; And a few location searches:
+Command 6: what_is_at	371347N	0802514W
+
+	The following feature(s) were found in (37d 13m 47s North, 80d 25m 14s West)
+	93052:  "Torgersen Hall"  "Montgomery"  "VA"
+------------------------------------------------------------------------------------------
+Command 7: what_is_at	370817N	0802808W
+
+	The following feature(s) were found in (37d 8m 17s North, 80d 28m 8s West)
+	18358:  "Barringer Mountain"  "Montgomery"  "VA"
+------------------------------------------------------------------------------------------
+Command 8: what_is_at	371105N	0803133W
+
+	The following feature(s) were found in (37d 11m 5s North, 80d 31m 33s West)
+	41367:  "Radford AAP Heliport"  "Montgomery"  "VA"
+------------------------------------------------------------------------------------------
+;
+; And a few region searches:
+Command 9: what_is_in	371347N	0802514W	5	5
+
+The following 12 feature(s) were found in (37d 13m 47s North +/- 5 , 80d 25m 14s West +/- 5)
+
+	49249:  "Brodie Hall"  "VA" (37d 13m 48s North, 80d 25m 12s West)
+	64598:  "Lane Hall"  "VA" (37d 13m 51s North, 80d 25m 11s West)
+	66603:  "Major Williams Dormitory"  "VA" (37d 13m 51s North, 80d 25m 15s West)
+	71562:  "Newman Library"  "VA" (37d 13m 44s North, 80d 25m 10s West)
+	77757:  "Rasche Hall"  "VA" (37d 13m 51s North, 80d 25m 9s West)
+	92489:  "Robert Femoyer Hall"  "VA" (37d 13m 52s North, 80d 25m 17s West)
+	93052:  "Torgersen Hall"  "VA" (37d 13m 47s North, 80d 25m 14s West)
+	93361:  "War Memorial Chapel"  "VA" (37d 13m 43s North, 80d 25m 15s West)
+	93642:  "William H "Bosco" Rasche Hall"  "VA" (37d 13m 50s North, 80d 25m 9s West)
+	94590:  "Arts and Science Administration Building"  "VA" (37d 13m 52s North, 80d 25m 13s West)
+	97755:  "James H Lane Hall"  "VA" (37d 13m 51s North, 80d 25m 12s West)
+	98725:  "Major Lloyd W Williams Hall"  "VA" (37d 13m 52s North, 80d 25m 16s West)
+------------------------------------------------------------------------------------------
+Command 10: what_is_in	371105N	0803133W	5	5
+
+The following 1 feature(s) were found in (37d 11m 5s North +/- 5 , 80d 31m 33s West +/- 5)
+
+	41367:  "Radford AAP Heliport"  "VA" (37d 11m 5s North, 80d 31m 33s West)
+------------------------------------------------------------------------------------------
+Command 11: what_is_in	370822N	0802430W	10	10
+
+The following 3 feature(s) were found in (37d 8m 22s North +/- 10 , 80d 24m 30s West +/- 10)
+
+	20695:  "Christiansburg Institute"  "VA" (37d 8m 22s North, 80d 24m 30s West)
+	53746:  "Church of God in Christ"  "VA" (37d 8m 12s North, 80d 24m 26s West)
+	102900:  "Tekoa Community School"  "VA" (37d 8m 21s North, 80d 24m 38s West)
+------------------------------------------------------------------------------------------
+;
+; This one's special because there's nothing at the given coordinates,
+; but there is something within the box centered there:
+Command 12: what_is_in	372230N	0802230W	120	120
+
+The following 1 feature(s) were found in (37d 22m 30s North +/- 120 , 80d 22m 30s West +/- 120)
+
+	20120:  "Bruisers Knob"  "VA" (37d 21m 11s North, 80d 20m 37s West)
+------------------------------------------------------------------------------------------
+;
+; And a few search failures:
+Command 13: what_is	Monterey	VA
+
+	No records match "Monterey" and "VA"
+------------------------------------------------------------------------------------------
+Command 14: what_is_at	371347N	0804505W
+
+	Nothing was found at (37d 13m 47s North, 80d 45m 5s West)
+------------------------------------------------------------------------------------------
+Command 15: what_is_in	372230N	0802230W	10	10
+
+	Nothing was found in (37d 22m 30s North +/- 10 , 80d 22m 30s West +/- 10)
+
+------------------------------------------------------------------------------------------
+;
+; Exit
+Command 16: quit
+
+Terminating execution of commands. 
+
+------------------------------------------------------------------------------------------
+End time: Fri Jul 07 17:15:28 PDT 2023

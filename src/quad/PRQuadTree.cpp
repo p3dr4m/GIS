@@ -4,6 +4,10 @@
 using namespace std;
 
 bool PRQuadTree::isCoordInBox(Coordinate coord, BoundingBox box) {
+    // Check if boundingBox is initialized
+    if (!isInitialized) {
+        return false;
+    }
     // Check if the coordinate is not within the latitude boundaries of the box
     if (coord.latitude < box.getBottomRight().latitude || coord.latitude > box.getTopLeft().latitude) {
         return false;
@@ -104,16 +108,16 @@ void PRQuadTree::split() {
 
     nodes[0] = new PRQuadTree(level + 1,
                               BoundingBox(Coordinate(centerX - quarterWidth, centerY + quarterHeight), quarterWidth,
-                                          quarterHeight), "tl");
+                                          quarterHeight), "tl", true);
     nodes[1] = new PRQuadTree(level + 1,
                               BoundingBox(Coordinate(centerX + quarterWidth, centerY + quarterHeight), quarterWidth,
-                                          quarterHeight), "tr");
+                                          quarterHeight), "tr", true);
     nodes[2] = new PRQuadTree(level + 1,
                               BoundingBox(Coordinate(centerX - quarterWidth, centerY - quarterHeight), quarterWidth,
-                                          quarterHeight), "bl");
+                                          quarterHeight), "bl", true);
     nodes[3] = new PRQuadTree(level + 1,
                               BoundingBox(Coordinate(centerX + quarterWidth, centerY - quarterHeight), quarterWidth,
-                                          quarterHeight), "br");
+                                          quarterHeight), "br", true);
 }
 
 void PRQuadTree::clear() {
@@ -225,6 +229,10 @@ vector<Location> PRQuadTree::getLocations() {
 }
 
 bool PRQuadTree::isCoordInBox(Coordinate coord) {
+    // Check if boundingBox is initialized
+    if (!isInitialized) {
+        return false;
+    }
     // Check if the coordinate is not within the latitude boundaries of the box
     if (coord.latitude < boundingBox.getBottomRight().latitude || coord.latitude > boundingBox.getTopLeft().latitude) {
         return false;

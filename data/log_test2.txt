@@ -1,0 +1,340 @@
+Course Project for COMP 8042
+Student Name: Raziq Khan, Student Id: A00990021
+Student Name: Pedram Nazari, Student Id: A00931203
+Begin of GIS Program log:
+dbFile:	./db_test2.txt
+script:	./Script02.txt
+log:	./log_test2.txt
+Start Time: Fri Jul 07 17:15:28 PDT 2023
+; Script 1
+;
+; Very basic testing of the simple search commands with a tiny DB.
+;
+; Specify boundaries of coordinate space:
+world	0794130W	0792630W	381500N	383000N
+
+------------------------------------------------------------------------------------------
+Latitude/longitude values in index entries are shown as signed integers, in total seconds.
+------------------------------------------------------------------------------------------
+						World boundaries are set to:
+						           138600
+						-286890              -285990
+						           137700
+------------------------------------------------------------------------------------------
+;
+; Import some data:
+Command 1: import	VA_Monterey.txt
+
+Imported Features by name: 62
+Longest probe sequence:   3
+Imported Locations:        62
+Average name length:       14
+------------------------------------------------------------------------------------------
+;
+; Let's take a look at our data set... this is NOT a required feature
+; and you may comment the following command out:
+Command 2: debug	world
+
++------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                              1                 2                                                     |
+|                                                                                                                                                      |
+|                 2                                  4                                                                     2                           |
+|                                                                                                                                                      |
+|                                                                                                    1                                                 |
+|                                                                              1                                                                       |
+|                                                                                                                                                      |
+|                                                                                             1                                                        |
+|                                                                                                                                                      |
+|                                                                                           1        2                                  3              |
+|        4                                                                                                        1                                    |
+|                                                                                           2        1                                  3              |
+|                                                    4                                                                                                 |
+|                                                                                                                                                      |
+|                     2                                                                                       2       2        2        1              |
+|        2                                                                     1                                                                       |
+|                              3                                                                                      1        1        1              |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                 2                                                                     1                                                              |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
+|                                                                                                                                                      |
++------------------------------------------------------------------------------------------------------------------------------------------------------+
+------------------------------------------------------------------------------------------
+;
+; Check the location and name/state indices:
+Command 3: debug	quad
+
+root@
+   tl@
+      tl*
+      tr[(138532,-286612), 21] [(138508,-286475), 37] 
+      bl*
+      br@
+         tl[(138326,-286638), 17] [(138315,-286582), 26] 
+         tr@
+            tl[(138341,-286500), 25] 
+            tr*
+            bl*
+            br@
+               tl*
+               tr[(138309,-286449), 3] 
+               bl@
+                  tl[(138284,-286490), 53] [(138282,-286486), 58] [(138282,-286491), 61] 
+                  tr*
+                  bl[(138266,-286484), 15] [(138267,-286486), 57] 
+                  br*
+               br*
+         bl[(138234,-286561), 42] 
+         br[(138257,-286517), 52] 
+   tr@
+      tl@
+         tl@
+            tl[(138593,-286403), 5] [(138593,-286390), 11] [(138574,-286428), 46] 
+            tr[(138593,-286342), 1] [(138591,-286358), 20] [(138597,-286383), 55] 
+            bl*
+            br*
+         tr@
+            tl[(138576,-286313), 9] 
+            tr[(138580,-286263), 13] 
+            bl[(138530,-286299), 12] [(138492,-286316), 47] 
+            br[(138536,-286231), 10|34] 
+         bl[(138414,-286329), 32] 
+         br@
+            tl[(138445,-286319), 22] [(138438,-286321), 41] 
+            tr[(138486,-286269), 28] 
+            bl[(138424,-286301), 36] [(138413,-286324), 39] 
+            br*
+      tr*
+      bl@
+         tl@
+            tl[(138367,-286392), 0] [(138370,-286393), 40] 
+            tr[(138352,-286353), 49] 
+            bl[(138293,-286416), 48] 
+            br[(138312,-286345), 31] [(138287,-286337), 59] 
+         tr*
+         bl*
+         br[(138193,-286273), 45] 
+      br[(138302,-286213), 29] 
+   bl@
+      tl*
+      tr[(137945,-286479), 16] [(138023,-286502), 19] [(138047,-286523), 50] [(138080,-286562), 60] 
+      bl*
+      br[(137860,-286627), 14] [(137896,-286628), 51] 
+   br@
+      tl[(137942,-286438), 2] [(138108,-286269), 23] [(138105,-286231), 30] [(138012,-286374), 43] 
+      tr*
+      bl@
+         tl*
+         tr@
+            tl*
+            tr[(137904,-286253), 8] [(137891,-286219), 38] [(137889,-286229), 54] 
+            bl[(137827,-286304), 7] [(137845,-286311), 27] 
+            br*
+         bl[(137756,-286433), 4] [(137773,-286358), 6] [(137772,-286376), 44] [(137772,-286356), 56] 
+         br[(137725,-286314), 18] [(137708,-286224), 24] 
+      br[(137722,-286212), 33] [(137731,-286205), 35] 
+------------------------------------------------------------------------------------------
+Command 4: debug	hash
+
+Format of display is
+Slot number: data record 
+Current table size is 1024
+Number of elements in table is 62
+
+	1: [Highland Wildlife Management Area VA, [2219]]
+	6: [Clover Creek Presbyterian Church VA, [7688]]
+	21: [Southall Chapel VA, [4582]]
+	34: [Central Church VA, [685]]
+	35: [Frank Run VA, [1553]]
+	61: [Monterey Methodist Episcopal Church VA, [7976]]
+	85: [Trimble Knob VA, [7169]]
+	117: [Monterey District VA, [8261]]
+	127: [Swope Hollow VA, [4866]]
+	141: [Elk Run VA, [1277]]
+	168: [Strait Creek School (historical) VA, [8120]]
+	177: [Bluegrass Valley VA, [122]]
+	182: [Laurel Run VA, [3045]]
+	187: [Mount Carlyle VA, [560]]
+	192: [Seldom Seen Hollow VA, [4137]]
+	209: [Clover Creek VA, [6167]]
+	291: [New Hampden VA, [6418]]
+	296: [Davis Run VA, [1120]]
+	317: [Claylick Hollow VA, [808]]
+	393: [Crab Run VA, [968]]
+	399: [Hannah Field Airport VA, [5901]]
+	423: [Seybert Chapel VA, [4303]]
+	428: [Town of Monterey VA, [8399]]
+	431: [Blue Grass School (historical) VA, [7549]]
+	434: [Union Chapel VA, [5155]]
+	437: [Gulf Mountain VA, [1830]]
+	438: [Seybert Hills VA, [6795]]
+	446: [Rich Hills VA, [6676]]
+	512: [West Strait Creek VA, [5436]]
+	517: [Hamilton Chapel VA, [1953]]
+	541: [Wooden Run VA, [5749]]
+	554: [Buck Hill VA, [282]]
+	555: [Trimble VA, [7042]]
+	562: [Burners Run VA, [404]]
+	573: [Doe Hill VA, [6300]]
+	589: [Sounding Knob VA, [6916]]
+	599: [Simmons Run VA, [4426]]
+	611: [Highland High School VA, [2080]]
+	618: [Meadow Draft VA, [3327]]
+	619: [Little Doe Hill VA, [3200]]
+	633: [Highland Elementary School VA, [7832]]
+	670: [Vance Hollow VA, [5276]]
+	690: [Thorny Bottom Church VA, [5026]]
+	709: [Smith Field VA, [7425]]
+	737: [Bear Mountain VA, [6041]]
+	752: [Lantz Mountain VA, [2921]]
+	754: [White Run VA, [5598]]
+	762: [Key Run VA, [2769]]
+	780: [Possum Trot VA, [6547]]
+	783: [Monterey VA, [7289]]
+	829: [Strait Creek VA, [4709]]
+	850: [Ginseng Mountain VA, [1707]]
+	851: [Hupman Valley VA, [2484]]
+	876: [Forks of Waters VA, [1429]]
+	900: [Miracle Ridge VA, [3486]]
+	901: [Barren Rock VA, [4016]]
+	943: [Asbury Church VA, [0]]
+	948: [Peck Run VA, [3863]]
+	960: [Jack Mountain VA, [2644]]
+	981: [New Salem Church VA, [3735]]
+	986: [Monterey Mountain VA, [3608]]
+	993: [Hightown Church VA, [2361]]
+------------------------------------------------------------------------------------------
+;
+; Let's try a single-match name/state search:
+Command 5: what_is	Trimble Knob	VA
+
+  7169: Highland (38d 24m 17s North, 79d 35m 17s West)
+------------------------------------------------------------------------------------------
+;
+; Let's check the buffer pool:
+Command 6: debug	pool
+MRU
+  7169: 1496326|Trimble Knob|Summit|VA|51|Highland|091|382417N|0793517W|38.404843|-79.5881037|||||952|3123|Monterey|09/28/1979
+LRU
+------------------------------------------------------------------------------------------
+;
+; Let's try a single-match location search:
+Command 7: what_is_at	382812N	0793156W
+
+	The following feature(s) were found in (38d 28m 12s North, 79d 31m 56s West)
+	6547:  "Possum Trot"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+;
+; Let's check the buffer pool:
+Command 8: debug	pool
+MRU
+  6547: 1496110|Possum Trot|Populated Place|VA|51|Highland|091|382812N|0793156W|38.4701196|-79.5322693|||||768|2520|Monterey|09/28/1979
+  7169: 1496326|Trimble Knob|Summit|VA|51|Highland|091|382417N|0793517W|38.404843|-79.5881037|||||952|3123|Monterey|09/28/1979
+LRU
+------------------------------------------------------------------------------------------
+;
+; Let's try a few more name/state searches:
+Command 9: what_is	Swope Hollow	VA
+
+  4866: Highland (38d 15m 31s North, 79d 30m 5s West)
+------------------------------------------------------------------------------------------
+Command 10: what_is	Possum Trot	VA
+
+  6547: Highland (38d 28m 12s North, 79d 31m 56s West)
+------------------------------------------------------------------------------------------
+Command 11: what_is	Blue Grass	VA
+
+	No records match "Blue Grass" and "VA"
+------------------------------------------------------------------------------------------
+;
+; Let's check the buffer pool:
+Command 12: debug	pool
+MRU
+  6547: 1496110|Possum Trot|Populated Place|VA|51|Highland|091|382812N|0793156W|38.4701196|-79.5322693|||||768|2520|Monterey|09/28/1979
+  4866: 1487758|Swope Hollow|Valley|VA|51|Highland|091|381531N|0793005W|38.2587359|-79.5014329|381619N|0793014W|38.2719444|-79.5038889|541|1775|Monterey SE|09/28/1979
+  7169: 1496326|Trimble Knob|Summit|VA|51|Highland|091|382417N|0793517W|38.404843|-79.5881037|||||952|3123|Monterey|09/28/1979
+LRU
+------------------------------------------------------------------------------------------
+;
+; Let's try a few more location searches:
+Command 13: what_is_at	382145N	0793031W
+
+	The following feature(s) were found in (38d 21m 45s North, 79d 30m 31s West)
+	4137:  "Seldom Seen Hollow"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+Command 14: what_is_at	382442N	0793451W
+
+	The following feature(s) were found in (38d 24m 42s North, 79d 34m 51s West)
+	7289:  "Monterey"  "Highland"  "VA"
+	7976:  "Monterey Methodist Episcopal Church"  "Highland"  "VA"
+	8399:  "Town of Monterey"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+Command 15: what_is_at	382607N	0793312W
+
+	The following feature(s) were found in (38d 26m 7s North, 79d 33m 12s West)
+	0:  "Asbury Church"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+;
+; Let's check the buffer pool:
+Command 16: debug	pool
+MRU
+  0: 1481345|Asbury Church|Church|VA|51|Highland|091|382607N|0793312W|38.4353981|-79.5533807|||||818|2684|Monterey|09/28/1979
+  8399: 2391311|Town of Monterey|Civil|VA|51|Highland|091|382442N|0793451W|38.4115829|-79.580854|||||884|2900|Monterey|02/19/2008
+  7976: 1673777|Monterey Methodist Episcopal Church|Church|VA|51|Highland|091|382442N|0793446W|38.4117874|-79.5794924|||||880|2887|Monterey|11/13/1995
+  7289: 1498517|Monterey|Populated Place|VA|51|Highland|091|382444N|0793450W|38.4123429|-79.5806036|||||882|2894|Monterey|09/28/1979
+  4137: 1486995|Seldom Seen Hollow|Valley|VA|51|Highland|091|382145N|0793031W|38.3626223|-79.5086563|382227N|0793004W|38.3741667|-79.5011111|750|2461|Monterey SE|09/28/1979
+  6547: 1496110|Possum Trot|Populated Place|VA|51|Highland|091|382812N|0793156W|38.4701196|-79.5322693|||||768|2520|Monterey|09/28/1979
+  4866: 1487758|Swope Hollow|Valley|VA|51|Highland|091|381531N|0793005W|38.2587359|-79.5014329|381619N|0793014W|38.2719444|-79.5038889|541|1775|Monterey SE|09/28/1979
+  7169: 1496326|Trimble Knob|Summit|VA|51|Highland|091|382417N|0793517W|38.404843|-79.5881037|||||952|3123|Monterey|09/28/1979
+LRU
+------------------------------------------------------------------------------------------
+;
+; Let's try a two-match location search:
+Command 17: what_is_at	382856N	0793031W
+
+	The following feature(s) were found in (38d 28m 56s North, 79d 30m 31s West)
+	1429:  "Forks of Waters"  "Highland"  "VA"
+	4709:  "Strait Creek"  "Highland"  "VA"
+------------------------------------------------------------------------------------------
+;
+; Let's check the buffer pool:
+Command 18: debug	pool
+MRU
+  4709: 1487661|Strait Creek|Stream|VA|51|Highland|091|382856N|0793031W|38.4823417|-79.5086575|382442N|0793222W|38.4116667|-79.5394444|705|2313|Monterey|09/28/1979
+  1429: 1483492|Forks of Waters|Locale|VA|51|Highland|091|382856N|0793031W|38.4823417|-79.5086575|||||705|2313|Monterey|09/28/1979
+  0: 1481345|Asbury Church|Church|VA|51|Highland|091|382607N|0793312W|38.4353981|-79.5533807|||||818|2684|Monterey|09/28/1979
+  8399: 2391311|Town of Monterey|Civil|VA|51|Highland|091|382442N|0793451W|38.4115829|-79.580854|||||884|2900|Monterey|02/19/2008
+  7976: 1673777|Monterey Methodist Episcopal Church|Church|VA|51|Highland|091|382442N|0793446W|38.4117874|-79.5794924|||||880|2887|Monterey|11/13/1995
+  7289: 1498517|Monterey|Populated Place|VA|51|Highland|091|382444N|0793450W|38.4123429|-79.5806036|||||882|2894|Monterey|09/28/1979
+  4137: 1486995|Seldom Seen Hollow|Valley|VA|51|Highland|091|382145N|0793031W|38.3626223|-79.5086563|382227N|0793004W|38.3741667|-79.5011111|750|2461|Monterey SE|09/28/1979
+  6547: 1496110|Possum Trot|Populated Place|VA|51|Highland|091|382812N|0793156W|38.4701196|-79.5322693|||||768|2520|Monterey|09/28/1979
+  4866: 1487758|Swope Hollow|Valley|VA|51|Highland|091|381531N|0793005W|38.2587359|-79.5014329|381619N|0793014W|38.2719444|-79.5038889|541|1775|Monterey SE|09/28/1979
+  7169: 1496326|Trimble Knob|Summit|VA|51|Highland|091|382417N|0793517W|38.404843|-79.5881037|||||952|3123|Monterey|09/28/1979
+LRU
+------------------------------------------------------------------------------------------
+;
+; Exit
+Command 19: quit
+
+Terminating execution of commands. 
+
+------------------------------------------------------------------------------------------
+End time: Fri Jul 07 17:15:28 PDT 2023
