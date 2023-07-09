@@ -174,7 +174,7 @@ void PRQuadTree::getNodeByCoordinate(vector<Location> &returnNodes, Coordinate c
                 float locationY = location.coordinate.getY();
                 float compareX = coord.getX();
                 float compareY = coord.getY();
-                if (nearlyEqual(locationX, compareX, 0.00001) && nearlyEqual(locationY, compareY, 0.00001)) {
+                if (nearlyEqual(locationX, compareX, 0.000005) && nearlyEqual(locationY, compareY, 0.000005)) {
                     returnNodes.push_back(location);
                 }
 
