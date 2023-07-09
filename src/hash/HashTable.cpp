@@ -26,9 +26,8 @@ bool HashTable::insert(const string &featureName, const string &stateAbbreviatio
             data[index].offsets.push_back(offset);
             inserted = true;
             break;
-        } else {
-            index = (index + i * i) % capacity;
         }
+        index = (index + i * i) % capacity;
     }
 
     if (((size * 1.0) / capacity) >= loadFactor) {
@@ -52,32 +51,41 @@ unsigned int HashTable::hash(const string &featureName, const string &stateAbbre
 }
 
 void HashTable::resize() {
-    capacity *= 2;
+    int oldCapacity = capacity;
+    capacity *= 2; // Increase capacity
+    capacity = nextPrime(capacity); // Ensure capacity is prime
+
     vector<HashEntry> temp = data;
     data.clear();
     data.resize(capacity);
     size = 0;
-    for (auto &entry: temp) {
-        if (entry.exists) {
-            insert(entry.featureName, entry.stateAbbreviation, entry.offsets[0]);
+
+    // Rehash the entries from old hash table
+    for (int i = 0; i < oldCapacity; i++) {
+        if (temp[i].exists) {
+            for (int offset: temp[i].offsets) {
+                insert(temp[i].featureName, temp[i].stateAbbreviation, offset);
+            }
         }
     }
 }
+
 
 vector<int> HashTable::find(const string &featureName, const string &stateAbbreviation) {
     unsigned int index = hash(featureName, stateAbbreviation);
     unsigned int originalIndex = index;
 
     for (int i = 0; i < capacity; i++) {
-        index = (originalIndex + i * i) % capacity;
-        bool hasFeatureName = data[index].featureName == featureName;
-//        bool hasFeatureName = data[index].featureName.find(featureName) == std::string::npos;
+        string featureNameHash = data[index].featureName;
+        bool hasFeatureName = featureNameHash == featureName;
+        bool hasStateAbbreviation = data[index].stateAbbreviation == stateAbbreviation;
         // If the existing entry matches the key
-        if (data[index].exists &&
-            hasFeatureName &&
-            data[index].stateAbbreviation == stateAbbreviation) {
-            return data[index].offsets;
+        if (data[index].exists) {
+            if (hasFeatureName && hasStateAbbreviation) {
+                return data[index].offsets;
+            }
         }
+        index = (originalIndex + i * i) % capacity;
     }
 
     // If the key is not found
