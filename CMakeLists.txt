@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.23.2)
-project(8042_project)
+project(GIS CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(THREADS_PREFER_PTHREAD_FLAG ON)

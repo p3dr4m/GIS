@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GIS (linux)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="./db_test.txt ./script01.txt ./log_test.txt " REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="8042_project" TARGET_NAME="GIS" CONFIG_NAME="Debug-WSL" RUN_TARGET_PROJECT_NAME="8042_project" RUN_TARGET_NAME="GIS">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>
